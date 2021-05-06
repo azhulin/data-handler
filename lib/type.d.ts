@@ -7,5 +7,5 @@ export declare type Config = BaseConfig & {
 };
 export declare type Definition = BaseDefinition & Config;
 export declare type Settings = BaseSettings & {
-    config: Config;
+    config?: Config;
 };

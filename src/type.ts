@@ -18,5 +18,5 @@ export type Config = BaseConfig & {
 export type Definition = BaseDefinition & Config
 
 export type Settings = BaseSettings & {
-  config: Config
+  config?: Config
 }
