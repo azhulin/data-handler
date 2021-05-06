@@ -52,7 +52,7 @@ export default abstract class Handler extends BaseHandler {
   /**
    * {@inheritdoc}
    */
-  public validate(data: unknown, baseContext?: BaseContext): Promise<unknown> {
+  public async validate(data: unknown, baseContext?: BaseContext): Promise<unknown> {
     return this.inInput(data).toBase(baseContext)
   }
 
@@ -162,7 +162,7 @@ export default abstract class Handler extends BaseHandler {
    * Returns store data from base data.
    */
   protected async formatBaseToStore(data: unknown, baseContext?: BaseContext): Promise<unknown> {
-    const context = this.getContext(baseContext)
+    const context = await this.getContext(baseContext)
     if (!await this.isStorable(context)) {
       return undefined
     }
@@ -179,7 +179,7 @@ export default abstract class Handler extends BaseHandler {
    * Returns output data from base data.
    */
   protected async formatBaseToOutput(data: unknown, baseContext?: BaseContext): Promise<unknown> {
-    const context = this.getContext(baseContext)
+    const context = await this.getContext(baseContext)
     if (!await this.isOutputable(context)) {
       return undefined
     }
@@ -196,7 +196,7 @@ export default abstract class Handler extends BaseHandler {
    * Returns base data from store data.
    */
   protected async formatStoreToBase(data: unknown, baseContext?: BaseContext): Promise<unknown> {
-    const context = this.getContext(baseContext)
+    const context = await this.getContext(baseContext)
     if (!await this.isStorable(context) || this.isOmitted(data)) {
       data = await this.getDefault(context)
     }
