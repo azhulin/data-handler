@@ -76,11 +76,11 @@ export default class NumberHandler extends Data.Handler {
     Object.entries(map).forEach(([prop, flag]) =>
       this[prop as Prop] = (config.span ?? "-0+").includes(flag))
     if (Object.keys(map).every(property => !(this[property as Prop]))) {
-      throw new Data.Error.Internal(`${this.name} configuration is invalid. Invalid 'span' property.`)
+      throw new Data.Error.Unexpected(`${this.name} configuration is invalid. Invalid 'span' property.`)
     }
     this.decimals = config.decimals ?? this.decimals
     if (null !== this.decimals && !Data.Util.isIndex(this.decimals)) {
-      throw new Data.Error.Internal(`${this.name} configuration is invalid. Invalid 'decimals' property.`)
+      throw new Data.Error.Unexpected(`${this.name} configuration is invalid. Invalid 'decimals' property.`)
     }
   }
 

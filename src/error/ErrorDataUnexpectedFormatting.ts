@@ -2,14 +2,14 @@ import type { Format, Path } from "../type"
 import { Error } from "@azhulin/data-validator"
 
 /**
- * The data format internal error.
+ * The data formatting unexpected error.
  */
-export default class ErrorDataInternalFormat extends Error.Internal {
+export default class ErrorDataUnexpectedFormatting extends Error.Unexpected {
 
   /**
    * {@inheritdoc}
    */
-  public type: string = "data.internal.format"
+  public type: string = "data.unexpected.formatting"
 
   /**
    * Constructor for the ErrorDataInternalFormat object.

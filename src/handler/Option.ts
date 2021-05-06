@@ -47,11 +47,11 @@ export default class Option extends Data.Handler {
     const config: Config = settings.config
     this.keyType = config.key_type ?? this.keyType
     if (!["number", "string"].includes(this.keyType)) {
-      throw new Data.Error.Internal(`${this.name} configuration is invalid. Invalid 'key_type' property.`)
+      throw new Data.Error.Unexpected(`${this.name} configuration is invalid. Invalid 'key_type' property.`)
     }
     this.options = config.options ?? this.options
     if (!this.optionKeys().every(key => this.isValidKeyType(key))) {
-      throw new Data.Error.Internal(`${this.name} configuration is invalid. Option keys don't match key type.`)
+      throw new Data.Error.Unexpected(`${this.name} configuration is invalid. Option keys don't match key type.`)
     }
   }
 

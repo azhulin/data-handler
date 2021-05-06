@@ -131,7 +131,7 @@ export default abstract class Handler extends BaseHandler {
         break
 
       default:
-        throw new Error.Internal("Invalid data format conversion.")
+        throw new Error.Unexpected("Invalid data format conversion.")
     }
     this.format = format
     return this.data
@@ -172,7 +172,7 @@ export default abstract class Handler extends BaseHandler {
     if (this.isValidBaseData(data)) {
       return this.baseToStore(data, context)
     }
-    throw new Error.InternalFormat(this.path, this.id, Format.base, Format.store, data)
+    throw new Error.UnexpectedFormatting(this.path, this.id, Format.base, Format.store, data)
   }
 
   /**
@@ -189,7 +189,7 @@ export default abstract class Handler extends BaseHandler {
     if (this.isValidBaseData(data)) {
       return this.baseToOutput(data, context)
     }
-    throw new Error.InternalFormat(this.path, this.id, Format.base, Format.output, data)
+    throw new Error.UnexpectedFormatting(this.path, this.id, Format.base, Format.output, data)
   }
 
   /**
@@ -206,7 +206,7 @@ export default abstract class Handler extends BaseHandler {
     if (this.isValidStoreData(data)) {
       return this.storeToBase(data, context)
     }
-    throw new Error.InternalFormat(this.path, this.id, Format.store, Format.base, data)
+    throw new Error.UnexpectedFormatting(this.path, this.id, Format.store, Format.base, data)
   }
 
   /**

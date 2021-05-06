@@ -70,7 +70,7 @@ export default class List extends Data.Handler {
     super(settings)
     const config: Config = settings.config
     if (!config.item) {
-      throw new Data.Error.Internal(`${this.name} configuration is invalid. Missing 'item' property.`)
+      throw new Data.Error.Unexpected(`${this.name} configuration is invalid. Missing 'item' property.`)
     }
     this.item = config.item
     const { id, name } = this.getHandler()
