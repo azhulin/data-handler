@@ -23,7 +23,7 @@ export default class Manager extends PluginManager {
   public handler(type: string, config?: Config): Handler
   public handler(type: string | Definition, config?: Config): Handler {
     ({ type, ...config } = Handler.definitionNormalize(type, config))
-    const settings: Settings = { config, pluginManager: this }
+    const settings: Settings = { config, manager: this }
     return this.instance(type, settings)
   }
 
