@@ -1,7 +1,4 @@
-import { Error } from "@azhulin/data-validator"
-import ErrorDataInternalFormat from "./error/ErrorDataInternalFormat"
+import InternalFormat from "./error/ErrorDataInternalFormat"
 
-export default {
-  ...Error,
-  InternalFormat: ErrorDataInternalFormat,
-}
+export * from "@azhulin/data-validator/lib/error"
+export { InternalFormat }

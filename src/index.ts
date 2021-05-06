@@ -1,4 +1,4 @@
-import Error from "./error"
+import * as Error from "./error"
 import Format from "./Format"
 import Handler from "./Handler"
 import Manager from "./Manager"

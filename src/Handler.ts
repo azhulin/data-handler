@@ -2,7 +2,7 @@ import type {
   BaseContext, Config, Context, Definition, Path, Property, Settings,
 } from "./type"
 import { Handler as BaseHandler } from "@azhulin/data-validator"
-import Error from "./error"
+import * as Error from "./error"
 import Format from "./Format"
 
 /**
