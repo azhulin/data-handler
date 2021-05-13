@@ -30,7 +30,7 @@ export declare class Handler extends List.Handler {
     constructor(settings: Data.Settings);
 }
 export declare function conf(config?: Config): {
-    accept?: Data.Property<boolean, Data.Context>;
+    input?: Data.Property<boolean, Data.Context>;
     require?: Data.Property<boolean, Data.Context>;
     default?: Partial<Data.Default>;
     preprocessors?: Data.Processor[];
