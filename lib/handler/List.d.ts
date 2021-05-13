@@ -1,11 +1,11 @@
 import * as Data from "..";
 export declare type Config = Data.Config & {
-    item?: string | Data.Definition;
+    item: Data.Definition;
 };
 /**
  * The list data handler class.
  */
-export default class List extends Data.Handler {
+export declare class Handler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
@@ -25,7 +25,7 @@ export default class List extends Data.Handler {
     /**
      * The list item definition.
      */
-    protected item: string | Data.Definition;
+    protected item: Data.Definition;
     /**
      * The list item type ID.
      */
@@ -63,7 +63,7 @@ export default class List extends Data.Handler {
      */
     protected storeToBase(data: unknown[], context: Data.Context): Promise<unknown[]>;
     /**
-     * Common inputToBase/baseToStore/baseToOutput/storeToBase handler.
+     * Performs format conversion.
      */
     protected convert(method: "toBase" | "toStore" | "toOutput", data: unknown[], context: Data.Context): Promise<unknown[]>;
     /**
@@ -71,4 +71,16 @@ export default class List extends Data.Handler {
      */
     protected getHandler(index?: number, data?: unknown): Data.Handler;
 }
-export { List as Handler };
+export declare function conf(config: Config): {
+    accept?: Data.Property<boolean, Data.Context>;
+    require?: Data.Property<boolean, Data.Context>;
+    default?: Partial<Data.Default>;
+    preprocessors?: Data.Processor[];
+    constraints?: Data.Constraint[];
+    postprocessors?: Data.Processor[];
+    store?: Data.Property<boolean, Data.Context>;
+    output?: Data.Property<boolean, Data.Context>;
+    item: Data.Definition;
+    Handler: typeof Handler;
+};
+export declare function init(config: Config): Handler;

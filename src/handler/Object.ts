@@ -1,15 +1,15 @@
 import * as Data from ".."
 
 export type Config = Data.Config & {
-  schema?: Data.Schema
+  schema: Data.Schema
   reduce?: boolean
 }
-type Obj = Record<string, unknown>
+type Struct = Record<string, unknown>
 
 /**
  * The object data handler class.
  */
-export default class ObjectHandler extends Data.Handler {
+export class Handler extends Data.Handler {
 
   /**
    * {@inheritdoc}
@@ -44,7 +44,7 @@ export default class ObjectHandler extends Data.Handler {
    */
   public constructor(settings: Data.Settings) {
     super(settings)
-    const config: Config = settings.config ?? {}
+    const config = settings.config as Config
     this.schemaRaw = config.schema ?? this.schemaRaw
     this.reduce = config.reduce ?? this.reduce
   }
@@ -66,46 +66,46 @@ export default class ObjectHandler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  protected async inputToBase(data: Obj, context: Data.Context): Promise<Obj> {
+  protected async inputToBase(data: Struct, context: Data.Context): Promise<Struct | null> {
     Object.keys(data).filter(key => !(key in this.schema))
       .forEach(key => this.warn(new Data.Error.Ignored([...this.path, key])))
     let result = await this.convert("toBase", data, context)
     if (this.reduce && Object.values(result).every(value => null === value)
         && !await this.isRequired(context)) {
-      result = await this.getDefault(context) as Obj
+      result = await this.getDefault(context) as Struct | null
     }
-    return super.inputToBase(result, context) as Promise<Obj>
+    return super.inputToBase(result, context) as Promise<Struct | null>
   }
 
   /**
    * {@inheritdoc}
    */
-  protected async baseToStore(data: Obj, context: Data.Context): Promise<Obj> {
+  protected async baseToStore(data: Struct, context: Data.Context): Promise<Struct> {
     const result = await this.convert("toStore", data, context)
-    return super.baseToStore(result, context) as Promise<Obj>
+    return super.baseToStore(result, context) as Promise<Struct>
   }
 
   /**
    * {@inheritdoc}
    */
-  public async baseToOutput(data: Obj, context: Data.Context): Promise<Obj> {
+  protected async baseToOutput(data: Struct, context: Data.Context): Promise<Struct> {
     const result = await this.convert("toOutput", data, context)
-    return super.baseToOutput(result, context) as Promise<Obj>
+    return super.baseToOutput(result, context) as Promise<Struct>
   }
 
   /**
    * {@inheritdoc}
    */
-  protected async storeToBase(data: Obj, context: Data.Context): Promise<Obj> {
+  protected async storeToBase(data: Struct, context: Data.Context): Promise<Struct> {
     const result = await this.convert("toBase", data, context)
-    return super.storeToBase(result, context) as Promise<Obj>
+    return super.storeToBase(result, context) as Promise<Struct>
   }
 
   /**
-   * Common baseToStore/baseToOutput/storeToBase handler.
+   * Performs format conversion.
    */
-  protected async convert(method: "toBase" | "toStore" | "toOutput", data: Obj, context: Data.Context): Promise<Obj> {
-    const result: Obj = {}
+  protected async convert(method: "toBase" | "toStore" | "toOutput", data: Struct, context: Data.Context): Promise<Struct> {
+    const result: Struct = {}
     this.result = Data.Util.set(this.result, this.path, result)
     for (const key of Object.keys(this.schema)) {
       const value = await this.getHandler(key, data[key])[method](context)
@@ -124,4 +124,5 @@ export default class ObjectHandler extends Data.Handler {
 
 }
 
-export { ObjectHandler as Handler }
+export function conf(config: Config) { return { Handler, ...config } }
+export function init(config: Config) { return new Handler({ config }) }

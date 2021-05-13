@@ -1,13 +1,13 @@
 import * as Data from ".."
 
 export type Config = Data.Config & {
-  item?: string | Data.Definition
+  item: Data.Definition
 }
 
 /**
  * The list data handler class.
  */
-export default class List extends Data.Handler {
+export class Handler extends Data.Handler {
 
   /**
    * {@inheritdoc}
@@ -51,7 +51,7 @@ export default class List extends Data.Handler {
   /**
    * The list item definition.
    */
-  protected item: string | Data.Definition
+  protected item: Data.Definition
 
   /**
    * The list item type ID.
@@ -68,10 +68,7 @@ export default class List extends Data.Handler {
    */
   public constructor(settings: Data.Settings) {
     super(settings)
-    const config: Config = settings.config
-    if (!config.item) {
-      throw new Data.Error.Unexpected(`${this.name} configuration is invalid. Missing 'item' property.`)
-    }
+    const config = settings.config as Config
     this.item = config.item
     const { id, name } = this.getHandler()
     this.typeId = id
@@ -155,7 +152,7 @@ export default class List extends Data.Handler {
   }
 
   /**
-   * Common inputToBase/baseToStore/baseToOutput/storeToBase handler.
+   * Performs format conversion.
    */
   protected async convert(method: "toBase" | "toStore" | "toOutput", data: unknown[], context: Data.Context): Promise<unknown[]> {
     const result: unknown[] = []
@@ -179,4 +176,5 @@ export default class List extends Data.Handler {
 
 }
 
-export { List as Handler }
+export function conf(config: Config) { return { Handler, ...config } }
+export function init(config: Config) { return new Handler({ config }) }

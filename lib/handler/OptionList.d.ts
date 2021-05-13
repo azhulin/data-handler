@@ -7,7 +7,7 @@ export declare type Config = Option.Config & {
 /**
  * The option list data handler class.
  */
-export default class OptionList extends List.Handler {
+export declare class Handler extends List.Handler {
     /**
      * {@inheritdoc}
      */
@@ -29,4 +29,18 @@ export default class OptionList extends List.Handler {
      */
     constructor(settings: Data.Settings);
 }
-export { OptionList as Handler };
+export declare function conf(config?: Config): {
+    accept?: Data.Property<boolean, Data.Context>;
+    require?: Data.Property<boolean, Data.Context>;
+    default?: Partial<Data.Default>;
+    preprocessors?: Data.Processor[];
+    constraints?: Data.Constraint[];
+    postprocessors?: Data.Processor[];
+    store?: Data.Property<boolean, Data.Context>;
+    output?: Data.Property<boolean, Data.Context>;
+    key_type?: import("@azhulin/data-validator/lib/handler/Option").KeyType;
+    options?: Option.Options;
+    preserve?: boolean;
+    Handler: typeof Handler;
+};
+export declare function init(config?: Config): Handler;

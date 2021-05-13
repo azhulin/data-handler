@@ -9,7 +9,7 @@ export type Config = Option.Config & {
 /**
  * The option list data handler class.
  */
-export default class OptionList extends List.Handler {
+export class Handler extends List.Handler {
 
   /**
    * {@inheritdoc}
@@ -46,11 +46,10 @@ export default class OptionList extends List.Handler {
       ...settings,
       config: {
         ...settings.config,
-        item: {
-          type: "Option",
+        item: Option.conf({
           key_type: (settings.config as Option.Config).key_type,
           options: (settings.config as Option.Config).options,
-        },
+        }),
       } as List.Config
     })
     const config = settings.config as Config
@@ -61,4 +60,5 @@ export default class OptionList extends List.Handler {
 
 }
 
-export { OptionList as Handler }
+export function conf(config?: Config) { return { Handler, ...config } }
+export function init(config?: Config) { return new Handler({ config }) }

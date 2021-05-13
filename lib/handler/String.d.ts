@@ -1,8 +1,9 @@
 import * as Data from "..";
+export declare type Config = Data.Config;
 /**
  * The string data handler class.
  */
-export default class String extends Data.Handler {
+export declare class Handler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
@@ -32,4 +33,15 @@ export default class String extends Data.Handler {
      */
     protected checkConstraint(constraint: string, data: string, context: Data.Context): Promise<Data.Constraint.Result>;
 }
-export { String as Handler };
+export declare function conf(config?: Config): {
+    accept?: Data.Property<boolean, Data.Context>;
+    require?: Data.Property<boolean, Data.Context>;
+    default?: Partial<Data.Default>;
+    preprocessors?: Data.Processor[];
+    constraints?: Data.Constraint[];
+    postprocessors?: Data.Processor[];
+    store?: Data.Property<boolean, Data.Context>;
+    output?: Data.Property<boolean, Data.Context>;
+    Handler: typeof Handler;
+};
+export declare function init(config?: Config): Handler;

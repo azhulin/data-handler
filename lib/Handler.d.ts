@@ -1,4 +1,4 @@
-import type { BaseContext, Config, Context, Definition, Path, Property, Settings } from "./type";
+import type { BaseContext, Context, Definition, Path, Property, Settings } from "./type";
 import { Handler as BaseHandler } from "@azhulin/data-validator";
 import Format from "./Format";
 /**
@@ -14,17 +14,13 @@ export default abstract class Handler extends BaseHandler {
      */
     protected data: unknown;
     /**
-     * [$] Whether the data should be present in "store" format.
+     * Whether the data should be present in "store" format.
      */
     protected store: Property<boolean, Context>;
     /**
-     * [#] Whether the data should be present in "output" format.
+     * Whether the data should be present in "output" format.
      */
     protected output: Property<boolean, Context>;
-    /**
-     * {@inheritdoc}
-     */
-    protected static modifiers: Record<string, (config: Config) => void>;
     /**
      * Constructor for the Handler object.
      */
@@ -129,5 +125,5 @@ export default abstract class Handler extends BaseHandler {
     /**
      * {@inheritdoc}
      */
-    protected initHandler(definition: string | Definition, path: Path): Handler;
+    protected initHandler(definition: Definition, path: Path): Handler;
 }

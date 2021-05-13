@@ -1,13 +1,13 @@
 import * as Data from "..";
 export declare type Config = Data.Config & {
-    schema?: Data.Schema;
+    schema: Data.Schema;
     reduce?: boolean;
 };
-declare type Obj = Record<string, unknown>;
+declare type Struct = Record<string, unknown>;
 /**
  * The object data handler class.
  */
-export default class ObjectHandler extends Data.Handler {
+export declare class Handler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
@@ -44,26 +44,40 @@ export default class ObjectHandler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
-    protected inputToBase(data: Obj, context: Data.Context): Promise<Obj>;
+    protected inputToBase(data: Struct, context: Data.Context): Promise<Struct | null>;
     /**
      * {@inheritdoc}
      */
-    protected baseToStore(data: Obj, context: Data.Context): Promise<Obj>;
+    protected baseToStore(data: Struct, context: Data.Context): Promise<Struct>;
     /**
      * {@inheritdoc}
      */
-    baseToOutput(data: Obj, context: Data.Context): Promise<Obj>;
+    protected baseToOutput(data: Struct, context: Data.Context): Promise<Struct>;
     /**
      * {@inheritdoc}
      */
-    protected storeToBase(data: Obj, context: Data.Context): Promise<Obj>;
+    protected storeToBase(data: Struct, context: Data.Context): Promise<Struct>;
     /**
-     * Common baseToStore/baseToOutput/storeToBase handler.
+     * Performs format conversion.
      */
-    protected convert(method: "toBase" | "toStore" | "toOutput", data: Obj, context: Data.Context): Promise<Obj>;
+    protected convert(method: "toBase" | "toStore" | "toOutput", data: Struct, context: Data.Context): Promise<Struct>;
     /**
      * Returns data handler.
      */
     protected getHandler(key: string, data: unknown): Data.Handler;
 }
-export { ObjectHandler as Handler };
+export declare function conf(config: Config): {
+    accept?: Data.Property<boolean, Data.Context>;
+    require?: Data.Property<boolean, Data.Context>;
+    default?: Partial<Data.Default>;
+    preprocessors?: Data.Processor[];
+    constraints?: Data.Constraint[];
+    postprocessors?: Data.Processor[];
+    store?: Data.Property<boolean, Data.Context>;
+    output?: Data.Property<boolean, Data.Context>;
+    schema: Record<string, import("@azhulin/data-validator").Definition>;
+    reduce?: boolean;
+    Handler: typeof Handler;
+};
+export declare function init(config: Config): Handler;
+export {};

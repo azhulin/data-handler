@@ -1,9 +1,11 @@
 import * as Data from ".."
 
+export type Config = Data.Config
+
 /**
  * The timestamp data handler class.
  */
-export default class Timestamp extends Data.Handler {
+export class Handler extends Data.Handler {
 
   /**
    * {@inheritdoc}
@@ -40,4 +42,5 @@ export default class Timestamp extends Data.Handler {
 
 }
 
-export { Timestamp as Handler }
+export function conf(config?: Config) { return { Handler, ...config } }
+export function init(config?: Config) { return new Handler({ config }) }

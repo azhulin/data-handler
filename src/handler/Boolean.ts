@@ -1,9 +1,11 @@
 import * as Data from ".."
 
+export type Config = Data.Config
+
 /**
  * The boolean data handler class.
  */
-export default class Boolean extends Data.Handler {
+export class Handler extends Data.Handler {
 
   /**
    * {@inheritdoc}
@@ -32,4 +34,5 @@ export default class Boolean extends Data.Handler {
 
 }
 
-export { Boolean as Handler }
+export function conf(config?: Config) { return { Handler, ...config } }
+export function init(config?: Config) { return new Handler({ config }) }

@@ -11,7 +11,7 @@ export declare type Options = Keys | KeysLabels;
 /**
  * The option data handler class.
  */
-export default class Option extends Data.Handler {
+export declare class Handler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
@@ -35,7 +35,7 @@ export default class Option extends Data.Handler {
     /**
      * {@inheritdoc}
      */
-    formatInputToBase(data: unknown, baseContext: Data.BaseContext): Promise<Key>;
+    protected formatInputToBase(data: unknown, baseContext: Data.BaseContext): Promise<Key>;
     /**
      * {@inheritdoc}
      */
@@ -53,4 +53,17 @@ export default class Option extends Data.Handler {
      */
     static optionKeys(options: Options): Keys;
 }
-export { Option as Handler };
+export declare function conf(config?: Config): {
+    accept?: Data.Property<boolean, Data.Context>;
+    require?: Data.Property<boolean, Data.Context>;
+    default?: Partial<Data.Default>;
+    preprocessors?: Data.Processor[];
+    constraints?: Data.Constraint[];
+    postprocessors?: Data.Processor[];
+    store?: Data.Property<boolean, Data.Context>;
+    output?: Data.Property<boolean, Data.Context>;
+    key_type?: import("@azhulin/data-validator/lib/handler/Option").KeyType;
+    options?: Options;
+    Handler: typeof Handler;
+};
+export declare function init(config?: Config): Handler;

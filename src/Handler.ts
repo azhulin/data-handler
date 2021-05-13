@@ -1,5 +1,5 @@
 import type {
-  BaseContext, Config, Context, Definition, Path, Property, Settings,
+  BaseContext, Context, Definition, Path, Property, Settings,
 } from "./type"
 import { Handler as BaseHandler } from "@azhulin/data-validator"
 import * as Error from "./error"
@@ -21,23 +21,14 @@ export default abstract class Handler extends BaseHandler {
   protected data: unknown
 
   /**
-   * [$] Whether the data should be present in "store" format.
+   * Whether the data should be present in "store" format.
    */
   protected store: Property<boolean, Context> = true
 
   /**
-   * [#] Whether the data should be present in "output" format.
+   * Whether the data should be present in "output" format.
    */
   protected output: Property<boolean, Context> = true
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static modifiers: Record<string, (config: Config) => void> = {
-    ...BaseHandler.modifiers,
-    "$": config => config.store = false,
-    "#": config => config.output = false,
-  }
 
   /**
    * Constructor for the Handler object.
@@ -81,6 +72,7 @@ export default abstract class Handler extends BaseHandler {
    * Initializes the handler with data in specified format.
    */
   public initData(format: Format, data: unknown): this {
+    this.reset(data)
     this.format = format
     this.data = data
     return this
@@ -114,21 +106,21 @@ export default abstract class Handler extends BaseHandler {
     if (this.format === format) {
       return this.data
     }
+    this.reset(this.data)
     switch (this.format + format) {
       case Format.input + Format.base:
         this.data = await this.formatInputToBase(this.data, baseContext)
         break
 
-      case Format.base + Format.store:
-        this.data = await this.formatBaseToStore(this.data, baseContext)
-        break
-
-      case Format.base + Format.output:
-        return this.formatBaseToOutput(this.data, baseContext)
-
       case Format.store + Format.base:
         this.data = await this.formatStoreToBase(this.data, baseContext)
         break
+
+      case Format.base + Format.store:
+        return this.formatBaseToStore(this.data, baseContext)
+
+      case Format.base + Format.output:
+        return this.formatBaseToOutput(this.data, baseContext)
 
       default:
         throw new Error.Unexpected("Invalid data format conversion.")
@@ -276,7 +268,7 @@ export default abstract class Handler extends BaseHandler {
   /**
    * {@inheritdoc}
    */
-  protected initHandler(definition: string | Definition, path: Path): Handler {
+  protected initHandler(definition: Definition, path: Path): Handler {
     return super.initHandler(definition, path) as Handler
   }
 

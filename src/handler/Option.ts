@@ -13,7 +13,7 @@ export type Options = Keys | KeysLabels
 /**
  * The option data handler class.
  */
-export default class Option extends Data.Handler {
+export class Handler extends Data.Handler {
 
   /**
    * {@inheritdoc}
@@ -46,9 +46,6 @@ export default class Option extends Data.Handler {
     super(settings)
     const config: Config = settings.config
     this.keyType = config.key_type ?? this.keyType
-    if (!["number", "string"].includes(this.keyType)) {
-      throw new Data.Error.Unexpected(`${this.name} configuration is invalid. Invalid 'key_type' property.`)
-    }
     this.options = config.options ?? this.options
     if (!this.optionKeys().every(key => this.isValidKeyType(key))) {
       throw new Data.Error.Unexpected(`${this.name} configuration is invalid. Option keys don't match key type.`)
@@ -58,7 +55,7 @@ export default class Option extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  public async formatInputToBase(data: unknown, baseContext: Data.BaseContext): Promise<Key> {
+  protected async formatInputToBase(data: unknown, baseContext: Data.BaseContext): Promise<Key> {
     try {
       return await super.formatInputToBase(data, baseContext) as Key
     }
@@ -88,7 +85,7 @@ export default class Option extends Data.Handler {
    * Returns option keys.
    */
   protected optionKeys(): Keys {
-    return Option.optionKeys(this.options)
+    return Handler.optionKeys(this.options)
   }
 
   /**
@@ -100,4 +97,5 @@ export default class Option extends Data.Handler {
 
 }
 
-export { Option as Handler }
+export function conf(config?: Config) { return { Handler, ...config } }
+export function init(config?: Config) { return new Handler({ config }) }
