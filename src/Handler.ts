@@ -255,14 +255,14 @@ export default abstract class Handler extends BaseHandler {
    * Returns "store" flag value.
    */
   protected async isStorable(context: Context): Promise<boolean> {
-    return this.getProperty<boolean, Context>("store", context)
+    return this.getProperty<boolean>("store", context)
   }
 
   /**
    * Returns "output" flag value.
    */
   protected async isOutputable(context: Context): Promise<boolean> {
-    return this.getProperty<boolean, Context>("output", context)
+    return this.getProperty<boolean>("output", context)
   }
 
   /**

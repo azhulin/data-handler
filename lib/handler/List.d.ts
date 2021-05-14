@@ -74,6 +74,9 @@ export declare class Handler extends Data.Handler {
 export declare function conf(config: Config): {
     Handler: typeof Handler;
     input?: Data.Property<boolean, Data.Context>;
+    /**
+     * {@inheritdoc}
+     */
     require?: Data.Property<boolean, Data.Context>;
     default?: Partial<Data.Default>;
     preprocessors?: Data.Processor[];
