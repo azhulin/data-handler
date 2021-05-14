@@ -22,17 +22,13 @@ export class Handler extends Data.Handler {
   public get name(): string { return "Object" }
 
   /**
-   * The raw schema.
-   */
-  protected schemaRaw: Data.Schema = {}
-
-  /**
    * The schema.
    */
   protected get schema(): Data.Schema {
-    return this._schema ?? (this._schema = this.prepareSchema())
+    return this._schema.prepared ?? (this._schema.prepared = this.prepareSchema())
   }
-  private _schema: Data.Schema
+  protected set schema(schema: Data.Schema) { this._schema = { raw: schema } }
+  private _schema: { raw?: Data.Schema, prepared?: Data.Schema } = { raw: {} }
 
   /**
    * Whether to use default value, if all schema keys are optional and equal to Null.
@@ -45,7 +41,7 @@ export class Handler extends Data.Handler {
   public constructor(settings: Data.Settings) {
     super(settings)
     const config = settings.config as Config
-    this.schemaRaw = config.schema ?? this.schemaRaw
+    this.schema = config.schema ?? this.schema
     this.reduce = config.reduce ?? this.reduce
   }
 
@@ -53,7 +49,7 @@ export class Handler extends Data.Handler {
    * Prepares the schema.
    */
   protected prepareSchema(): Data.Schema {
-    return this.schemaRaw
+    return this._schema.raw
   }
 
   /**
