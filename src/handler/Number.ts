@@ -12,9 +12,7 @@ export class Handler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  public get id(): string {
-    return 0 === this.decimals ? "number.integer" : "number"
-  }
+  public id: string = "number"
 
   /**
    * {@inheritdoc}
@@ -27,10 +25,7 @@ export class Handler extends Data.Handler {
   public get description(): string {
     switch (this.decimals) {
       case null:
-        return ""
-
-      case 0:
-        return "integer"
+        return
 
       case 1:
         return "1 decimal place"
@@ -50,7 +45,7 @@ export class Handler extends Data.Handler {
    */
   public constructor(settings: Data.Settings) {
     super(settings)
-    const config = settings.config as Config
+    const config: Config = settings.config ?? {}
     this.decimals = config.decimals ?? this.decimals
     if (null !== this.decimals && !Data.Util.isIndex(this.decimals)) {
       throw new Data.Error.Unexpected(`${this.name} configuration is invalid. Invalid 'decimals' property.`)
@@ -61,8 +56,7 @@ export class Handler extends Data.Handler {
    * {@inheritdoc}
    */
   protected isValid(data: unknown): boolean {
-    return "number" === typeof data && isFinite(data)
-      && (0 !== this.decimals || Number.isInteger(data))
+    return Data.Util.isNumber(data)
   }
 
   /**

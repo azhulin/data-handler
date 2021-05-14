@@ -1,13 +1,13 @@
 import * as Data from "..";
-import * as List from "./List";
-import * as Option from "./Option";
-export declare type Config = Option.Config & {
+import * as $List from "./List";
+import * as $Option from "./Option";
+export declare type Config = $Option.Config & {
     preserve?: boolean;
 };
 /**
  * The option list data handler class.
  */
-export declare class Handler extends List.Handler {
+export declare class Handler extends $List.Handler {
     /**
      * {@inheritdoc}
      */
@@ -19,7 +19,7 @@ export declare class Handler extends List.Handler {
     /**
      * The options.
      */
-    protected options: Option.Options;
+    protected options: $Option.Options;
     /**
      * Whether to keep the items order from the input.
      */
@@ -39,7 +39,7 @@ export declare function conf(config?: Config): {
     store?: Data.Property<boolean, Data.Context>;
     output?: Data.Property<boolean, Data.Context>;
     key_type?: import("@azhulin/data-validator/lib/handler/Option").KeyType;
-    options?: Option.Options;
+    options?: $Option.Options;
     preserve?: boolean;
     Handler: typeof Handler;
 };

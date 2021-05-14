@@ -12,16 +12,12 @@ export class Handler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  public get id(): string {
-    return `array<${this.typeId}>`
-  }
+  public get id(): string { return `array<${this.typeId}>` }
 
   /**
    * {@inheritdoc}
    */
-  public get name(): string {
-    return `Array (${this.typeName})`
-  }
+  public get name(): string { return `${this.typeName} array` }
 
   /**
    * {@inheritdoc}
@@ -86,8 +82,8 @@ export class Handler extends Data.Handler {
    * {@inheritdoc}
    */
   protected async checkConstraint(constraint: string, data: unknown[], context: Data.Context): Promise<Data.Constraint.Result> {
-    const matches = constraint.match(/^length([><]?=?)(\d+)$/)
-    if (matches && matches[1]) {
+    const matches = constraint.match(/^length(=|>|>=|<|<=|<>)(\d+)$/)
+    if (matches) {
       const length = +matches[2]
       switch (matches[1]) {
         case "=":
@@ -114,6 +110,11 @@ export class Handler extends Data.Handler {
           return data.length <= length
             ? null
             : `Length should be lesser than or equal to ${length}.`
+
+        case "<>":
+          return data.length !== length
+            ? null
+            : `Length should not be equal to ${length}.`
       }
     }
     return super.checkConstraint(constraint, data, context)

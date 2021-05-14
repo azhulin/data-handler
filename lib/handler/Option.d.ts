@@ -6,8 +6,9 @@ export declare type Config = Data.Config & {
 export declare type Key = number | string;
 export declare type KeyType = "number" | "string";
 export declare type Keys<T = Key> = T[];
-export declare type KeysLabels<T = Key> = Map<T, string>;
-export declare type Options = Keys | KeysLabels;
+export declare type KeysLabelsNumber = Map<number, string>;
+export declare type KeysLabelsString = Record<string, string>;
+export declare type Options = Keys | KeysLabelsNumber | KeysLabelsString;
 /**
  * The option data handler class.
  */
@@ -35,7 +36,7 @@ export declare class Handler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
-    protected formatInputToBase(data: unknown, baseContext: Data.BaseContext): Promise<Key>;
+    protected formatInputToBase(data: unknown, baseContext?: Data.BaseContext): Promise<Key>;
     /**
      * {@inheritdoc}
      */
@@ -54,7 +55,9 @@ export declare class Handler extends Data.Handler {
     static optionKeys(options: Options): Keys;
 }
 export declare function conf(config?: Config): {
-    input?: Data.Property<boolean, Data.Context>;
+    input?: Data.Property<boolean, Data.Context>; /**
+     * {@inheritdoc}
+     */
     require?: Data.Property<boolean, Data.Context>;
     default?: Partial<Data.Default>;
     preprocessors?: Data.Processor[];

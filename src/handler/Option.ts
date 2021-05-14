@@ -7,8 +7,9 @@ export type Config = Data.Config & {
 export type Key = number | string
 export type KeyType = "number" | "string"
 export type Keys<T = Key> = T[]
-export type KeysLabels<T = Key> = Map<T, string>
-export type Options = Keys | KeysLabels
+export type KeysLabelsNumber = Map<number, string>
+export type KeysLabelsString = Record<string, string>
+export type Options = Keys | KeysLabelsNumber | KeysLabelsString
 
 /**
  * The option data handler class.
@@ -18,9 +19,7 @@ export class Handler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  public get id(): string {
-    return this.keyType
-  }
+  public get id(): string { return this.keyType }
 
   /**
    * {@inheritdoc}
@@ -44,7 +43,7 @@ export class Handler extends Data.Handler {
    */
   public constructor(settings: Data.Settings) {
     super(settings)
-    const config: Config = settings.config
+    const config: Config = settings.config ?? {}
     this.keyType = config.key_type ?? this.keyType
     this.options = config.options ?? this.options
     if (!this.optionKeys().every(key => this.isValidKeyType(key))) {
@@ -55,13 +54,13 @@ export class Handler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  protected async formatInputToBase(data: unknown, baseContext: Data.BaseContext): Promise<Key> {
+  protected async formatInputToBase(data: unknown, baseContext?: Data.BaseContext): Promise<Key> {
     try {
       return await super.formatInputToBase(data, baseContext) as Key
     }
     catch (error) {
       if (error instanceof Data.Error.Type) {
-        throw new Data.Error.Option(this.path, this.options, this.keyType)
+        throw new Data.Error.Option(this.path, this, this.options)
       }
       throw error
     }
@@ -78,7 +77,8 @@ export class Handler extends Data.Handler {
    * Determines whether the option key type is valid.
    */
   protected isValidKeyType(key: unknown): boolean {
-    return ("number" === this.keyType ? Data.Util.isIndex : Data.Util.isString)(key)
+    const { isNumber, isString } = Data.Util
+    return ("number" === this.keyType ? isNumber : isString)(key)
   }
 
   /**
@@ -92,7 +92,11 @@ export class Handler extends Data.Handler {
    * Returns option keys.
    */
   public static optionKeys(options: Options): Keys {
-    return Array.isArray(options) ? options : [...options.keys()]
+    return Array.isArray(options)
+      ? options
+      : options instanceof Map
+        ? [...options.keys()]
+        : Object.keys(options)
   }
 
 }

@@ -79,7 +79,9 @@ export declare function conf(config: Config): {
     constraints?: Data.Constraint[];
     postprocessors?: Data.Processor[];
     store?: Data.Property<boolean, Data.Context>;
-    output?: Data.Property<boolean, Data.Context>;
+    output?: Data.Property<boolean, Data.Context>; /**
+     * {@inheritdoc}
+     */
     item: Data.Definition;
     Handler: typeof Handler;
 };

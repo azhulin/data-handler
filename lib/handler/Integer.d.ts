@@ -1,11 +1,10 @@
 import * as Data from "..";
-export declare type Config = Data.Config & {
-    decimals?: number;
-};
+import * as $Number from "./Number";
+export declare type Config = Data.Config;
 /**
- * The number data handler class.
+ * The integer data handler class.
  */
-export declare class Handler extends Data.Handler {
+export declare class Handler extends $Number.Handler {
     /**
      * {@inheritdoc}
      */
@@ -19,25 +18,13 @@ export declare class Handler extends Data.Handler {
      */
     get description(): string;
     /**
-     * The number of decimal points.
+     * {@inheritdoc}
      */
     protected decimals: number | null;
     /**
      * {@inheritdoc}
      */
-    constructor(settings: Data.Settings);
-    /**
-     * {@inheritdoc}
-     */
     protected isValid(data: unknown): boolean;
-    /**
-     * {@inheritdoc}
-     */
-    protected inputToBase(data: number, context: Data.Context): Promise<number>;
-    /**
-     * {@inheritdoc}
-     */
-    protected checkConstraint(constraint: string, data: number, context: Data.Context): Promise<Data.Constraint.Result>;
 }
 export declare function conf(config?: Config): {
     input?: Data.Property<boolean, Data.Context>;
@@ -46,9 +33,10 @@ export declare function conf(config?: Config): {
     preprocessors?: Data.Processor[];
     constraints?: Data.Constraint[];
     postprocessors?: Data.Processor[];
-    store?: Data.Property<boolean, Data.Context>;
+    store?: Data.Property<boolean, Data.Context>; /**
+     * {@inheritdoc}
+     */
     output?: Data.Property<boolean, Data.Context>;
-    decimals?: number;
     Handler: typeof Handler;
 };
 export declare function init(config?: Config): Handler;
