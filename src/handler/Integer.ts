@@ -11,12 +11,12 @@ export class Handler extends $Number.Handler {
   /**
    * {@inheritdoc}
    */
-  public id: string = this.id + ".integer"
+  public get id(): string { return super.id + ".integer" }
 
   /**
    * {@inheritdoc}
    */
-  public name: string = "Integer"
+  public get name(): string { return "Integer" }
 
   /**
    * {@inheritdoc}

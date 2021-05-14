@@ -14,12 +14,12 @@ export class Handler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  public id: string = "object"
+  public get id(): string { return "object" }
 
   /**
    * {@inheritdoc}
    */
-  public name: string = "Object"
+  public get name(): string { return "Object" }
 
   /**
    * The raw schema.

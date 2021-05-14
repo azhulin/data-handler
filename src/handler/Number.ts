@@ -12,12 +12,12 @@ export class Handler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  public id: string = "number"
+  public get id(): string { return "number" }
 
   /**
    * {@inheritdoc}
    */
-  public name: string = "Number"
+  public get name(): string { return "Number" }
 
   /**
    * {@inheritdoc}

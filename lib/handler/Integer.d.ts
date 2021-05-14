@@ -8,11 +8,11 @@ export declare class Handler extends $Number.Handler {
     /**
      * {@inheritdoc}
      */
-    id: string;
+    get id(): string;
     /**
      * {@inheritdoc}
      */
-    name: string;
+    get name(): string;
     /**
      * {@inheritdoc}
      */
@@ -33,9 +33,7 @@ export declare function conf(config?: Config): {
     preprocessors?: Data.Processor[];
     constraints?: Data.Constraint[];
     postprocessors?: Data.Processor[];
-    store?: Data.Property<boolean, Data.Context>; /**
-     * {@inheritdoc}
-     */
+    store?: Data.Property<boolean, Data.Context>;
     output?: Data.Property<boolean, Data.Context>;
     Handler: typeof Handler;
 };

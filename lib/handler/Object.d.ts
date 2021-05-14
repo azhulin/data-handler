@@ -11,11 +11,11 @@ export declare class Handler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
-    id: string;
+    get id(): string;
     /**
      * {@inheritdoc}
      */
-    name: string;
+    get name(): string;
     /**
      * The raw schema.
      */
