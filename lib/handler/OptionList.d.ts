@@ -30,6 +30,7 @@ export declare class Handler extends $List.Handler {
     constructor(settings: Data.Settings);
 }
 export declare function conf(config?: Config): {
+    Handler: typeof Handler;
     input?: Data.Property<boolean, Data.Context>;
     require?: Data.Property<boolean, Data.Context>;
     default?: Partial<Data.Default>;
@@ -41,6 +42,5 @@ export declare function conf(config?: Config): {
     key_type?: import("@azhulin/data-validator/lib/handler/Option").KeyType;
     options?: $Option.Options;
     preserve?: boolean;
-    Handler: typeof Handler;
 };
 export declare function init(config?: Config): Handler;

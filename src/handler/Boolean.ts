@@ -34,5 +34,5 @@ export class Handler extends Data.Handler {
 
 }
 
-export function conf(config?: Config) { return { Handler, ...config } }
+export function conf(config?: Config) { return { ...config, Handler } }
 export function init(config?: Config) { return new Handler({ config }) }

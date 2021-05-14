@@ -55,6 +55,7 @@ export declare class Handler extends Data.Handler {
     static optionKeys(options: Options): Keys;
 }
 export declare function conf(config?: Config): {
+    Handler: typeof Handler;
     input?: Data.Property<boolean, Data.Context>; /**
      * {@inheritdoc}
      */
@@ -67,6 +68,5 @@ export declare function conf(config?: Config): {
     output?: Data.Property<boolean, Data.Context>;
     key_type?: import("@azhulin/data-validator/lib/handler/Option").KeyType;
     options?: Options;
-    Handler: typeof Handler;
 };
 export declare function init(config?: Config): Handler;
