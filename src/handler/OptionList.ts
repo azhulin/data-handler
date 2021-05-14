@@ -52,7 +52,7 @@ export class Handler extends $List.Handler {
         }),
       },
     })
-    const config = settings.config as Config
+    const config: Config = settings.config ?? {}
     this.options = config.options ?? this.options
     this.preserve = config.preserve ?? this.preserve
     this.preserve || this.postprocessors.push("order")

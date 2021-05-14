@@ -64,7 +64,10 @@ export class Handler extends Data.Handler {
    */
   public constructor(settings: Data.Settings) {
     super(settings)
-    const config = settings.config as Config
+    const config = (settings.config ?? {}) as Config
+    if (!config.item) {
+      throw new Data.Error.Unexpected(`${this.name} configuration is invalid. Missing 'item' property.`)
+    }
     this.item = config.item
     const { id, name } = this.getHandler()
     this.typeId = id

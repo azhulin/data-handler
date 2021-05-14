@@ -21,7 +21,10 @@ export declare class Handler extends Data.Handler {
      */
     protected get schema(): Data.Schema;
     protected set schema(schema: Data.Schema);
-    private _schema;
+    protected _schema: {
+        raw?: Data.Schema;
+        prepared?: Data.Schema;
+    };
     /**
      * Whether to use default value, if all schema keys are optional and equal to Null.
      */
