@@ -64,7 +64,7 @@ export declare function conf(config?: Config): {
     postprocessors?: Data.Processor[];
     store?: Data.Property<boolean, Data.Context>;
     output?: Data.Property<boolean, Data.Context>;
-    key_type?: import("@azhulin/data-validator/lib/handler/Option").KeyType;
+    key_type?: KeyType;
     options?: Options;
 };
 export declare function init(config?: Config): Handler;

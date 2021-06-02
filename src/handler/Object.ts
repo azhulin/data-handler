@@ -24,11 +24,15 @@ export class Handler extends Data.Handler {
   /**
    * The schema.
    */
-  protected get schema(): Data.Schema {
-    return this._schema.prepared ?? (this._schema.prepared = this.prepareSchema())
+  protected schema: Data.Schema = {}
+
+  /**
+   * The prepared schema.
+   */
+  protected get preparedSchema(): Data.Schema {
+    return this._preparedSchema ?? (this._preparedSchema = this.prepareSchema())
   }
-  protected set schema(schema: Data.Schema) { this._schema = { raw: schema } }
-  protected _schema: { raw?: Data.Schema, prepared?: Data.Schema } = { raw: {} }
+  private _preparedSchema: Data.Schema
 
   /**
    * Whether to use default value, if all schema keys are optional and equal to Null.
@@ -49,7 +53,7 @@ export class Handler extends Data.Handler {
    * Prepares the schema.
    */
   protected prepareSchema(): Data.Schema {
-    return this._schema.raw
+    return this.schema
   }
 
   /**
@@ -63,7 +67,7 @@ export class Handler extends Data.Handler {
    * {@inheritdoc}
    */
   protected async inputToBase(data: Struct, context: Data.Context): Promise<Struct | null> {
-    Object.keys(data).filter(key => !(key in this.schema))
+    Object.keys(data).filter(key => !(key in this.preparedSchema))
       .forEach(key => this.warn(new Data.Error.Ignored([...this.path, key])))
     let result = await this.convert("toBase", data, context)
     if (this.reduce && Object.values(result).every(value => null === value)
@@ -103,7 +107,7 @@ export class Handler extends Data.Handler {
   protected async convert(method: "toBase" | "toStore" | "toOutput", data: Struct, context: Data.Context): Promise<Struct> {
     const result: Struct = {}
     this.result = Data.Util.set(this.result, this.path, result)
-    for (const key of Object.keys(this.schema)) {
+    for (const key of Object.keys(this.preparedSchema)) {
       const value = await this.getHandler(key, data[key])[method](context)
       undefined !== value && (result[key] = value)
     }
@@ -114,7 +118,7 @@ export class Handler extends Data.Handler {
    * Returns data handler.
    */
   protected getHandler(key: string, data: unknown): Data.Handler {
-    return this.initHandler(this.schema[key], [...this.path, key])
+    return this.initHandler(this.preparedSchema[key], [...this.path, key])
       .initData(this.format, data)
   }
 

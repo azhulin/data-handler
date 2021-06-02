@@ -19,12 +19,12 @@ export declare class Handler extends Data.Handler {
     /**
      * The schema.
      */
-    protected get schema(): Data.Schema;
-    protected set schema(schema: Data.Schema);
-    protected _schema: {
-        raw?: Data.Schema;
-        prepared?: Data.Schema;
-    };
+    protected schema: Data.Schema;
+    /**
+     * The prepared schema.
+     */
+    protected get preparedSchema(): Data.Schema;
+    private _preparedSchema;
     /**
      * Whether to use default value, if all schema keys are optional and equal to Null.
      */
@@ -76,7 +76,7 @@ export declare function conf(config: Config): {
     postprocessors?: Data.Processor[];
     store?: Data.Property<boolean, Data.Context>;
     output?: Data.Property<boolean, Data.Context>;
-    schema: Record<string, import("@azhulin/data-validator").Definition>;
+    schema: Data.Schema;
     reduce?: boolean;
 };
 export declare function init(config: Config): Handler;
