@@ -3,7 +3,6 @@ export declare type Config = Data.Config & {
     schema: Data.Schema;
     reduce?: boolean;
 };
-declare type Struct = Record<string, unknown>;
 /**
  * The object data handler class.
  */
@@ -44,23 +43,23 @@ export declare class Handler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
-    protected inputToBase(data: Struct, context: Data.Context): Promise<Struct | null>;
+    protected inputToBase(data: Record<string, unknown>, context: Data.Context): Promise<Record<string, unknown> | null>;
     /**
      * {@inheritdoc}
      */
-    protected baseToStore(data: Struct, context: Data.Context): Promise<Struct>;
+    protected baseToStore(data: Record<string, unknown>, context: Data.Context): Promise<Record<string, unknown>>;
     /**
      * {@inheritdoc}
      */
-    protected baseToOutput(data: Struct, context: Data.Context): Promise<Struct>;
+    protected baseToOutput(data: Record<string, unknown>, context: Data.Context): Promise<Record<string, unknown>>;
     /**
      * {@inheritdoc}
      */
-    protected storeToBase(data: Struct, context: Data.Context): Promise<Struct>;
+    protected storeToBase(data: Record<string, unknown>, context: Data.Context): Promise<Record<string, unknown>>;
     /**
      * Performs format conversion.
      */
-    protected convert(method: "toBase" | "toStore" | "toOutput", data: Struct, context: Data.Context): Promise<Struct>;
+    protected convert(method: "toBase" | "toStore" | "toOutput", data: Record<string, unknown>, context: Data.Context): Promise<Record<string, unknown>>;
     /**
      * Returns data handler.
      */
@@ -74,10 +73,11 @@ export declare function conf(config: Config): {
     require?: Data.Property<boolean, Data.Context>;
     default?: Partial<Data.Default>;
     preprocessors?: Data.Processor[];
-    constraints?: Data.Constraint[];
+    constraints?: Data.Constraint[]; /**
+     * The schema.
+     */
     postprocessors?: Data.Processor[];
     schema: Data.Schema;
     reduce?: boolean;
 };
 export declare function init(config: Config): Data.$Object.Handler;
-export {};
