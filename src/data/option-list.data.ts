@@ -1,5 +1,5 @@
 import * as Data from ".."
-import { $List, $Option } from ".."
+import { $List, $Option } from "."
 
 export type Config = $Option.Config & {
   preserve?: boolean
