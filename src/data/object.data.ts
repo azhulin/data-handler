@@ -31,7 +31,7 @@ export class Handler extends Data.Handler {
   protected get preparedSchema(): Data.Schema {
     return this._preparedSchema ?? (this._preparedSchema = this.prepareSchema())
   }
-  private _preparedSchema: Data.Schema
+  private _preparedSchema?: Data.Schema
 
   /**
    * Whether to use default value, if all schema keys are optional and equal to Null.
@@ -68,7 +68,8 @@ export class Handler extends Data.Handler {
   protected async inputToBase(data: Record<string, unknown>, context: Data.Context): Promise<Record<string, unknown> | null> {
     Object.keys(data).filter(key => !(key in this.preparedSchema))
       .forEach(key => this.warn(new Data.ErrorIgnored([...this.path, key])))
-    let result = await this.convert("toBase", data, context)
+    let result: Record<string, unknown> | null
+      = await this.convert("toBase", data, context)
     if (this.reduce && Object.values(result).every(value => null === value)
         && !await this.isRequired(context)) {
       result = await this.getDefault(context) as Record<string, unknown> | null

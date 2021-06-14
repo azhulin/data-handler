@@ -76,17 +76,17 @@ export declare function conf(config: Config): {
     /**
      * {@inheritdoc}
      */
-    store?: Data.Property<boolean, Data.Context>;
-    output?: Data.Property<boolean, Data.Context>;
+    store?: Data.Property<boolean, Data.Context> | undefined;
+    output?: Data.Property<boolean, Data.Context> | undefined;
     /**
      * {@inheritdoc}
      */
-    input?: Data.Property<boolean, Data.Context>;
-    require?: Data.Property<boolean, Data.Context>;
-    default?: Partial<Data.Default>;
-    preprocessors?: Data.Processor[];
-    constraints?: Data.Constraint[];
-    postprocessors?: Data.Processor[];
+    input?: Data.Property<boolean, Data.Context> | undefined;
+    require?: Data.Property<boolean, Data.Context> | undefined;
+    default?: Partial<Data.Default> | undefined;
+    preprocessors?: Data.Processor[] | undefined;
+    constraints?: Data.Constraint[] | undefined;
+    postprocessors?: Data.Processor[] | undefined;
     item: Data.Definition;
 };
 export declare function init(config: Config): Data.$List.Handler;

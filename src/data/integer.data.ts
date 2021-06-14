@@ -21,7 +21,7 @@ export class Handler extends $Number.Handler {
   /**
    * {@inheritdoc}
    */
-  public get description(): string { return }
+  public get description(): string { return "" }
 
   /**
    * {@inheritdoc}

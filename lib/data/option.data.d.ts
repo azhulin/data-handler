@@ -56,15 +56,15 @@ export declare class Handler extends Data.Handler {
 }
 export declare function conf(config?: Config): {
     Handler: typeof Data.$Option.Handler;
-    store?: Data.Property<boolean, Data.Context>;
-    output?: Data.Property<boolean, Data.Context>;
-    input?: Data.Property<boolean, Data.Context>;
-    require?: Data.Property<boolean, Data.Context>;
-    default?: Partial<Data.Default>;
-    preprocessors?: Data.Processor[];
-    constraints?: Data.Constraint[];
-    postprocessors?: Data.Processor[];
-    key_type?: Data.$Option.KeyType;
-    options?: Data.$Option.Options;
+    store?: Data.Property<boolean, Data.Context> | undefined;
+    output?: Data.Property<boolean, Data.Context> | undefined;
+    input?: Data.Property<boolean, Data.Context> | undefined;
+    require?: Data.Property<boolean, Data.Context> | undefined;
+    default?: Partial<Data.Default> | undefined;
+    preprocessors?: Data.Processor[] | undefined;
+    constraints?: Data.Constraint[] | undefined;
+    postprocessors?: Data.Processor[] | undefined;
+    key_type?: Data.$Option.KeyType | undefined;
+    options?: Data.$Option.Options | undefined;
 };
 export declare function init(config?: Config): Data.$Option.Handler;

@@ -13,7 +13,7 @@ export abstract class Handler extends HandlerBase {
   /**
    * The current data format.
    */
-  protected format: Format
+  protected format: Format = Format.base
 
   /**
    * The data in current format.

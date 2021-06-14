@@ -23,7 +23,7 @@ export declare class Handler extends Data.Handler {
      * The prepared schema.
      */
     protected get preparedSchema(): Data.Schema;
-    private _preparedSchema;
+    private _preparedSchema?;
     /**
      * Whether to use default value, if all schema keys are optional and equal to Null.
      */
@@ -67,17 +67,17 @@ export declare class Handler extends Data.Handler {
 }
 export declare function conf(config: Config): {
     Handler: typeof Data.$Object.Handler;
-    store?: Data.Property<boolean, Data.Context>;
-    output?: Data.Property<boolean, Data.Context>;
-    input?: Data.Property<boolean, Data.Context>;
-    require?: Data.Property<boolean, Data.Context>;
-    default?: Partial<Data.Default>;
-    preprocessors?: Data.Processor[];
-    constraints?: Data.Constraint[]; /**
+    store?: Data.Property<boolean, Data.Context> | undefined;
+    output?: Data.Property<boolean, Data.Context> | undefined;
+    input?: Data.Property<boolean, Data.Context> | undefined;
+    require?: Data.Property<boolean, Data.Context> | undefined;
+    default?: Partial<Data.Default> | undefined;
+    preprocessors?: Data.Processor[] | undefined;
+    constraints?: Data.Constraint[] | undefined; /**
      * The schema.
      */
-    postprocessors?: Data.Processor[];
+    postprocessors?: Data.Processor[] | undefined;
     schema: Data.Schema;
-    reduce?: boolean;
+    reduce?: boolean | undefined;
 };
 export declare function init(config: Config): Data.$Object.Handler;

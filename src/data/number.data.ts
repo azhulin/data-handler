@@ -25,7 +25,7 @@ export class Handler extends Data.Handler {
   public get description(): string {
     switch (this.decimals) {
       case null:
-        return
+        return ""
 
       case 1:
         return "1 decimal place"
