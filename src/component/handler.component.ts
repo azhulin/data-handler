@@ -190,7 +190,7 @@ export abstract class Handler extends HandlerBase {
   protected async formatStoreToBase(data: unknown, baseContext?: BaseContext): Promise<unknown> {
     const context = await this.getContext(baseContext)
     if (!await this.isStorable(context) || this.isOmitted(data)) {
-      data = await this.getDefault(context)
+      data = await this.getDefault(context, "read")
     }
     if (this.isOmitted(data) || this.isEmpty(data)) {
       return data
