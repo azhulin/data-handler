@@ -15,10 +15,6 @@ export declare class Handler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
-    protected default: Data.Default;
-    /**
-     * {@inheritdoc}
-     */
     protected isValid(data: unknown): boolean;
 }
 export declare function conf(config?: Config): {

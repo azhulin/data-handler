@@ -20,14 +20,6 @@ export class Handler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  protected default: Data.Default = {
-    ...this.default,
-    value: this.default.value ?? false,
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected isValid(data: unknown): boolean {
     return "boolean" === typeof data
   }
