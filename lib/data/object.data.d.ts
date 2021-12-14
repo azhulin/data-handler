@@ -72,10 +72,9 @@ export declare function conf(config: Config): {
     input?: Data.Property<boolean, Data.Context> | undefined;
     require?: Data.Property<boolean, Data.Context> | undefined;
     default?: Partial<Data.Default> | undefined;
+    preparers?: Data.Processor[] | undefined;
     preprocessors?: Data.Processor[] | undefined;
-    constraints?: Data.Constraint[] | undefined; /**
-     * The schema.
-     */
+    constraints?: Data.Constraint[] | undefined;
     postprocessors?: Data.Processor[] | undefined;
     schema: Data.Schema;
     reduce?: boolean | undefined;
