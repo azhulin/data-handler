@@ -1,11 +1,13 @@
 import * as Data from ".."
 
-export type Config = Data.Config
+export namespace $Timestamp {
+  export type Config<T extends null | number> = Data.Config<T>
+}
 
 /**
  * The timestamp data handler class.
  */
-export class Handler extends Data.Handler {
+export class $Timestamp<T extends null | number> extends Data.Handler<T> {
 
   /**
    * {@inheritdoc}
@@ -25,12 +27,16 @@ export class Handler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  protected constraintLibrary: Data.Constraint.Library = {
-    ...this.constraintLibrary,
-    ">now": (data: number) =>
-      data > +new Date() ? null : "Future date expected.",
-    "<now": (data: number) =>
-      data < +new Date() ? null : "Past date expected.",
+  public static constraint = {
+    ...Data.Handler.constraint,
+    future: <Data.Constraint<number>>[
+      ">now",
+      data => data > +new Date() ? null : "Future date expected.",
+    ],
+    past: <Data.Constraint<number>>[
+      "<now",
+      data => data < +new Date() ? null : "Past date expected.",
+    ],
   }
 
   /**
@@ -40,7 +46,18 @@ export class Handler extends Data.Handler {
     return Data.isIndex(data)
   }
 
-}
+  /**
+   * Configures the data handler.
+   */
+  public static conf(config?: $Timestamp.Config<number>): Data.Definition {
+    return [$Timestamp, config]
+  }
 
-export function conf(config?: Config) { return { ...config, Handler } }
-export function init(config?: Config) { return new Handler({ config }) }
+  /**
+   * Initializes the data handler.
+   */
+  public static init<T extends null | number = number>(config?: $Timestamp.Config<T>): $Timestamp<T> {
+    return new $Timestamp<T>({ config })
+  }
+
+}

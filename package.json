@@ -1,6 +1,6 @@
 {
   "name": "@azhulin/data-handler",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "The data handler.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -11,8 +11,5 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/azhulin/data-handler.git"
-  },
-  "dependencies": {
-    "@azhulin/data-validator": "git+https://github.com/azhulin/data-validator.git#develop"
   }
 }

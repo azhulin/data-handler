@@ -1,11 +1,13 @@
 import * as Data from "..";
-export declare type Config = Data.Config & {
-    decimals?: number;
-};
+export declare namespace $Number {
+    type Config<T extends null | number> = Data.Config<T> & {
+        decimals?: number;
+    };
+}
 /**
  * The number data handler class.
  */
-export declare class Handler extends Data.Handler {
+export declare class $Number<T extends null | number> extends Data.Handler<T> {
     /**
      * {@inheritdoc}
      */
@@ -21,7 +23,18 @@ export declare class Handler extends Data.Handler {
     /**
      * The number of decimal points.
      */
-    protected decimals: number | null;
+    protected decimals: null | number;
+    /**
+     * {@inheritdoc}
+     */
+    static constraint: {
+        eq: (value: number) => Data.Constraint<number>;
+        gt: (value: number) => Data.Constraint<number>;
+        gte: (value: number) => Data.Constraint<number>;
+        lt: (value: number) => Data.Constraint<number>;
+        lte: (value: number) => Data.Constraint<number>;
+        neq: (value: number) => Data.Constraint<number>;
+    };
     /**
      * {@inheritdoc}
      */
@@ -33,23 +46,13 @@ export declare class Handler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
-    protected inputToBase(data: number, context: Data.Context): Promise<number>;
+    protected inputToBase(data: number, context: Data.Context): Promise<NonNullable<T>>;
     /**
-     * {@inheritdoc}
+     * Configures the data handler.
      */
-    protected checkConstraint(constraint: string, data: number, context: Data.Context): Promise<Data.Constraint.Result>;
+    static conf(config?: $Number.Config<number>): Data.Definition;
+    /**
+     * Initializes the data handler.
+     */
+    static init<T extends null | number = number>(config?: $Number.Config<T>): $Number<T>;
 }
-export declare function conf(config?: Config): {
-    Handler: typeof Data.$Number.Handler;
-    store?: Data.Property<boolean, Data.Context> | undefined;
-    output?: Data.Property<boolean, Data.Context> | undefined;
-    input?: Data.Property<boolean, Data.Context> | undefined;
-    require?: Data.Property<boolean, Data.Context> | undefined;
-    default?: Partial<Data.Default> | undefined;
-    preparers?: Data.Processor[] | undefined;
-    preprocessors?: Data.Processor[] | undefined;
-    constraints?: Data.Constraint[] | undefined;
-    postprocessors?: Data.Processor[] | undefined;
-    decimals?: number | undefined;
-};
-export declare function init(config?: Config): Data.$Number.Handler;

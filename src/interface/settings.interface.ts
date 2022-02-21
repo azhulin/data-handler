@@ -1,9 +1,14 @@
-import type { Settings as SettingsBase } from "@azhulin/data-validator"
 import type { Config } from "."
+import type { Path } from "../type"
 
 /**
  * The data handler settings.
  */
-export interface Settings extends SettingsBase {
-  config?: Config
+export interface Settings {
+  config?: Config<any>
+  path?: Path
+  storage?: Record<string, unknown>
+  source?: unknown
+  result?: unknown
+  warnings?: Error[]
 }

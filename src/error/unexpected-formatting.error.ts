@@ -1,7 +1,7 @@
 import { ErrorUnexpected } from "."
 
-import type { Path } from "../type"
 import type { Format } from "../enum"
+import type { Path } from "../type"
 
 /**
  * The data formatting unexpected error.

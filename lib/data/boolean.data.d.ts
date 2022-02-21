@@ -1,9 +1,11 @@
 import * as Data from "..";
-export declare type Config = Data.Config;
+export declare namespace $Boolean {
+    type Config<T extends null | boolean> = Data.Config<T>;
+}
 /**
  * The boolean data handler class.
  */
-export declare class Handler extends Data.Handler {
+export declare class $Boolean<T extends null | boolean> extends Data.Handler<T> {
     /**
      * {@inheritdoc}
      */
@@ -16,17 +18,12 @@ export declare class Handler extends Data.Handler {
      * {@inheritdoc}
      */
     protected isValid(data: unknown): boolean;
+    /**
+     * Configures the data handler.
+     */
+    static conf(config?: $Boolean.Config<boolean>): Data.Definition;
+    /**
+     * Initializes the data handler.
+     */
+    static init<T extends null | boolean = boolean>(config?: $Boolean.Config<T>): $Boolean<T>;
 }
-export declare function conf(config?: Config): {
-    Handler: typeof Data.$Boolean.Handler;
-    store?: Data.Property<boolean, Data.Context> | undefined;
-    output?: Data.Property<boolean, Data.Context> | undefined;
-    input?: Data.Property<boolean, Data.Context> | undefined;
-    require?: Data.Property<boolean, Data.Context> | undefined;
-    default?: Partial<Data.Default> | undefined;
-    preparers?: Data.Processor[] | undefined;
-    preprocessors?: Data.Processor[] | undefined;
-    constraints?: Data.Constraint[] | undefined;
-    postprocessors?: Data.Processor[] | undefined;
-};
-export declare function init(config?: Config): Data.$Boolean.Handler;

@@ -1,9 +1,11 @@
 import * as Data from "..";
-export declare type Config = Data.Config;
+export declare namespace $String {
+    type Config<T extends null | string> = Data.Config<T>;
+}
 /**
  * The string data handler class.
  */
-export declare class Handler extends Data.Handler {
+export declare class $String<T extends null | string> extends Data.Handler<T> {
     /**
      * {@inheritdoc}
      */
@@ -15,11 +17,25 @@ export declare class Handler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
-    protected constraintLibrary: Data.Constraint.Library;
+    static constraint: {
+        trimmed: Data.Constraint<string>;
+        length: {
+            eq: (length: number) => Data.Constraint<string>;
+            gt: (length: number) => Data.Constraint<string>;
+            gte: (length: number) => Data.Constraint<string>;
+            lt: (length: number) => Data.Constraint<string>;
+            lte: (length: number) => Data.Constraint<string>;
+            neq: (length: number) => Data.Constraint<string>;
+        };
+    };
     /**
      * {@inheritdoc}
      */
-    protected processorLibrary: Data.Processor.Library;
+    static processor: {
+        trim: (data: string) => string;
+        lower: (data: string) => string;
+        upper: (data: string) => string;
+    };
     /**
      * {@inheritdoc}
      */
@@ -27,22 +43,13 @@ export declare class Handler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
-    protected inputToBase(data: string, context: Data.Context): Promise<string>;
+    protected inputToBase(data: NonNullable<T>, context: Data.Context): Promise<NonNullable<T>>;
     /**
-     * {@inheritdoc}
+     * Configures the data handler.
      */
-    protected checkConstraint(constraint: string, data: string, context: Data.Context): Promise<Data.Constraint.Result>;
+    static conf(config?: $String.Config<string>): Data.Definition;
+    /**
+     * Initializes the data handler.
+     */
+    static init<T extends null | string = string>(config?: $String.Config<T>): $String<T>;
 }
-export declare function conf(config?: Config): {
-    Handler: typeof Data.$String.Handler;
-    store?: Data.Property<boolean, Data.Context> | undefined;
-    output?: Data.Property<boolean, Data.Context> | undefined;
-    input?: Data.Property<boolean, Data.Context> | undefined;
-    require?: Data.Property<boolean, Data.Context> | undefined;
-    default?: Partial<Data.Default> | undefined;
-    preparers?: Data.Processor[] | undefined;
-    preprocessors?: Data.Processor[] | undefined;
-    constraints?: Data.Constraint[] | undefined;
-    postprocessors?: Data.Processor[] | undefined;
-};
-export declare function init(config?: Config): Data.$String.Handler;

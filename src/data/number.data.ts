@@ -1,13 +1,15 @@
 import * as Data from ".."
 
-export type Config = Data.Config & {
-  decimals?: number
+export namespace $Number {
+  export type Config<T extends null | number> = Data.Config<T> & {
+    decimals?: number
+  }
 }
 
 /**
  * The number data handler class.
  */
-export class Handler extends Data.Handler {
+export class $Number<T extends null | number> extends Data.Handler<T> {
 
   /**
    * {@inheritdoc}
@@ -38,14 +40,45 @@ export class Handler extends Data.Handler {
   /**
    * The number of decimal points.
    */
-  protected decimals: number | null = null
+  protected decimals: null | number = null
+
+  /**
+   * {@inheritdoc}
+   */
+  public static constraint = {
+    ...Data.Handler.constraint,
+    eq: (value: number): Data.Constraint<number> => [
+      `=${value}`,
+      data => data === value ? null : `Value should be equal to ${value}.`,
+    ],
+    gt: (value: number): Data.Constraint<number> => [
+      `>${value}`,
+      data => data > value ? null : `Value should be greater than ${value}.`,
+    ],
+    gte: (value: number): Data.Constraint<number> => [
+      `>=${value}`,
+      data => data >= value ? null : `Value should be greater than or equal to ${value}.`,
+    ],
+    lt: (value: number): Data.Constraint<number> => [
+      `<${value}`,
+      data => data < value ? null : `Value should be lesser than ${value}.`,
+    ],
+    lte: (value: number): Data.Constraint<number> => [
+      `<=${value}`,
+      data => data <= value ? null : `Value should be lesser than or equal to ${value}.`,
+    ],
+    neq: (value: number): Data.Constraint<number> => [
+      `<>${value}`,
+      data => data !== value ? null : `Value should not be equal to ${value}.`,
+    ],
+  }
 
   /**
    * {@inheritdoc}
    */
   public constructor(settings: Data.Settings) {
     super(settings)
-    const config: Config = settings.config ?? {}
+    const config = (settings.config ?? {}) as $Number.Config<T>
     this.decimals = config.decimals ?? this.decimals
     if (null !== this.decimals && !Data.isIndex(this.decimals)) {
       throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Invalid 'decimals' property.`)
@@ -62,57 +95,26 @@ export class Handler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  protected async inputToBase(data: number, context: Data.Context): Promise<number> {
+  protected async inputToBase(data: number, context: Data.Context): Promise<NonNullable<T>> {
     const original = data
     data = null !== this.decimals ? +data.toFixed(this.decimals) : data
     original !== data
       && this.warn(new Data.ErrorAdapted(this.path, original, data))
-    return super.inputToBase(data, context) as Promise<number>
+    return super.inputToBase(data as NonNullable<T>, context)
   }
 
   /**
-   * {@inheritdoc}
+   * Configures the data handler.
    */
-  protected async checkConstraint(constraint: string, data: number, context: Data.Context): Promise<Data.Constraint.Result> {
-    const matches = constraint.match(/^(=|>|>=|<|<=|<>)(\d+)$/)
-    if (matches) {
-      const value = +matches[2]
-      switch (matches[1]) {
-        case "=":
-          return data === value
-            ? null
-            : `Value should be equal to ${value}.`
+  public static conf(config?: $Number.Config<number>): Data.Definition {
+    return [$Number, config]
+  }
 
-        case ">":
-          return data > value
-            ? null
-            : `Value should be greater than ${value}.`
-
-        case ">=":
-          return data >= value
-            ? null
-            : `Value should be greater than or equal to ${value}.`
-
-        case "<":
-          return data < value
-            ? null
-            : `Value should be lesser than ${value}.`
-
-        case "<=":
-          return data <= value
-            ? null
-            : `Value should be lesser than or equal to ${value}.`
-
-        case "<>":
-          return data !== value
-            ? null
-            : `Value should not be equal to ${value}.`
-      }
-    }
-    return super.checkConstraint(constraint, data, context)
+  /**
+   * Initializes the data handler.
+   */
+  public static init<T extends null | number = number>(config?: $Number.Config<T>): $Number<T> {
+    return new $Number<T>({ config })
   }
 
 }
-
-export function conf(config?: Config) { return { ...config, Handler } }
-export function init(config?: Config) { return new Handler({ config }) }

@@ -1,11 +1,11 @@
-import { Handler as HandlerBase } from "@azhulin/data-validator";
+import { Validator } from ".";
 import { Format } from "../enum";
-import type { Path, Property } from "../type";
-import type { BaseContext, Context, Definition, Settings } from "../interface";
+import type { Definition, Path, Property } from "../type";
+import type { BaseContext, Context, Settings } from "../interface";
 /**
- * The base data handler class.
+ * The data handler class.
  */
-export declare abstract class Handler extends HandlerBase {
+export declare abstract class Handler<T extends any = any> extends Validator<T> {
     /**
      * The current data format.
      */
@@ -29,7 +29,7 @@ export declare abstract class Handler extends HandlerBase {
     /**
      * {@inheritdoc}
      */
-    validate(data: unknown, baseContext?: BaseContext): Promise<unknown>;
+    validate(data: unknown, baseContext?: BaseContext): Promise<T>;
     /**
      * Initializes the handler with data in input format.
      */
@@ -37,7 +37,7 @@ export declare abstract class Handler extends HandlerBase {
     /**
      * Initializes the handler with data in base format.
      */
-    inBase(data: unknown): this;
+    inBase(data: T): this;
     /**
      * Initializes the handler with data in store format.
      */
@@ -49,7 +49,7 @@ export declare abstract class Handler extends HandlerBase {
     /**
      * Returns the data in base format.
      */
-    toBase(baseContext?: BaseContext): Promise<unknown>;
+    toBase(baseContext?: BaseContext): Promise<T>;
     /**
      * Returns the data in store format.
      */
@@ -73,19 +73,19 @@ export declare abstract class Handler extends HandlerBase {
     /**
      * Returns the data in base format from data in input format.
      */
-    protected formatInputToBase(data: unknown, baseContext?: BaseContext): Promise<unknown>;
+    protected formatInputToBase(data: unknown, baseContext?: BaseContext): Promise<T>;
     /**
      * Returns store data from base data.
      */
-    protected formatBaseToStore(data: unknown, baseContext?: BaseContext): Promise<unknown>;
+    protected formatBaseToStore(data: T, baseContext?: BaseContext): Promise<unknown>;
     /**
      * Returns output data from base data.
      */
-    protected formatBaseToOutput(data: unknown, baseContext?: BaseContext): Promise<unknown>;
+    protected formatBaseToOutput(data: T, baseContext?: BaseContext): Promise<unknown>;
     /**
      * Returns base data from store data.
      */
-    protected formatStoreToBase(data: unknown, baseContext?: BaseContext): Promise<unknown>;
+    protected formatStoreToBase(data: unknown, baseContext?: BaseContext): Promise<T>;
     /**
      * Determines whether the data is in expected input format.
      */
@@ -101,20 +101,20 @@ export declare abstract class Handler extends HandlerBase {
     /**
      * Converts data in input format to data in base format.
      */
-    protected inputToBase(data: unknown, context: Context): Promise<unknown>;
-    protected process: (data: unknown, context: Context) => Promise<unknown>;
+    protected inputToBase(data: NonNullable<T>, context: Context): Promise<NonNullable<T>>;
+    protected process: (data: NonNullable<T>, context: Context) => Promise<NonNullable<T>>;
     /**
      * Converts data in base format to data in store format.
      */
-    protected baseToStore(data: unknown, context: Context): Promise<unknown>;
+    protected baseToStore(data: NonNullable<T>, context: Context): Promise<unknown>;
     /**
      * Converts data in base format to data in output format.
      */
-    protected baseToOutput(data: unknown, context: Context): Promise<unknown>;
+    protected baseToOutput(data: NonNullable<T>, context: Context): Promise<unknown>;
     /**
      * Converts data in store format to data in base format.
      */
-    protected storeToBase(data: unknown, context: Context): Promise<unknown>;
+    protected storeToBase(data: unknown, context: Context): Promise<NonNullable<T>>;
     /**
      * Returns "store" flag value.
      */

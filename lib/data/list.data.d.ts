@@ -1,11 +1,13 @@
 import * as Data from "..";
-export declare type Config = Data.Config & {
-    item: Data.Definition;
-};
+export declare namespace $List {
+    type Config<T extends null | any[]> = Data.Config<T> & {
+        item: Data.Definition;
+    };
+}
 /**
  * The list data handler class.
  */
-export declare class Handler extends Data.Handler {
+export declare class $List<T extends null | any[]> extends Data.Handler<T> {
     /**
      * {@inheritdoc}
      */
@@ -17,11 +19,21 @@ export declare class Handler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
-    protected default: Data.Default;
+    protected default: Data.Default<T>;
     /**
      * {@inheritdoc}
      */
-    protected constraintLibrary: Data.Constraint.Library;
+    static constraint: {
+        length: {
+            eq: (length: number) => Data.Constraint<any[]>;
+            gt: (length: number) => Data.Constraint<any[]>;
+            gte: (length: number) => Data.Constraint<any[]>;
+            lt: (length: number) => Data.Constraint<any[]>;
+            lte: (length: number) => Data.Constraint<any[]>;
+            neq: (length: number) => Data.Constraint<any[]>;
+        };
+        unique: Data.Constraint<any[]>;
+    };
     /**
      * The list item definition.
      */
@@ -45,23 +57,19 @@ export declare class Handler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
-    protected checkConstraint(constraint: string, data: unknown[], context: Data.Context): Promise<Data.Constraint.Result>;
+    protected inputToBase(data: NonNullable<T>, context: Data.Context): Promise<NonNullable<T>>;
     /**
      * {@inheritdoc}
      */
-    protected inputToBase(data: unknown[], context: Data.Context): Promise<unknown[]>;
+    protected baseToStore(data: NonNullable<T>, context: Data.Context): Promise<unknown[]>;
     /**
      * {@inheritdoc}
      */
-    protected baseToStore(data: unknown[], context: Data.Context): Promise<unknown[]>;
+    protected baseToOutput(data: NonNullable<T>, context: Data.Context): Promise<unknown[]>;
     /**
      * {@inheritdoc}
      */
-    protected baseToOutput(data: unknown[], context: Data.Context): Promise<unknown[]>;
-    /**
-     * {@inheritdoc}
-     */
-    protected storeToBase(data: unknown[], context: Data.Context): Promise<unknown[]>;
+    protected storeToBase(data: unknown[], context: Data.Context): Promise<NonNullable<T>>;
     /**
      * Performs format conversion.
      */
@@ -70,24 +78,12 @@ export declare class Handler extends Data.Handler {
      * Returns data handler.
      */
     protected getHandler(index?: number, data?: unknown): Data.Handler;
+    /**
+     * Configures the data handler.
+     */
+    static conf(config?: $List.Config<any[]>): Data.Definition;
+    /**
+     * Initializes the data handler.
+     */
+    static init<T extends null | any[] = any[]>(config?: $List.Config<T>): $List<T>;
 }
-export declare function conf(config: Config): {
-    Handler: typeof Data.$List.Handler;
-    /**
-     * {@inheritdoc}
-     */
-    store?: Data.Property<boolean, Data.Context> | undefined;
-    output?: Data.Property<boolean, Data.Context> | undefined;
-    /**
-     * {@inheritdoc}
-     */
-    input?: Data.Property<boolean, Data.Context> | undefined;
-    require?: Data.Property<boolean, Data.Context> | undefined;
-    default?: Partial<Data.Default> | undefined;
-    preparers?: Data.Processor[] | undefined;
-    preprocessors?: Data.Processor[] | undefined;
-    constraints?: Data.Constraint[] | undefined;
-    postprocessors?: Data.Processor[] | undefined;
-    item: Data.Definition;
-};
-export declare function init(config: Config): Data.$List.Handler;

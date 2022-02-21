@@ -1,5 +1,4 @@
-export { BaseContext, Context } from "@azhulin/data-validator/lib/interface";
+export * from "./base-context.interface";
 export * from "./config.interface";
-export * from "./definition.interface";
+export * from "./context.interface";
 export * from "./settings.interface";
-export * from "./$handler.interface";

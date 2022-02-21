@@ -1,20 +1,26 @@
 import * as Data from "..";
 import { $List, $Option } from ".";
-export declare type Config = $Option.Config & {
-    preserve?: boolean;
-};
+export declare namespace $OptionList {
+    type Config<T extends null | (number | string)[]> = Data.Config<T> & {
+        key_type?: $Option.KeyType;
+        options?: $Option.Options;
+        preserve?: boolean;
+    };
+}
 /**
  * The option list data handler class.
  */
-export declare class Handler extends $List.Handler {
+export declare class $OptionList<T extends null | (number | string)[]> extends $List<T> {
     /**
      * {@inheritdoc}
      */
-    protected constraints: Data.Constraint[];
+    protected constraints: Data.Constraint.List<NonNullable<T>>;
     /**
      * {@inheritdoc}
      */
-    protected processorLibrary: Data.Processor.Library;
+    static processor: {
+        order: <T_1 extends any[]>(data: T_1, { handler }: Data.Context) => T_1;
+    };
     /**
      * The options.
      */
@@ -27,20 +33,12 @@ export declare class Handler extends $List.Handler {
      * {@inheritdoc}
      */
     constructor(settings: Data.Settings);
+    /**
+     * Configures the data handler.
+     */
+    static conf(config?: $OptionList.Config<(number | string)[]>): Data.Definition;
+    /**
+     * Initializes the data handler.
+     */
+    static init<T extends null | (number | string)[] = (number | string)[]>(config?: $OptionList.Config<T>): $OptionList<T>;
 }
-export declare function conf(config?: Config): {
-    Handler: typeof Data.$OptionList.Handler;
-    store?: Data.Property<boolean, Data.Context> | undefined;
-    output?: Data.Property<boolean, Data.Context> | undefined;
-    input?: Data.Property<boolean, Data.Context> | undefined;
-    require?: Data.Property<boolean, Data.Context> | undefined;
-    default?: Partial<Data.Default> | undefined;
-    preparers?: Data.Processor[] | undefined;
-    preprocessors?: Data.Processor[] | undefined;
-    constraints?: Data.Constraint[] | undefined;
-    postprocessors?: Data.Processor[] | undefined;
-    key_type?: $Option.KeyType | undefined;
-    options?: $Option.Options | undefined;
-    preserve?: boolean | undefined;
-};
-export declare function init(config?: Config): Data.$OptionList.Handler;

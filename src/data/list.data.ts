@@ -1,13 +1,15 @@
 import * as Data from ".."
 
-export type Config = Data.Config & {
-  item: Data.Definition
+export namespace $List {
+  export type Config<T extends null | any[]> = Data.Config<T> & {
+    item: Data.Definition
+  }
 }
 
 /**
  * The list data handler class.
  */
-export class Handler extends Data.Handler {
+export class $List<T extends null | any[]> extends Data.Handler<T> {
 
   /**
    * {@inheritdoc}
@@ -22,26 +24,55 @@ export class Handler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  protected default: Data.Default = {
+  protected default: Data.Default<T> = {
     ...this.default,
-    value: this.default.value ?? [],
+    value: (this.default.value ?? []) as T,
   }
 
   /**
    * {@inheritdoc}
    */
-  protected constraintLibrary: Data.Constraint.Library = {
-    ...this.constraintLibrary,
-    unique: (data: unknown[]) => {
-      const items = new Set()
-      for (const [index, item] of data.map(i => JSON.stringify(i)).entries()) {
-        if (items.has(item)) {
-          return [`Values are not unique.`, { index }]
-        }
-        items.add(item)
-      }
-      return null
+  public static constraint = {
+    ...Data.Handler.constraint,
+    length: {
+      eq: (length: number): Data.Constraint<any[]> => [
+        `length=${length}`,
+        data => data.length === length ? null : `Length should be equal to ${length}.`,
+      ],
+      gt: (length: number): Data.Constraint<any[]> => [
+        `length>${length}`,
+        data => data.length > length ? null : `Length should be greater than ${length}.`,
+      ],
+      gte: (length: number): Data.Constraint<any[]> => [
+        `length>=${length}`,
+        data => data.length >= length ? null : `Length should be greater than or equal to ${length}.`,
+      ],
+      lt: (length: number): Data.Constraint<any[]> => [
+        `length<${length}`,
+        data => data.length < length ? null : `Length should be lesser than ${length}.`,
+      ],
+      lte: (length: number): Data.Constraint<any[]> => [
+        `length<=${length}`,
+        data => data.length <= length ? null : `Length should be lesser than or equal to ${length}.`,
+      ],
+      neq: (length: number): Data.Constraint<any[]> => [
+        `length<>${length}`,
+        data => data.length !== length ? null : `Length should not be equal to ${length}.`,
+      ],
     },
+    unique: <Data.Constraint<any[]>>[
+      "unique",
+      data => {
+        const items = new Set()
+        for (const [index, item] of data.map(i => JSON.stringify(i)).entries()) {
+          if (items.has(item)) {
+            return [`Values are not unique.`, { index }]
+          }
+          items.add(item)
+        }
+        return null
+      }
+    ],
   }
 
   /**
@@ -64,9 +95,9 @@ export class Handler extends Data.Handler {
    */
   public constructor(settings: Data.Settings) {
     super(settings)
-    const config = (settings.config ?? {}) as Config
+    const config = (settings.config ?? {}) as $List.Config<T>
     if (!config.item) {
-      throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Missing 'item' property.`)
+      throw new Data.ErrorUnexpected(`List configuration is invalid. Missing 'item' property.`)
     }
     this.item = config.item
     const { id, name } = this.getHandler()
@@ -84,75 +115,33 @@ export class Handler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  protected async checkConstraint(constraint: string, data: unknown[], context: Data.Context): Promise<Data.Constraint.Result> {
-    const matches = constraint.match(/^length(=|>|>=|<|<=|<>)(\d+)$/)
-    if (matches) {
-      const length = +matches[2]
-      switch (matches[1]) {
-        case "=":
-          return data.length === length
-            ? null
-            : `Length should be equal to ${length}.`
-
-        case ">":
-          return data.length > length
-            ? null
-            : `Length should be greater than ${length}.`
-
-        case ">=":
-          return data.length >= length
-            ? null
-            : `Length should be greater than or equal to ${length}.`
-
-        case "<":
-          return data.length < length
-            ? null
-            : `Length should be lesser than ${length}.`
-
-        case "<=":
-          return data.length <= length
-            ? null
-            : `Length should be lesser than or equal to ${length}.`
-
-        case "<>":
-          return data.length !== length
-            ? null
-            : `Length should not be equal to ${length}.`
-      }
-    }
-    return super.checkConstraint(constraint, data, context)
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected async inputToBase(data: unknown[], context: Data.Context): Promise<unknown[]> {
+  protected async inputToBase(data: NonNullable<T>, context: Data.Context): Promise<NonNullable<T>> {
     const result = await this.convert("toBase", data, context)
-    return super.inputToBase(result, context) as Promise<unknown[]>
+    return super.inputToBase(result as NonNullable<T>, context)
   }
 
   /**
    * {@inheritdoc}
    */
-  protected async baseToStore(data: unknown[], context: Data.Context): Promise<unknown[]> {
-    const result = await this.convert("toStore", data, context)
+  protected async baseToStore(data: NonNullable<T>, context: Data.Context): Promise<unknown[]> {
+    const result = await this.convert("toStore", data, context) as NonNullable<T>
     return super.baseToStore(result, context) as Promise<unknown[]>
   }
 
   /**
    * {@inheritdoc}
    */
-  protected async baseToOutput(data: unknown[], context: Data.Context): Promise<unknown[]> {
-    const result = await this.convert("toOutput", data, context)
+  protected async baseToOutput(data: NonNullable<T>, context: Data.Context): Promise<unknown[]> {
+    const result = await this.convert("toOutput", data, context) as NonNullable<T>
     return super.baseToOutput(result, context) as Promise<unknown[]>
   }
 
   /**
    * {@inheritdoc}
    */
-  protected async storeToBase(data: unknown[], context: Data.Context): Promise<unknown[]> {
+  protected async storeToBase(data: unknown[], context: Data.Context): Promise<NonNullable<T>> {
     const result = await this.convert("toBase", data, context)
-    return super.storeToBase(result, context) as Promise<unknown[]>
+    return super.storeToBase(result, context)
   }
 
   /**
@@ -178,7 +167,18 @@ export class Handler extends Data.Handler {
       .initData(this.format, data)
   }
 
-}
+  /**
+   * Configures the data handler.
+   */
+  public static conf(config?: $List.Config<any[]>): Data.Definition {
+    return [$List, config]
+  }
 
-export function conf(config: Config) { return { ...config, Handler } }
-export function init(config: Config) { return new Handler({ config }) }
+  /**
+   * Initializes the data handler.
+   */
+  public static init<T extends null | any[] = any[]>(config?: $List.Config<T>): $List<T> {
+    return new $List<T>({ config })
+  }
+
+}

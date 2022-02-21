@@ -1,27 +1,34 @@
 import * as Data from ".."
 import { $List, $Option } from "."
 
-export type Config = $Option.Config & {
-  preserve?: boolean
+export namespace $OptionList {
+  export type Config<T extends null | (number | string)[]> = Data.Config<T> & {
+    key_type?: $Option.KeyType
+    options?: $Option.Options
+    preserve?: boolean
+  }
 }
 
 /**
  * The option list data handler class.
  */
-export class Handler extends $List.Handler {
+export class $OptionList<T extends null | (number | string)[]> extends $List<T> {
 
   /**
    * {@inheritdoc}
    */
-  protected constraints: Data.Constraint[] = [...this.constraints, "unique"]
+  protected constraints: Data.Constraint.List<NonNullable<T>> = [
+    ...this.constraints,
+    $List.constraint.unique,
+  ]
 
   /**
    * {@inheritdoc}
    */
-  protected processorLibrary: Data.Processor.Library = {
-    ...this.processorLibrary,
-    order: (data: $Option.Keys): $Option.Keys => {
-      const keys = $Option.Handler.optionKeys(this.options)
+  public static processor = {
+    ...$List.processor,
+    order: <T extends any[]>(data: T, { handler }: Data.Context): T => {
+      const keys = $Option.optionKeys((<$OptionList<T>>handler).options)
       type Key = typeof keys[0]
       return data.sort((a: Key, b: Key) => keys.indexOf(a) - keys.indexOf(b))
     }
@@ -43,21 +50,32 @@ export class Handler extends $List.Handler {
   public constructor(settings: Data.Settings) {
     super({
       ...settings,
-      config: <$List.Config>{
+      config: <$List.Config<T>>{
         ...settings.config,
         item: $Option.conf({
-          key_type: (settings.config as $Option.Config).key_type,
-          options: (settings.config as $Option.Config).options,
+          key_type: (settings.config as $Option.Config<any>).key_type,
+          options: (settings.config as $Option.Config<any>).options,
         }),
       },
     })
-    const config: Config = settings.config ?? {}
+    const config = (settings.config ?? {}) as $OptionList.Config<T>
     this.options = config.options ?? this.options
     this.preserve = config.preserve ?? this.preserve
-    this.preserve || this.postprocessors.push("order")
+    this.preserve || this.postprocessors.push($OptionList.processor.order)
+  }
+
+  /**
+   * Configures the data handler.
+   */
+  public static conf(config?: $OptionList.Config<(number | string)[]>): Data.Definition {
+    return [$OptionList, config]
+  }
+
+  /**
+   * Initializes the data handler.
+   */
+  public static init<T extends null | (number | string)[] = (number | string)[]>(config?: $OptionList.Config<T>): $OptionList<T> {
+    return new $OptionList<T>({ config })
   }
 
 }
-
-export function conf(config?: Config) { return { ...config, Handler } }
-export function init(config?: Config) { return new Handler({ config }) }

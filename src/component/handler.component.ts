@@ -1,14 +1,14 @@
-import { Handler as HandlerBase } from "@azhulin/data-validator"
+import { Validator } from "."
 import { ErrorUnexpected, ErrorUnexpectedFormatting } from "../error"
 import { Format } from "../enum"
 
-import type { Path, Property } from "../type"
-import type { BaseContext, Context, Definition, Settings } from "../interface"
+import type { Definition, Path, Property } from "../type"
+import type { BaseContext, Context, Settings } from "../interface"
 
 /**
- * The base data handler class.
+ * The data handler class.
  */
-export abstract class Handler extends HandlerBase {
+export abstract class Handler<T extends any = any> extends Validator<T> {
 
   /**
    * The current data format.
@@ -43,7 +43,7 @@ export abstract class Handler extends HandlerBase {
   /**
    * {@inheritdoc}
    */
-  public async validate(data: unknown, baseContext?: BaseContext): Promise<unknown> {
+  public async validate(data: unknown, baseContext?: BaseContext): Promise<T> {
     return this.inInput(data).toBase(baseContext)
   }
 
@@ -57,7 +57,7 @@ export abstract class Handler extends HandlerBase {
   /**
    * Initializes the handler with data in base format.
    */
-  public inBase(data: unknown): this {
+  public inBase(data: T): this {
     return this.initData(Format.base, data)
   }
 
@@ -81,8 +81,8 @@ export abstract class Handler extends HandlerBase {
   /**
    * Returns the data in base format.
    */
-  public async toBase(baseContext?: BaseContext): Promise<unknown> {
-    return this.formatData(Format.base, baseContext)
+  public async toBase(baseContext?: BaseContext): Promise<T> {
+    return this.formatData(Format.base, baseContext) as Promise<T>
   }
 
   /**
@@ -117,10 +117,10 @@ export abstract class Handler extends HandlerBase {
         break
 
       case Format.base + Format.store:
-        return this.formatBaseToStore(this.data, baseContext)
+        return this.formatBaseToStore(this.data as T, baseContext)
 
       case Format.base + Format.output:
-        return this.formatBaseToOutput(this.data, baseContext)
+        return this.formatBaseToOutput(this.data as T, baseContext)
 
       default:
         throw new ErrorUnexpected("Invalid data format conversion.")
@@ -146,14 +146,14 @@ export abstract class Handler extends HandlerBase {
   /**
    * Returns the data in base format from data in input format.
    */
-  protected async formatInputToBase(data: unknown, baseContext?: BaseContext): Promise<unknown> {
+  protected async formatInputToBase(data: unknown, baseContext?: BaseContext): Promise<T> {
     return super.validate(data, baseContext)
   }
 
   /**
    * Returns store data from base data.
    */
-  protected async formatBaseToStore(data: unknown, baseContext?: BaseContext): Promise<unknown> {
+  protected async formatBaseToStore(data: T, baseContext?: BaseContext): Promise<unknown> {
     const context = await this.getContext(baseContext)
     if (!await this.isStorable(context)) {
       return undefined
@@ -162,7 +162,7 @@ export abstract class Handler extends HandlerBase {
       return data
     }
     if (this.isValidBaseData(data)) {
-      return this.baseToStore(data, context)
+      return this.baseToStore(data as NonNullable<T>, context)
     }
     throw new ErrorUnexpectedFormatting(this.path, this.id, Format.base, Format.store, data)
   }
@@ -170,7 +170,7 @@ export abstract class Handler extends HandlerBase {
   /**
    * Returns output data from base data.
    */
-  protected async formatBaseToOutput(data: unknown, baseContext?: BaseContext): Promise<unknown> {
+  protected async formatBaseToOutput(data: T, baseContext?: BaseContext): Promise<unknown> {
     const context = await this.getContext(baseContext)
     if (!await this.isOutputable(context)) {
       return undefined
@@ -179,7 +179,7 @@ export abstract class Handler extends HandlerBase {
       return data
     }
     if (this.isValidBaseData(data)) {
-      return this.baseToOutput(data, context)
+      return this.baseToOutput(data as NonNullable<T>, context)
     }
     throw new ErrorUnexpectedFormatting(this.path, this.id, Format.base, Format.output, data)
   }
@@ -187,13 +187,13 @@ export abstract class Handler extends HandlerBase {
   /**
    * Returns base data from store data.
    */
-  protected async formatStoreToBase(data: unknown, baseContext?: BaseContext): Promise<unknown> {
+  protected async formatStoreToBase(data: unknown, baseContext?: BaseContext): Promise<T> {
     const context = await this.getContext(baseContext)
     if (!await this.isStorable(context) || this.isOmitted(data)) {
       data = await this.getDefault(context, "read")
     }
     if (this.isOmitted(data) || this.isEmpty(data)) {
-      return data
+      return data as T
     }
     if (this.isValidStoreData(data)) {
       return this.storeToBase(data, context)
@@ -225,7 +225,7 @@ export abstract class Handler extends HandlerBase {
   /**
    * Converts data in input format to data in base format.
    */
-  protected async inputToBase(data: unknown, context: Context): Promise<unknown> {
+  protected async inputToBase(data: NonNullable<T>, context: Context): Promise<NonNullable<T>> {
     return super.process(data, context)
   }
   protected process = this.inputToBase
@@ -233,22 +233,22 @@ export abstract class Handler extends HandlerBase {
   /**
    * Converts data in base format to data in store format.
    */
-  protected async baseToStore(data: unknown, context: Context): Promise<unknown> {
+  protected async baseToStore(data: NonNullable<T>, context: Context): Promise<unknown> {
     return data
   }
 
   /**
    * Converts data in base format to data in output format.
    */
-  protected async baseToOutput(data: unknown, context: Context): Promise<unknown> {
+  protected async baseToOutput(data: NonNullable<T>, context: Context): Promise<unknown> {
     return data
   }
 
   /**
    * Converts data in store format to data in base format.
    */
-  protected async storeToBase(data: unknown, context: Context): Promise<unknown> {
-    return data
+  protected async storeToBase(data: unknown, context: Context): Promise<NonNullable<T>> {
+    return data as NonNullable<T>
   }
 
   /**

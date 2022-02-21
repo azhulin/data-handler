@@ -1,9 +1,9 @@
-export * as $Boolean from "./boolean.data";
-export * as $List from "./list.data";
-export * as $Number from "./number.data";
-export * as $Integer from "./integer.data";
-export * as $Object from "./object.data";
-export * as $Option from "./option.data";
-export * as $OptionList from "./option-list.data";
-export * as $String from "./string.data";
-export * as $Timestamp from "./timestamp.data";
+export * from "./boolean.data";
+export * from "./list.data";
+export * from "./number.data";
+export * from "./integer.data";
+export * from "./object.data";
+export * from "./option.data";
+export * from "./option-list.data";
+export * from "./string.data";
+export * from "./timestamp.data";

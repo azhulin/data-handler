@@ -1,11 +1,13 @@
 import * as Data from ".."
 
-export type Config = Data.Config
+export namespace $String {
+  export type Config<T extends null | string> = Data.Config<T>
+}
 
 /**
  * The string data handler class.
  */
-export class Handler extends Data.Handler {
+export class $String<T extends null | string> extends Data.Handler<T> {
 
   /**
    * {@inheritdoc}
@@ -20,20 +22,48 @@ export class Handler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  protected constraintLibrary: Data.Constraint.Library = {
-    ...this.constraintLibrary,
-    trimmed: (data: string) =>
-      data === data.trim() ? null : "Value should be trimmed."
+  public static constraint = {
+    ...Data.Handler.constraint,
+    trimmed: <Data.Constraint<string>>[
+      "trimmed",
+      (data: string) => data === data.trim() ? null : "Value should be trimmed.",
+    ],
+    length: {
+      eq: (length: number): Data.Constraint<string> => [
+        `length=${length}`,
+        data => data.length === length ? null : `Length should be equal to ${length}.`,
+      ],
+      gt: (length: number): Data.Constraint<string> => [
+        `length>${length}`,
+        data => data.length > length ? null : `Length should be greater than ${length}.`,
+      ],
+      gte: (length: number): Data.Constraint<string> => [
+        `length>=${length}`,
+        data => data.length >= length ? null : `Length should be greater than or equal to ${length}.`,
+      ],
+      lt: (length: number): Data.Constraint<string> => [
+        `length<${length}`,
+        data => data.length < length ? null : `Length should be lesser than ${length}.`,
+      ],
+      lte: (length: number): Data.Constraint<string> => [
+        `length<=${length}`,
+        data => data.length <= length ? null : `Length should be lesser than or equal to ${length}.`,
+      ],
+      neq: (length: number): Data.Constraint<string> => [
+        `length<>${length}`,
+        data => data.length !== length ? null : `Length should not be equal to ${length}.`,
+      ],
+    },
   }
 
   /**
    * {@inheritdoc}
    */
-  protected processorLibrary: Data.Processor.Library = {
-    ...this.processorLibrary,
-    trim: (data: string): string => data.trim(),
-    lower: (data: string): string => data.toLowerCase(),
-    upper: (data: string): string => data.toUpperCase(),
+  public static processor = {
+    ...Data.Handler.processor,
+    trim: (data: string) => data.trim(),
+    lower: (data: string) => data.toLowerCase(),
+    upper: (data: string) => data.toUpperCase(),
   }
 
   /**
@@ -46,57 +76,26 @@ export class Handler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  protected async inputToBase(data: string, context: Data.Context): Promise<string> {
+  protected async inputToBase(data: NonNullable<T>, context: Data.Context): Promise<NonNullable<T>> {
     const original = data
-    data = await super.inputToBase(data, context) as string
+    data = await super.inputToBase(data, context)
     original !== data
       && this.warn(new Data.ErrorAdapted(this.path, original, data))
     return data
   }
 
   /**
-   * {@inheritdoc}
+   * Configures the data handler.
    */
-  protected async checkConstraint(constraint: string, data: string, context: Data.Context): Promise<Data.Constraint.Result> {
-    const matches = constraint.match(/^length(=|>|>=|<|<=|<>)(\d+)$/)
-    if (matches) {
-      const length = +matches[2]
-      switch (matches[1]) {
-        case "=":
-          return data.length === length
-            ? null
-            : `Length should be equal to ${length}.`
+  public static conf(config?: $String.Config<string>): Data.Definition {
+    return [$String, config]
+  }
 
-        case ">":
-          return data.length > length
-            ? null
-            : `Length should be greater than ${length}.`
-
-        case ">=":
-          return data.length >= length
-            ? null
-            : `Length should be greater than or equal to ${length}.`
-
-        case "<":
-          return data.length < length
-            ? null
-            : `Length should be lesser than ${length}.`
-
-        case "<=":
-          return data.length <= length
-            ? null
-            : `Length should be lesser than or equal to ${length}.`
-
-        case "<>":
-          return data.length !== length
-            ? null
-            : `Length should not be equal to ${length}.`
-      }
-    }
-    return super.checkConstraint(constraint, data, context)
+  /**
+   * Initializes the data handler.
+   */
+  public static init<T extends null | string = string>(config?: $String.Config<T>): $String<T> {
+    return new $String<T>({ config })
   }
 
 }
-
-export function conf(config?: Config) { return { ...config, Handler } }
-export function init(config?: Config) { return new Handler({ config }) }
