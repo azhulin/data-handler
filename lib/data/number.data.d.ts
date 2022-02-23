@@ -1,13 +1,8 @@
 import * as Data from "..";
-export declare namespace $Number {
-    type Config<T extends null | number> = Data.Config<T> & {
-        decimals?: number;
-    };
-}
 /**
  * The number data handler class.
  */
-export declare class $Number<T extends null | number> extends Data.Handler<T> {
+declare class NumberHandler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
@@ -46,13 +41,27 @@ export declare class $Number<T extends null | number> extends Data.Handler<T> {
     /**
      * {@inheritdoc}
      */
-    protected inputToBase(data: number, context: Data.Context): Promise<NonNullable<T>>;
-    /**
-     * Configures the data handler.
-     */
-    static conf(config?: $Number.Config<number>): Data.Definition;
-    /**
-     * Initializes the data handler.
-     */
-    static init<T extends null | number = number>(config?: $Number.Config<T>): $Number<T>;
+    protected inputToBase(data: number, context: Data.Context): Promise<number>;
 }
+export declare namespace $Number {
+    type Config<T = number> = Data.Config<T> & {
+        decimals?: number;
+    };
+    const Handler: typeof NumberHandler;
+    const constraint: {
+        eq: (value: number) => Data.Constraint<number>;
+        gt: (value: number) => Data.Constraint<number>;
+        gte: (value: number) => Data.Constraint<number>;
+        lt: (value: number) => Data.Constraint<number>;
+        lte: (value: number) => Data.Constraint<number>;
+        neq: (value: number) => Data.Constraint<number>;
+    };
+    const preparer: Data.Preparer.Library;
+    const processor: Data.Processor.Library;
+    function conf(config?: Config): {
+        Handler: typeof NumberHandler;
+        config: Config<number>;
+    };
+    function init(config?: Config): NumberHandler;
+}
+export {};

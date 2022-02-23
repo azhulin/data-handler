@@ -1,15 +1,9 @@
 import * as Data from ".."
 
-export namespace $Number {
-  export type Config<T extends null | number> = Data.Config<T> & {
-    decimals?: number
-  }
-}
-
 /**
  * The number data handler class.
  */
-export class $Number<T extends null | number> extends Data.Handler<T> {
+class NumberHandler extends Data.Handler {
 
   /**
    * {@inheritdoc}
@@ -47,30 +41,30 @@ export class $Number<T extends null | number> extends Data.Handler<T> {
    */
   public static constraint = {
     ...Data.Handler.constraint,
-    eq: (value: number): Data.Constraint<number> => [
+    eq: (value: number) => new Data.Constraint<number>(
       `=${value}`,
       data => data === value ? null : `Value should be equal to ${value}.`,
-    ],
-    gt: (value: number): Data.Constraint<number> => [
+    ),
+    gt: (value: number) => new Data.Constraint<number>(
       `>${value}`,
       data => data > value ? null : `Value should be greater than ${value}.`,
-    ],
-    gte: (value: number): Data.Constraint<number> => [
+    ),
+    gte: (value: number) => new Data.Constraint<number>(
       `>=${value}`,
       data => data >= value ? null : `Value should be greater than or equal to ${value}.`,
-    ],
-    lt: (value: number): Data.Constraint<number> => [
+    ),
+    lt: (value: number) => new Data.Constraint<number>(
       `<${value}`,
       data => data < value ? null : `Value should be lesser than ${value}.`,
-    ],
-    lte: (value: number): Data.Constraint<number> => [
+    ),
+    lte: (value: number) => new Data.Constraint<number>(
       `<=${value}`,
       data => data <= value ? null : `Value should be lesser than or equal to ${value}.`,
-    ],
-    neq: (value: number): Data.Constraint<number> => [
+    ),
+    neq: (value: number) => new Data.Constraint<number>(
       `<>${value}`,
       data => data !== value ? null : `Value should not be equal to ${value}.`,
-    ],
+    ),
   }
 
   /**
@@ -78,7 +72,7 @@ export class $Number<T extends null | number> extends Data.Handler<T> {
    */
   public constructor(settings: Data.Settings) {
     super(settings)
-    const config = (settings.config ?? {}) as $Number.Config<T>
+    const config = (settings.config ?? {}) as $Number.Config
     this.decimals = config.decimals ?? this.decimals
     if (null !== this.decimals && !Data.isIndex(this.decimals)) {
       throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Invalid 'decimals' property.`)
@@ -95,26 +89,24 @@ export class $Number<T extends null | number> extends Data.Handler<T> {
   /**
    * {@inheritdoc}
    */
-  protected async inputToBase(data: number, context: Data.Context): Promise<NonNullable<T>> {
+  protected async inputToBase(data: number, context: Data.Context): Promise<number> {
     const original = data
     data = null !== this.decimals ? +data.toFixed(this.decimals) : data
     original !== data
       && this.warn(new Data.ErrorAdapted(this.path, original, data))
-    return super.inputToBase(data as NonNullable<T>, context)
+    return super.inputToBase(data, context) as Promise<number>
   }
 
-  /**
-   * Configures the data handler.
-   */
-  public static conf(config?: $Number.Config<number>): Data.Definition {
-    return [$Number, config]
-  }
+}
 
-  /**
-   * Initializes the data handler.
-   */
-  public static init<T extends null | number = number>(config?: $Number.Config<T>): $Number<T> {
-    return new $Number<T>({ config })
+export namespace $Number {
+  export type Config<T = number> = Data.Config<T> & {
+    decimals?: number
   }
-
+  export const Handler = NumberHandler
+  export const constraint = Handler.constraint
+  export const preparer = Handler.preparer
+  export const processor = Handler.processor
+  export function conf(config: Config = {}) { return { Handler, config } }
+  export function init(config: Config = {}) { return new Handler({ config }) }
 }

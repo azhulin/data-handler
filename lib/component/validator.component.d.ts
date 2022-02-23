@@ -1,9 +1,10 @@
+import { Constraint } from "../component";
 import type { BaseContext, Context, Settings } from "../interface";
-import type { Constraint, Default, Definition, Path, Preparer, Processor, Property } from "../type";
+import type { Default, Definition, Path, Preparer, Processor, Property } from "../type";
 /**
  * The data validator class.
  */
-export declare abstract class Validator<T extends any = any> {
+export declare abstract class Validator {
     /**
      * The ID of the data type.
      */
@@ -16,6 +17,10 @@ export declare abstract class Validator<T extends any = any> {
      * The description of the data type.
      */
     get description(): string;
+    /**
+     * The label of the data handler.
+     */
+    get label(): string;
     /**
      * A map of available data preparers.
      */
@@ -31,7 +36,7 @@ export declare abstract class Validator<T extends any = any> {
     /**
      * The default data.
      */
-    protected default: Default<T>;
+    protected default: Default;
     /**
      * Whether to accept the data from input.
      */
@@ -43,27 +48,27 @@ export declare abstract class Validator<T extends any = any> {
     /**
      * An array of data preparers.
      */
-    protected preparers: Preparer<T>[];
+    protected preparers: Preparer<any>[];
     /**
      * An array of data preprocessors.
      */
-    protected preprocessors: Processor<NonNullable<T>>[];
+    protected preprocessors: Processor<any>[];
     /**
      * An array of data constraints.
      */
-    protected constraints: Constraint.List<NonNullable<T>>;
+    protected constraints: Constraint.List<any>;
     /**
      * An array of data postprocessors.
      */
-    protected postprocessors: Processor<NonNullable<T>>[];
+    protected postprocessors: Processor<any>[];
     /**
      * Custom preparers, preprocessors, constraints, postprocessors.
      */
     protected custom: {
-        preparers?: Preparer<T>[];
-        preprocessors?: Processor<NonNullable<T>>[];
-        constraints?: Constraint.List<NonNullable<T>>;
-        postprocessors?: Processor<NonNullable<T>>[];
+        preparers?: Preparer<any>[];
+        preprocessors?: Processor<any>[];
+        constraints?: Constraint.List<any>;
+        postprocessors?: Processor<any>[];
     };
     /**
      * The path of the data in the data tree.
@@ -96,7 +101,7 @@ export declare abstract class Validator<T extends any = any> {
     /**
      * Returns validated data.
      */
-    validate(data: unknown, baseContext?: BaseContext): Promise<T>;
+    validate(data: unknown, baseContext?: BaseContext): Promise<unknown>;
     /**
      * Returns the context.
      */
@@ -104,7 +109,7 @@ export declare abstract class Validator<T extends any = any> {
     /**
      * Prepares the data.
      */
-    protected prepare(data: unknown, context: Context): Promise<T>;
+    protected prepare(data: unknown, context: Context): Promise<unknown>;
     /**
      * Determines whether the data is valid.
      */
@@ -112,23 +117,23 @@ export declare abstract class Validator<T extends any = any> {
     /**
      * Processes the data.
      */
-    protected process(data: NonNullable<T>, context: Context): Promise<NonNullable<T>>;
+    protected process(data: unknown, context: Context): Promise<unknown>;
     /**
      * Runs data preprocessors.
      */
-    protected preprocess(data: NonNullable<T>, context: Context): Promise<NonNullable<T>>;
+    protected preprocess(data: unknown, context: Context): Promise<unknown>;
     /**
      * Runs data postprocessors.
      */
-    protected postprocess(data: NonNullable<T>, context: Context): Promise<NonNullable<T>>;
+    protected postprocess(data: unknown, context: Context): Promise<unknown>;
     /**
      * Runs processors on the data.
      */
-    protected run(type: "preprocessors" | "postprocessors", data: NonNullable<T>, context: Context): Promise<NonNullable<T>>;
+    protected run(type: "preprocessors" | "postprocessors", data: unknown, context: Context): Promise<unknown>;
     /**
      * Checks data constraints.
      */
-    protected checkConstraints(data: NonNullable<T>, context: Context): Promise<void>;
+    protected checkConstraints(data: unknown, context: Context): Promise<void>;
     /**
      * Determines whether the value is present in source data.
      */
@@ -156,7 +161,7 @@ export declare abstract class Validator<T extends any = any> {
     /**
      * Returns the default value based on behavior.
      */
-    protected getDefault(context: Context, behavior?: keyof Default<T>): Promise<T>;
+    protected getDefault(context: Context, behavior?: keyof Default): Promise<unknown>;
     /**
      * Returns data handler dynamic context property value.
      */

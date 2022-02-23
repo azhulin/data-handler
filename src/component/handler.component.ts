@@ -8,7 +8,7 @@ import type { BaseContext, Context, Settings } from "../interface"
 /**
  * The data handler class.
  */
-export abstract class Handler<T extends any = any> extends Validator<T> {
+export abstract class Handler extends Validator {
 
   /**
    * The current data format.
@@ -43,7 +43,7 @@ export abstract class Handler<T extends any = any> extends Validator<T> {
   /**
    * {@inheritdoc}
    */
-  public async validate(data: unknown, baseContext?: BaseContext): Promise<T> {
+  public async validate(data: unknown, baseContext?: BaseContext): Promise<unknown> {
     return this.inInput(data).toBase(baseContext)
   }
 
@@ -57,7 +57,7 @@ export abstract class Handler<T extends any = any> extends Validator<T> {
   /**
    * Initializes the handler with data in base format.
    */
-  public inBase(data: T): this {
+  public inBase(data: unknown): this {
     return this.initData(Format.base, data)
   }
 
@@ -81,8 +81,8 @@ export abstract class Handler<T extends any = any> extends Validator<T> {
   /**
    * Returns the data in base format.
    */
-  public async toBase(baseContext?: BaseContext): Promise<T> {
-    return this.formatData(Format.base, baseContext) as Promise<T>
+  public async toBase(baseContext?: BaseContext): Promise<unknown> {
+    return this.formatData(Format.base, baseContext) as Promise<unknown>
   }
 
   /**
@@ -117,10 +117,10 @@ export abstract class Handler<T extends any = any> extends Validator<T> {
         break
 
       case Format.base + Format.store:
-        return this.formatBaseToStore(this.data as T, baseContext)
+        return this.formatBaseToStore(this.data, baseContext)
 
       case Format.base + Format.output:
-        return this.formatBaseToOutput(this.data as T, baseContext)
+        return this.formatBaseToOutput(this.data, baseContext)
 
       default:
         throw new ErrorUnexpected("Invalid data format conversion.")
@@ -146,14 +146,14 @@ export abstract class Handler<T extends any = any> extends Validator<T> {
   /**
    * Returns the data in base format from data in input format.
    */
-  protected async formatInputToBase(data: unknown, baseContext?: BaseContext): Promise<T> {
+  protected async formatInputToBase(data: unknown, baseContext?: BaseContext): Promise<unknown> {
     return super.validate(data, baseContext)
   }
 
   /**
    * Returns store data from base data.
    */
-  protected async formatBaseToStore(data: T, baseContext?: BaseContext): Promise<unknown> {
+  protected async formatBaseToStore(data: unknown, baseContext?: BaseContext): Promise<unknown> {
     const context = await this.getContext(baseContext)
     if (!await this.isStorable(context)) {
       return undefined
@@ -162,7 +162,7 @@ export abstract class Handler<T extends any = any> extends Validator<T> {
       return data
     }
     if (this.isValidBaseData(data)) {
-      return this.baseToStore(data as NonNullable<T>, context)
+      return this.baseToStore(data, context)
     }
     throw new ErrorUnexpectedFormatting(this.path, this.id, Format.base, Format.store, data)
   }
@@ -170,7 +170,7 @@ export abstract class Handler<T extends any = any> extends Validator<T> {
   /**
    * Returns output data from base data.
    */
-  protected async formatBaseToOutput(data: T, baseContext?: BaseContext): Promise<unknown> {
+  protected async formatBaseToOutput(data: unknown, baseContext?: BaseContext): Promise<unknown> {
     const context = await this.getContext(baseContext)
     if (!await this.isOutputable(context)) {
       return undefined
@@ -179,7 +179,7 @@ export abstract class Handler<T extends any = any> extends Validator<T> {
       return data
     }
     if (this.isValidBaseData(data)) {
-      return this.baseToOutput(data as NonNullable<T>, context)
+      return this.baseToOutput(data, context)
     }
     throw new ErrorUnexpectedFormatting(this.path, this.id, Format.base, Format.output, data)
   }
@@ -187,13 +187,13 @@ export abstract class Handler<T extends any = any> extends Validator<T> {
   /**
    * Returns base data from store data.
    */
-  protected async formatStoreToBase(data: unknown, baseContext?: BaseContext): Promise<T> {
+  protected async formatStoreToBase(data: unknown, baseContext?: BaseContext): Promise<unknown> {
     const context = await this.getContext(baseContext)
     if (!await this.isStorable(context) || this.isOmitted(data)) {
       data = await this.getDefault(context, "read")
     }
     if (this.isOmitted(data) || this.isEmpty(data)) {
-      return data as T
+      return data
     }
     if (this.isValidStoreData(data)) {
       return this.storeToBase(data, context)
@@ -225,7 +225,7 @@ export abstract class Handler<T extends any = any> extends Validator<T> {
   /**
    * Converts data in input format to data in base format.
    */
-  protected async inputToBase(data: NonNullable<T>, context: Context): Promise<NonNullable<T>> {
+  protected async inputToBase(data: unknown, context: Context): Promise<unknown> {
     return super.process(data, context)
   }
   protected process = this.inputToBase
@@ -233,22 +233,22 @@ export abstract class Handler<T extends any = any> extends Validator<T> {
   /**
    * Converts data in base format to data in store format.
    */
-  protected async baseToStore(data: NonNullable<T>, context: Context): Promise<unknown> {
+  protected async baseToStore(data: unknown, context: Context): Promise<unknown> {
     return data
   }
 
   /**
    * Converts data in base format to data in output format.
    */
-  protected async baseToOutput(data: NonNullable<T>, context: Context): Promise<unknown> {
+  protected async baseToOutput(data: unknown, context: Context): Promise<unknown> {
     return data
   }
 
   /**
    * Converts data in store format to data in base format.
    */
-  protected async storeToBase(data: unknown, context: Context): Promise<NonNullable<T>> {
-    return data as NonNullable<T>
+  protected async storeToBase(data: unknown, context: Context): Promise<unknown> {
+    return data
   }
 
   /**

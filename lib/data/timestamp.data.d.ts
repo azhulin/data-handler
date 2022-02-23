@@ -1,11 +1,9 @@
 import * as Data from "..";
-export declare namespace $Timestamp {
-    type Config<T extends null | number> = Data.Config<T>;
-}
+import { $Number } from ".";
 /**
  * The timestamp data handler class.
  */
-export declare class $Timestamp<T extends null | number> extends Data.Handler<T> {
+declare class TimestampHandler extends $Number.Handler {
     /**
      * {@inheritdoc}
      */
@@ -24,17 +22,41 @@ export declare class $Timestamp<T extends null | number> extends Data.Handler<T>
     static constraint: {
         future: Data.Constraint<number>;
         past: Data.Constraint<number>;
+        eq: (value: number) => Data.Constraint<number>;
+        gt: (value: number) => Data.Constraint<number>;
+        gte: (value: number) => Data.Constraint<number>;
+        lt: (value: number) => Data.Constraint<number>;
+        lte: (value: number) => Data.Constraint<number>;
+        neq: (value: number) => Data.Constraint<number>;
     };
     /**
      * {@inheritdoc}
      */
+    protected decimals: null | number;
+    /**
+     * {@inheritdoc}
+     */
     protected isValid(data: unknown): boolean;
-    /**
-     * Configures the data handler.
-     */
-    static conf(config?: $Timestamp.Config<number>): Data.Definition;
-    /**
-     * Initializes the data handler.
-     */
-    static init<T extends null | number = number>(config?: $Timestamp.Config<T>): $Timestamp<T>;
 }
+export declare namespace $Timestamp {
+    type Config = Omit<$Number.Config, "decimals">;
+    const Handler: typeof TimestampHandler;
+    const constraint: {
+        future: Data.Constraint<number>;
+        past: Data.Constraint<number>;
+        eq: (value: number) => Data.Constraint<number>;
+        gt: (value: number) => Data.Constraint<number>;
+        gte: (value: number) => Data.Constraint<number>;
+        lt: (value: number) => Data.Constraint<number>;
+        lte: (value: number) => Data.Constraint<number>;
+        neq: (value: number) => Data.Constraint<number>;
+    };
+    const preparer: Data.Preparer.Library;
+    const processor: Data.Processor.Library;
+    function conf(config?: Config): {
+        Handler: typeof TimestampHandler;
+        config: Config;
+    };
+    function init(config?: Config): TimestampHandler;
+}
+export {};

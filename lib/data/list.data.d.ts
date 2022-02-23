@@ -1,13 +1,8 @@
 import * as Data from "..";
-export declare namespace $List {
-    type Config<T extends null | any[]> = Data.Config<T> & {
-        item: Data.Definition;
-    };
-}
 /**
  * The list data handler class.
  */
-export declare class $List<T extends null | any[]> extends Data.Handler<T> {
+declare class ListHandler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
@@ -19,7 +14,7 @@ export declare class $List<T extends null | any[]> extends Data.Handler<T> {
     /**
      * {@inheritdoc}
      */
-    protected default: Data.Default<T>;
+    protected default: Data.Default<null | any[]>;
     /**
      * {@inheritdoc}
      */
@@ -41,11 +36,11 @@ export declare class $List<T extends null | any[]> extends Data.Handler<T> {
     /**
      * The list item type ID.
      */
-    protected typeId: string;
+    protected itemId: string;
     /**
      * The list item type name.
      */
-    protected typeName: string;
+    protected itemName: string;
     /**
      * {@inheritdoc}
      */
@@ -57,19 +52,19 @@ export declare class $List<T extends null | any[]> extends Data.Handler<T> {
     /**
      * {@inheritdoc}
      */
-    protected inputToBase(data: NonNullable<T>, context: Data.Context): Promise<NonNullable<T>>;
+    protected inputToBase(data: unknown[], context: Data.Context): Promise<unknown[]>;
     /**
      * {@inheritdoc}
      */
-    protected baseToStore(data: NonNullable<T>, context: Data.Context): Promise<unknown[]>;
+    protected baseToStore(data: any[], context: Data.Context): Promise<unknown[]>;
     /**
      * {@inheritdoc}
      */
-    protected baseToOutput(data: NonNullable<T>, context: Data.Context): Promise<unknown[]>;
+    protected baseToOutput(data: any[], context: Data.Context): Promise<unknown[]>;
     /**
      * {@inheritdoc}
      */
-    protected storeToBase(data: unknown[], context: Data.Context): Promise<NonNullable<T>>;
+    protected storeToBase(data: unknown[], context: Data.Context): Promise<any[]>;
     /**
      * Performs format conversion.
      */
@@ -78,12 +73,29 @@ export declare class $List<T extends null | any[]> extends Data.Handler<T> {
      * Returns data handler.
      */
     protected getHandler(index?: number, data?: unknown): Data.Handler;
-    /**
-     * Configures the data handler.
-     */
-    static conf(config?: $List.Config<any[]>): Data.Definition;
-    /**
-     * Initializes the data handler.
-     */
-    static init<T extends null | any[] = any[]>(config?: $List.Config<T>): $List<T>;
 }
+export declare namespace $List {
+    type Config<T extends any[] = any[]> = Data.Config<T> & {
+        item: Data.Definition;
+    };
+    const Handler: typeof ListHandler;
+    const constraint: {
+        length: {
+            eq: (length: number) => Data.Constraint<any[]>;
+            gt: (length: number) => Data.Constraint<any[]>;
+            gte: (length: number) => Data.Constraint<any[]>;
+            lt: (length: number) => Data.Constraint<any[]>;
+            lte: (length: number) => Data.Constraint<any[]>;
+            neq: (length: number) => Data.Constraint<any[]>;
+        };
+        unique: Data.Constraint<any[]>;
+    };
+    const preparer: Data.Preparer.Library;
+    const processor: Data.Processor.Library;
+    function conf<T extends any[] = any[]>(config: Config<T>): {
+        Handler: typeof ListHandler;
+        config: Config<T>;
+    };
+    function init<T extends any[] = any[]>(config: Config<T>): ListHandler;
+}
+export {};

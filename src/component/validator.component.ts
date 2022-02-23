@@ -1,3 +1,4 @@
+import { Constraint } from "../component"
 import { Operation } from "../enum"
 import {
   ErrorConstraint, ErrorEmpty, ErrorIgnored, ErrorRequired, ErrorType, ErrorUnexpected,
@@ -5,12 +6,12 @@ import {
 import { extract, pathResolve } from "../util"
 
 import type { BaseContext, Context, Settings } from "../interface"
-import type { Constraint, Default, Definition, Path, Preparer, Processor, Property } from "../type"
+import type { Default, Definition, Path, Preparer, Processor, Property } from "../type"
 
 /**
  * The data validator class.
  */
-export abstract class Validator<T extends any = any> {
+export abstract class Validator {
 
   /**
    * The ID of the data type.
@@ -26,6 +27,11 @@ export abstract class Validator<T extends any = any> {
    * The description of the data type.
    */
   public get description(): string { return "" }
+
+  /**
+   * The label of the data handler.
+   */
+  public get label(): string { return this.name }
 
   /**
    * A map of available data preparers.
@@ -45,11 +51,11 @@ export abstract class Validator<T extends any = any> {
   /**
    * The default data.
    */
-  protected default: Default<T> = {
-    value: null as T,
+  protected default: Default = {
+    value: null,
     read: context => this.getValue(this.default.value, context),
     create: context => this.getValue(this.default.value, context),
-    update: context => (context.original() ?? this.default.value) as T,
+    update: context => (context.original() as any ?? this.default.value),
     integrate: context => this.getValue(this.default.update, context),
     nulled: context => this.getValue(this.default.create, context),
   }
@@ -67,31 +73,31 @@ export abstract class Validator<T extends any = any> {
   /**
    * An array of data preparers.
    */
-  protected preparers: Preparer<T>[] = []
+  protected preparers: Preparer<any>[] = []
 
   /**
    * An array of data preprocessors.
    */
-  protected preprocessors: Processor<NonNullable<T>>[] = []
+  protected preprocessors: Processor<any>[] = []
 
   /**
    * An array of data constraints.
    */
-  protected constraints: Constraint.List<NonNullable<T>> = []
+  protected constraints: Constraint.List<any> = []
 
   /**
    * An array of data postprocessors.
    */
-  protected postprocessors: Processor<NonNullable<T>>[] = []
+  protected postprocessors: Processor<any>[] = []
 
   /**
    * Custom preparers, preprocessors, constraints, postprocessors.
    */
   protected custom: {
-    preparers?: Preparer<T>[]
-    preprocessors?: Processor<NonNullable<T>>[]
-    constraints?: Constraint.List<NonNullable<T>>
-    postprocessors?: Processor<NonNullable<T>>[]
+    preparers?: Preparer<any>[]
+    preprocessors?: Processor<any>[]
+    constraints?: Constraint.List<any>
+    postprocessors?: Processor<any>[]
   } = {}
 
   /**
@@ -164,7 +170,7 @@ export abstract class Validator<T extends any = any> {
   /**
    * Returns validated data.
    */
-  public async validate(data: unknown, baseContext?: BaseContext): Promise<T> {
+  public async validate(data: unknown, baseContext?: BaseContext): Promise<unknown> {
     this.reset(data)
     const context = await this.getContext(baseContext)
     if (!await this.isInputable(context)) {
@@ -175,16 +181,16 @@ export abstract class Validator<T extends any = any> {
     else if (this.isOmitted(data)) {
       const required = await this.isRequired(context)
       if (required && !context.update && !context.integrate) {
-        throw new ErrorRequired(this.path)
+        throw new ErrorRequired(this.path, this)
       }
       data = await this.getDefault(context)
       if (required && this.isEmpty(data)) {
-        throw new ErrorRequired(this.path)
+        throw new ErrorRequired(this.path, this)
       }
     }
     else if (this.isEmpty(data)) {
       if (await this.isRequired(context)) {
-        throw new ErrorEmpty(this.path)
+        throw new ErrorEmpty(this.path, this)
       }
       data = await this.getDefault(context, "nulled")
     }
@@ -193,9 +199,9 @@ export abstract class Validator<T extends any = any> {
       if (!this.isValid(data)) {
         throw new ErrorType(this.path, this)
       }
-      data = await this.process(data as NonNullable<T>, context)
+      data = await this.process(data, context)
     }
-    return data as T
+    return data
   }
 
   /**
@@ -227,11 +233,11 @@ export abstract class Validator<T extends any = any> {
   /**
    * Prepares the data.
    */
-  protected async prepare(data: unknown, context: Context): Promise<T> {
+  protected async prepare(data: unknown, context: Context): Promise<unknown> {
     for (let preparer of [...this.preparers, ...this.custom.preparers ?? []]) {
       data = await preparer(data, context)
     }
-    return data as T
+    return data
   }
 
   /**
@@ -244,7 +250,7 @@ export abstract class Validator<T extends any = any> {
   /**
    * Processes the data.
    */
-  protected async process(data: NonNullable<T>, context: Context): Promise<NonNullable<T>> {
+  protected async process(data: unknown, context: Context): Promise<unknown> {
     data = await this.preprocess(data, context)
     await this.checkConstraints(data, context)
     return this.postprocess(data, context)
@@ -253,21 +259,21 @@ export abstract class Validator<T extends any = any> {
   /**
    * Runs data preprocessors.
    */
-  protected async preprocess(data: NonNullable<T>, context: Context): Promise<NonNullable<T>> {
+  protected async preprocess(data: unknown, context: Context): Promise<unknown> {
     return this.run("preprocessors", data, context)
   }
 
   /**
    * Runs data postprocessors.
    */
-  protected async postprocess(data: NonNullable<T>, context: Context): Promise<NonNullable<T>> {
+  protected async postprocess(data: unknown, context: Context): Promise<unknown> {
     return this.run("postprocessors", data, context)
   }
 
   /**
    * Runs processors on the data.
    */
-  protected async run(type: "preprocessors" | "postprocessors", data: NonNullable<T>, context: Context): Promise<NonNullable<T>> {
+  protected async run(type: "preprocessors" | "postprocessors", data: unknown, context: Context): Promise<unknown> {
     for (let processor of [...this[type], ...this.custom[type] ?? []]) {
       data = await processor(data, context)
     }
@@ -277,15 +283,15 @@ export abstract class Validator<T extends any = any> {
   /**
    * Checks data constraints.
    */
-  protected async checkConstraints(data: NonNullable<T>, context: Context): Promise<void> {
+  protected async checkConstraints(data: unknown, context: Context): Promise<void> {
     const constraints = []
     for (const item of [...this.constraints, ...this.custom.constraints ?? []]) {
       constraints.push(..."function" === typeof item ? item(context) : [item])
     }
-    for (const [id, func, runOnUpdate = false] of constraints) {
+    for (const { id, func, skip } of constraints) {
       const { update, original } = context
       // Allows to skip constraint validation on update with unchanged value.
-      if (!runOnUpdate && update && data === original()) {
+      if (skip && update && data === original()) {
         continue
       }
       const result = await func(data, context)
@@ -341,7 +347,7 @@ export abstract class Validator<T extends any = any> {
   /**
    * Returns the default value based on behavior.
    */
-  protected async getDefault(context: Context, behavior?: keyof Default<T>): Promise<T> {
+  protected async getDefault(context: Context, behavior?: keyof Default): Promise<unknown> {
     const property = this.default[behavior ?? context.operation]
     return this.getValue(property, context)
   }
@@ -366,9 +372,9 @@ export abstract class Validator<T extends any = any> {
    * Returns the data handler for specified data definition.
    */
   protected initHandler(definition: Definition, path: Path): Validator {
-    const [handler, config] = Array.isArray(definition) ? definition : [definition, {}]
+    const { Handler, config } = "config" in definition ? definition : { ...definition, config: {} }
     const { source, result, storage, warnings } = this
-    return new handler({ config, path, source, result, storage, warnings })
+    return new Handler({ config, path, source, result, storage, warnings })
   }
 
   /**

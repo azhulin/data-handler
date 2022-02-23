@@ -1,12 +1,8 @@
-import * as Data from "..";
 import { $Number } from ".";
-export declare namespace $Integer {
-    type Config<T extends null | number> = Data.Config<T>;
-}
 /**
  * The integer data handler class.
  */
-export declare class $Integer<T extends null | number> extends $Number<T> {
+declare class IntegerHandler extends $Number.Handler {
     /**
      * {@inheritdoc}
      */
@@ -27,12 +23,24 @@ export declare class $Integer<T extends null | number> extends $Number<T> {
      * {@inheritdoc}
      */
     protected isValid(data: unknown): boolean;
-    /**
-     * Configures the data handler.
-     */
-    static conf(config?: $Integer.Config<number>): Data.Definition;
-    /**
-     * Initializes the data handler.
-     */
-    static init<T extends null | number = number>(config?: $Integer.Config<T>): $Integer<T>;
 }
+export declare namespace $Integer {
+    type Config = Omit<$Number.Config, "decimals">;
+    const Handler: typeof IntegerHandler;
+    const constraint: {
+        eq: (value: number) => import("..").Constraint<number>;
+        gt: (value: number) => import("..").Constraint<number>;
+        gte: (value: number) => import("..").Constraint<number>;
+        lt: (value: number) => import("..").Constraint<number>;
+        lte: (value: number) => import("..").Constraint<number>;
+        neq: (value: number) => import("..").Constraint<number>;
+    };
+    const preparer: import("..").Preparer.Library;
+    const processor: import("..").Processor.Library;
+    function conf(config?: Config): {
+        Handler: typeof IntegerHandler;
+        config: Config;
+    };
+    function init(config?: Config): IntegerHandler;
+}
+export {};

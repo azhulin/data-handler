@@ -1,4 +1,5 @@
 import { ErrorExpected } from ".";
+import type { Validator } from "../component";
 import type { Path } from "../type";
 /**
  * The data required error.
@@ -11,5 +12,5 @@ export declare class ErrorRequired extends ErrorExpected {
     /**
      * Constructor for the ErrorRequired object.
      */
-    constructor(path: Path);
+    constructor(path: Path, { id, name, description }: Validator);
 }

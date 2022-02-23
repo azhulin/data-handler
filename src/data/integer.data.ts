@@ -1,14 +1,9 @@
-import * as Data from ".."
 import { $Number } from "."
-
-export namespace $Integer {
-  export type Config<T extends null | number> = Data.Config<T>
-}
 
 /**
  * The integer data handler class.
  */
-export class $Integer<T extends null | number> extends $Number<T> {
+class IntegerHandler extends $Number.Handler {
 
   /**
    * {@inheritdoc}
@@ -37,18 +32,14 @@ export class $Integer<T extends null | number> extends $Number<T> {
     return super.isValid(data) && Number.isInteger(data)
   }
 
-  /**
-   * Configures the data handler.
-   */
-  public static conf(config?: $Integer.Config<number>): Data.Definition {
-    return [$Integer, config]
-  }
+}
 
-  /**
-   * Initializes the data handler.
-   */
-  public static init<T extends null | number = number>(config?: $Integer.Config<T>): $Integer<T> {
-    return new $Integer<T>({ config })
-  }
-
+export namespace $Integer {
+  export type Config = Omit<$Number.Config, "decimals">
+  export const Handler = IntegerHandler
+  export const constraint = Handler.constraint
+  export const preparer = Handler.preparer
+  export const processor = Handler.processor
+  export function conf(config: Config = {}) { return { Handler, config } }
+  export function init(config: Config = {}) { return new Handler({ config }) }
 }

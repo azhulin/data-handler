@@ -1,4 +1,3 @@
-export * from "./constraint.type";
 export * from "./default.type";
 export * from "./definition.type";
 export * from "./handler-constructor.type";

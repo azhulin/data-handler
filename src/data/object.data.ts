@@ -1,16 +1,9 @@
 import * as Data from ".."
 
-export namespace $Object {
-  export type Config<T extends null | Record<string, any>> = Data.Config<T> & {
-    schema: Data.Schema
-    reduce?: boolean
-  }
-}
-
 /**
  * The object data handler class.
  */
-export class $Object<T extends null | Record<string, any>> extends Data.Handler<T> {
+class ObjectHandler extends Data.Handler {
 
   /**
    * {@inheritdoc}
@@ -45,7 +38,7 @@ export class $Object<T extends null | Record<string, any>> extends Data.Handler<
    */
   public constructor(settings: Data.Settings) {
     super(settings)
-    const config = (settings.config ?? {}) as $Object.Config<T>
+    const config = (settings.config ?? {}) as $Object.Config
     this.schema = config.schema ?? this.schema
     this.reduce = config.reduce ?? this.reduce
   }
@@ -67,52 +60,52 @@ export class $Object<T extends null | Record<string, any>> extends Data.Handler<
   /**
    * {@inheritdoc}
    */
-  protected async inputToBase(data: NonNullable<T>, context: Data.Context): Promise<NonNullable<T>> {
+  protected async inputToBase(data: Record<string, any>, context: Data.Context): Promise<Record<string, any>> {
     Object.keys(data).filter(key => !(key in this.preparedSchema))
       .forEach(key => this.warn(new Data.ErrorIgnored([...this.path, key])))
     let result = await this.convert("toBase", data, context)
     if (this.reduce && Object.values(result!).every(value => null === value)
         && !await this.isRequired(context)) {
-      result = await this.getDefault(context) as NonNullable<T>
+      result = await this.getDefault(context) as Record<string, any>
     }
-    return super.inputToBase(result, context)
+    return super.inputToBase(result, context) as Promise<Record<string, any>>
   }
 
   /**
    * {@inheritdoc}
    */
-  protected async baseToStore(data: NonNullable<T>, context: Data.Context): Promise<unknown> {
-    const result = await this.convert("toStore", data, context) as NonNullable<T>
+  protected async baseToStore(data: Record<string, any>, context: Data.Context): Promise<any> {
+    const result = await this.convert("toStore", data, context)
     return super.baseToStore(result, context)
   }
 
   /**
    * {@inheritdoc}
    */
-  protected async baseToOutput(data: NonNullable<T>, context: Data.Context): Promise<unknown> {
-    const result = await this.convert("toOutput", data, context) as NonNullable<T>
+  protected async baseToOutput(data: Record<string, any>, context: Data.Context): Promise<any> {
+    const result = await this.convert("toOutput", data, context)
     return super.baseToOutput(result, context)
   }
 
   /**
    * {@inheritdoc}
    */
-  protected async storeToBase(data: NonNullable<T>, context: Data.Context): Promise<NonNullable<T>> {
+  protected async storeToBase(data: Record<string, any>, context: Data.Context): Promise<Record<string, any>> {
     const result = await this.convert("toBase", data, context)
-    return super.storeToBase(result, context)
+    return super.storeToBase(result, context) as Promise<Record<string, any>>
   }
 
   /**
    * Performs format conversion.
    */
-  protected async convert(method: "toBase" | "toStore" | "toOutput", data: NonNullable<T>, context: Data.Context): Promise<NonNullable<T>> {
+  protected async convert(method: "toBase" | "toStore" | "toOutput", data: Record<string, any>, context: Data.Context): Promise<Record<string, any>> {
     const result: Record<string, any> = {}
     this.result = Data.set(this.result, this.path, result)
     for (const key of Object.keys(this.preparedSchema)) {
       const value = await this.getHandler(key, data[key])[method](context)
       undefined !== value && (result[key] = value)
     }
-    return result as NonNullable<T>
+    return result
   }
 
   /**
@@ -123,18 +116,17 @@ export class $Object<T extends null | Record<string, any>> extends Data.Handler<
       .initData(this.format, data)
   }
 
-  /**
-   * Configures the data handler.
-   */
-  public static conf(config?: $Object.Config<Record<string, any>>): Data.Definition {
-    return [$Object, config]
-  }
+}
 
-  /**
-   * Initializes the data handler.
-   */
-  public static init<T extends null | Record<string, any> = Record<string, any>>(config?: $Object.Config<T>): $Object<T> {
-    return new $Object<T>({ config })
+export namespace $Object {
+  export type Config<T extends Record<string, any> = Record<string, any>> = Data.Config<T> & {
+    schema: Data.Schema
+    reduce?: boolean
   }
-
+  export const Handler = ObjectHandler
+  export const constraint = Handler.constraint
+  export const preparer = Handler.preparer
+  export const processor = Handler.processor
+  export function conf<T extends Record<string, any> = Record<string, any>>(config: Config<T>) { return { Handler, config } }
+  export function init<T extends Record<string, any> = Record<string, any>>(config: Config<T>) { return new Handler({ config }) }
 }

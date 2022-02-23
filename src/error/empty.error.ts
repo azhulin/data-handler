@@ -1,5 +1,6 @@
 import { ErrorExpected } from "."
 
+import type { Validator } from "../component"
 import type { Path } from "../type"
 
 /**
@@ -15,8 +16,11 @@ export class ErrorEmpty extends ErrorExpected {
   /**
    * Constructor for the ErrorEmpty object.
    */
-  public constructor(path: Path) {
-    super("Value should not be empty.", path)
+  public constructor(path: Path, { id, name, description }: Validator) {
+    super("", path)
+    const type = description ? `${name} (${description})` : name
+    this.message = `Value should not be empty. ${type} expected.`
+    this.details = { ...this.details, type: id }
   }
 
 }

@@ -1,32 +1,26 @@
 import * as Data from ".."
 
-export namespace $List {
-  export type Config<T extends null | any[]> = Data.Config<T> & {
-    item: Data.Definition
-  }
-}
-
 /**
  * The list data handler class.
  */
-export class $List<T extends null | any[]> extends Data.Handler<T> {
+class ListHandler extends Data.Handler {
 
   /**
    * {@inheritdoc}
    */
-  public get id(): string { return `array<${this.typeId}>` }
+  public get id(): string { return `array<${this.itemId}>` }
 
   /**
    * {@inheritdoc}
    */
-  public get name(): string { return `${this.typeName} array` }
+  public get name(): string { return `${this.itemName} array` }
 
   /**
    * {@inheritdoc}
    */
-  protected default: Data.Default<T> = {
+  protected default: Data.Default<null | any[]> = {
     ...this.default,
-    value: (this.default.value ?? []) as T,
+    value: this.default.value ?? [],
   }
 
   /**
@@ -35,32 +29,32 @@ export class $List<T extends null | any[]> extends Data.Handler<T> {
   public static constraint = {
     ...Data.Handler.constraint,
     length: {
-      eq: (length: number): Data.Constraint<any[]> => [
+      eq: (length: number) => new Data.Constraint<any[]>(
         `length=${length}`,
         data => data.length === length ? null : `Length should be equal to ${length}.`,
-      ],
-      gt: (length: number): Data.Constraint<any[]> => [
+      ),
+      gt: (length: number) => new Data.Constraint<any[]>(
         `length>${length}`,
         data => data.length > length ? null : `Length should be greater than ${length}.`,
-      ],
-      gte: (length: number): Data.Constraint<any[]> => [
+      ),
+      gte: (length: number) => new Data.Constraint<any[]>(
         `length>=${length}`,
         data => data.length >= length ? null : `Length should be greater than or equal to ${length}.`,
-      ],
-      lt: (length: number): Data.Constraint<any[]> => [
+      ),
+      lt: (length: number) => new Data.Constraint<any[]>(
         `length<${length}`,
         data => data.length < length ? null : `Length should be lesser than ${length}.`,
-      ],
-      lte: (length: number): Data.Constraint<any[]> => [
+      ),
+      lte: (length: number) => new Data.Constraint<any[]>(
         `length<=${length}`,
         data => data.length <= length ? null : `Length should be lesser than or equal to ${length}.`,
-      ],
-      neq: (length: number): Data.Constraint<any[]> => [
+      ),
+      neq: (length: number) => new Data.Constraint<any[]>(
         `length<>${length}`,
         data => data.length !== length ? null : `Length should not be equal to ${length}.`,
-      ],
+      ),
     },
-    unique: <Data.Constraint<any[]>>[
+    unique: new Data.Constraint<any[]>(
       "unique",
       data => {
         const items = new Set()
@@ -72,7 +66,7 @@ export class $List<T extends null | any[]> extends Data.Handler<T> {
         }
         return null
       }
-    ],
+    ),
   }
 
   /**
@@ -83,26 +77,26 @@ export class $List<T extends null | any[]> extends Data.Handler<T> {
   /**
    * The list item type ID.
    */
-  protected typeId: string
+  protected itemId: string
 
   /**
    * The list item type name.
    */
-  protected typeName: string
+  protected itemName: string
 
   /**
    * {@inheritdoc}
    */
   public constructor(settings: Data.Settings) {
     super(settings)
-    const config = (settings.config ?? {}) as $List.Config<T>
+    const config = (settings.config ?? {}) as $List.Config
     if (!config.item) {
       throw new Data.ErrorUnexpected(`List configuration is invalid. Missing 'item' property.`)
     }
     this.item = config.item
     const { id, name } = this.getHandler()
-    this.typeId = id
-    this.typeName = name
+    this.itemId = id
+    this.itemName = name
   }
 
   /**
@@ -115,33 +109,33 @@ export class $List<T extends null | any[]> extends Data.Handler<T> {
   /**
    * {@inheritdoc}
    */
-  protected async inputToBase(data: NonNullable<T>, context: Data.Context): Promise<NonNullable<T>> {
+  protected async inputToBase(data: unknown[], context: Data.Context): Promise<unknown[]> {
     const result = await this.convert("toBase", data, context)
-    return super.inputToBase(result as NonNullable<T>, context)
+    return super.inputToBase(result, context) as Promise<unknown[]>
   }
 
   /**
    * {@inheritdoc}
    */
-  protected async baseToStore(data: NonNullable<T>, context: Data.Context): Promise<unknown[]> {
-    const result = await this.convert("toStore", data, context) as NonNullable<T>
+  protected async baseToStore(data: any[], context: Data.Context): Promise<unknown[]> {
+    const result = await this.convert("toStore", data, context)
     return super.baseToStore(result, context) as Promise<unknown[]>
   }
 
   /**
    * {@inheritdoc}
    */
-  protected async baseToOutput(data: NonNullable<T>, context: Data.Context): Promise<unknown[]> {
-    const result = await this.convert("toOutput", data, context) as NonNullable<T>
+  protected async baseToOutput(data: any[], context: Data.Context): Promise<unknown[]> {
+    const result = await this.convert("toOutput", data, context)
     return super.baseToOutput(result, context) as Promise<unknown[]>
   }
 
   /**
    * {@inheritdoc}
    */
-  protected async storeToBase(data: unknown[], context: Data.Context): Promise<NonNullable<T>> {
+  protected async storeToBase(data: unknown[], context: Data.Context): Promise<any[]> {
     const result = await this.convert("toBase", data, context)
-    return super.storeToBase(result, context)
+    return super.storeToBase(result, context) as Promise<any[]>
   }
 
   /**
@@ -167,18 +161,16 @@ export class $List<T extends null | any[]> extends Data.Handler<T> {
       .initData(this.format, data)
   }
 
-  /**
-   * Configures the data handler.
-   */
-  public static conf(config?: $List.Config<any[]>): Data.Definition {
-    return [$List, config]
-  }
+}
 
-  /**
-   * Initializes the data handler.
-   */
-  public static init<T extends null | any[] = any[]>(config?: $List.Config<T>): $List<T> {
-    return new $List<T>({ config })
+export namespace $List {
+  export type Config<T extends any[] = any[]> = Data.Config<T> & {
+    item: Data.Definition
   }
-
+  export const Handler = ListHandler
+  export const constraint = Handler.constraint
+  export const preparer = Handler.preparer
+  export const processor = Handler.processor
+  export function conf<T extends any[] = any[]>(config: Config<T>) { return { Handler, config } }
+  export function init<T extends any[] = any[]>(config: Config<T>) { return new Handler({ config }) }
 }

@@ -1,14 +1,8 @@
 import * as Data from "..";
-export declare namespace $Object {
-    type Config<T extends null | Record<string, any>> = Data.Config<T> & {
-        schema: Data.Schema;
-        reduce?: boolean;
-    };
-}
 /**
  * The object data handler class.
  */
-export declare class $Object<T extends null | Record<string, any>> extends Data.Handler<T> {
+declare class ObjectHandler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
@@ -45,33 +39,41 @@ export declare class $Object<T extends null | Record<string, any>> extends Data.
     /**
      * {@inheritdoc}
      */
-    protected inputToBase(data: NonNullable<T>, context: Data.Context): Promise<NonNullable<T>>;
+    protected inputToBase(data: Record<string, any>, context: Data.Context): Promise<Record<string, any>>;
     /**
      * {@inheritdoc}
      */
-    protected baseToStore(data: NonNullable<T>, context: Data.Context): Promise<unknown>;
+    protected baseToStore(data: Record<string, any>, context: Data.Context): Promise<any>;
     /**
      * {@inheritdoc}
      */
-    protected baseToOutput(data: NonNullable<T>, context: Data.Context): Promise<unknown>;
+    protected baseToOutput(data: Record<string, any>, context: Data.Context): Promise<any>;
     /**
      * {@inheritdoc}
      */
-    protected storeToBase(data: NonNullable<T>, context: Data.Context): Promise<NonNullable<T>>;
+    protected storeToBase(data: Record<string, any>, context: Data.Context): Promise<Record<string, any>>;
     /**
      * Performs format conversion.
      */
-    protected convert(method: "toBase" | "toStore" | "toOutput", data: NonNullable<T>, context: Data.Context): Promise<NonNullable<T>>;
+    protected convert(method: "toBase" | "toStore" | "toOutput", data: Record<string, any>, context: Data.Context): Promise<Record<string, any>>;
     /**
      * Returns data handler.
      */
     protected getHandler(key: string, data: unknown): Data.Handler;
-    /**
-     * Configures the data handler.
-     */
-    static conf(config?: $Object.Config<Record<string, any>>): Data.Definition;
-    /**
-     * Initializes the data handler.
-     */
-    static init<T extends null | Record<string, any> = Record<string, any>>(config?: $Object.Config<T>): $Object<T>;
 }
+export declare namespace $Object {
+    type Config<T extends Record<string, any> = Record<string, any>> = Data.Config<T> & {
+        schema: Data.Schema;
+        reduce?: boolean;
+    };
+    const Handler: typeof ObjectHandler;
+    const constraint: Data.Constraint.Library;
+    const preparer: Data.Preparer.Library;
+    const processor: Data.Processor.Library;
+    function conf<T extends Record<string, any> = Record<string, any>>(config: Config<T>): {
+        Handler: typeof ObjectHandler;
+        config: Config<T>;
+    };
+    function init<T extends Record<string, any> = Record<string, any>>(config: Config<T>): ObjectHandler;
+}
+export {};

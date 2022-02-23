@@ -1,13 +1,9 @@
 import * as Data from ".."
 
-export namespace $String {
-  export type Config<T extends null | string> = Data.Config<T>
-}
-
 /**
  * The string data handler class.
  */
-export class $String<T extends null | string> extends Data.Handler<T> {
+class StringHandler extends Data.Handler {
 
   /**
    * {@inheritdoc}
@@ -24,35 +20,35 @@ export class $String<T extends null | string> extends Data.Handler<T> {
    */
   public static constraint = {
     ...Data.Handler.constraint,
-    trimmed: <Data.Constraint<string>>[
+    trimmed: new Data.Constraint<string>(
       "trimmed",
       (data: string) => data === data.trim() ? null : "Value should be trimmed.",
-    ],
+    ),
     length: {
-      eq: (length: number): Data.Constraint<string> => [
+      eq: (length: number) => new Data.Constraint<string>(
         `length=${length}`,
         data => data.length === length ? null : `Length should be equal to ${length}.`,
-      ],
-      gt: (length: number): Data.Constraint<string> => [
+      ),
+      gt: (length: number) => new Data.Constraint<string>(
         `length>${length}`,
         data => data.length > length ? null : `Length should be greater than ${length}.`,
-      ],
-      gte: (length: number): Data.Constraint<string> => [
+      ),
+      gte: (length: number) => new Data.Constraint<string>(
         `length>=${length}`,
         data => data.length >= length ? null : `Length should be greater than or equal to ${length}.`,
-      ],
-      lt: (length: number): Data.Constraint<string> => [
+      ),
+      lt: (length: number) => new Data.Constraint<string>(
         `length<${length}`,
         data => data.length < length ? null : `Length should be lesser than ${length}.`,
-      ],
-      lte: (length: number): Data.Constraint<string> => [
+      ),
+      lte: (length: number) => new Data.Constraint<string>(
         `length<=${length}`,
         data => data.length <= length ? null : `Length should be lesser than or equal to ${length}.`,
-      ],
-      neq: (length: number): Data.Constraint<string> => [
+      ),
+      neq: (length: number) => new Data.Constraint<string>(
         `length<>${length}`,
         data => data.length !== length ? null : `Length should not be equal to ${length}.`,
-      ],
+      ),
     },
   }
 
@@ -76,26 +72,22 @@ export class $String<T extends null | string> extends Data.Handler<T> {
   /**
    * {@inheritdoc}
    */
-  protected async inputToBase(data: NonNullable<T>, context: Data.Context): Promise<NonNullable<T>> {
+  protected async inputToBase(data: string, context: Data.Context): Promise<string> {
     const original = data
-    data = await super.inputToBase(data, context)
+    data = await super.inputToBase(data, context) as string
     original !== data
       && this.warn(new Data.ErrorAdapted(this.path, original, data))
     return data
   }
 
-  /**
-   * Configures the data handler.
-   */
-  public static conf(config?: $String.Config<string>): Data.Definition {
-    return [$String, config]
-  }
+}
 
-  /**
-   * Initializes the data handler.
-   */
-  public static init<T extends null | string = string>(config?: $String.Config<T>): $String<T> {
-    return new $String<T>({ config })
-  }
-
+export namespace $String {
+  export type Config<T = string> = Data.Config<T>
+  export const Handler = StringHandler
+  export const constraint = Handler.constraint
+  export const preparer = Handler.preparer
+  export const processor = Handler.processor
+  export function conf(config: Config = {}) { return { Handler, config } }
+  export function init(config: Config = {}) { return new Handler({ config }) }
 }

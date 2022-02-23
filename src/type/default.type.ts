@@ -5,6 +5,8 @@ import type { Context } from "../interface"
 /**
  * The data default value behaviors configuration.
  */
-export type Default<T> = {
+export type Default<T = Value> = {
   [key in "value" | "nulled" | "read" | Operation]: Property<T, Context>
 }
+
+type Value = null | boolean | number | string | Array<Value> | { [key: string]: Value }

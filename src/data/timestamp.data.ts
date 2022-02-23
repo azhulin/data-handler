@@ -1,18 +1,15 @@
 import * as Data from ".."
-
-export namespace $Timestamp {
-  export type Config<T extends null | number> = Data.Config<T>
-}
+import { $Number } from "."
 
 /**
  * The timestamp data handler class.
  */
-export class $Timestamp<T extends null | number> extends Data.Handler<T> {
+class TimestampHandler extends $Number.Handler {
 
   /**
    * {@inheritdoc}
    */
-  public get id(): string { return "number.timestamp" }
+  public get id(): string { return super.id + ".timestamp" }
 
   /**
    * {@inheritdoc}
@@ -22,22 +19,27 @@ export class $Timestamp<T extends null | number> extends Data.Handler<T> {
   /**
    * {@inheritdoc}
    */
-  public get description(): string { return `e.g. ${+new Date()}` }
+  public get description(): string { return `e.g. ${Date.now()}` }
 
   /**
    * {@inheritdoc}
    */
   public static constraint = {
-    ...Data.Handler.constraint,
-    future: <Data.Constraint<number>>[
+    ...$Number.constraint,
+    future: new Data.Constraint<number>(
       ">now",
-      data => data > +new Date() ? null : "Future date expected.",
-    ],
-    past: <Data.Constraint<number>>[
+      data => data > Date.now() ? null : "Future date expected.",
+    ),
+    past: new Data.Constraint<number>(
       "<now",
-      data => data < +new Date() ? null : "Past date expected.",
-    ],
+      data => data < Date.now() ? null : "Past date expected.",
+    ),
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected decimals: null | number = 0
 
   /**
    * {@inheritdoc}
@@ -46,18 +48,14 @@ export class $Timestamp<T extends null | number> extends Data.Handler<T> {
     return Data.isIndex(data)
   }
 
-  /**
-   * Configures the data handler.
-   */
-  public static conf(config?: $Timestamp.Config<number>): Data.Definition {
-    return [$Timestamp, config]
-  }
+}
 
-  /**
-   * Initializes the data handler.
-   */
-  public static init<T extends null | number = number>(config?: $Timestamp.Config<T>): $Timestamp<T> {
-    return new $Timestamp<T>({ config })
-  }
-
+export namespace $Timestamp {
+  export type Config = Omit<$Number.Config, "decimals">
+  export const Handler = TimestampHandler
+  export const constraint = Handler.constraint
+  export const preparer = Handler.preparer
+  export const processor = Handler.processor
+  export function conf(config: Config = {}) { return { Handler, config } }
+  export function init(config: Config = {}) { return new Handler({ config }) }
 }

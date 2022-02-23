@@ -5,7 +5,7 @@ import type { BaseContext, Context, Settings } from "../interface";
 /**
  * The data handler class.
  */
-export declare abstract class Handler<T extends any = any> extends Validator<T> {
+export declare abstract class Handler extends Validator {
     /**
      * The current data format.
      */
@@ -29,7 +29,7 @@ export declare abstract class Handler<T extends any = any> extends Validator<T> 
     /**
      * {@inheritdoc}
      */
-    validate(data: unknown, baseContext?: BaseContext): Promise<T>;
+    validate(data: unknown, baseContext?: BaseContext): Promise<unknown>;
     /**
      * Initializes the handler with data in input format.
      */
@@ -37,7 +37,7 @@ export declare abstract class Handler<T extends any = any> extends Validator<T> 
     /**
      * Initializes the handler with data in base format.
      */
-    inBase(data: T): this;
+    inBase(data: unknown): this;
     /**
      * Initializes the handler with data in store format.
      */
@@ -49,7 +49,7 @@ export declare abstract class Handler<T extends any = any> extends Validator<T> 
     /**
      * Returns the data in base format.
      */
-    toBase(baseContext?: BaseContext): Promise<T>;
+    toBase(baseContext?: BaseContext): Promise<unknown>;
     /**
      * Returns the data in store format.
      */
@@ -73,19 +73,19 @@ export declare abstract class Handler<T extends any = any> extends Validator<T> 
     /**
      * Returns the data in base format from data in input format.
      */
-    protected formatInputToBase(data: unknown, baseContext?: BaseContext): Promise<T>;
+    protected formatInputToBase(data: unknown, baseContext?: BaseContext): Promise<unknown>;
     /**
      * Returns store data from base data.
      */
-    protected formatBaseToStore(data: T, baseContext?: BaseContext): Promise<unknown>;
+    protected formatBaseToStore(data: unknown, baseContext?: BaseContext): Promise<unknown>;
     /**
      * Returns output data from base data.
      */
-    protected formatBaseToOutput(data: T, baseContext?: BaseContext): Promise<unknown>;
+    protected formatBaseToOutput(data: unknown, baseContext?: BaseContext): Promise<unknown>;
     /**
      * Returns base data from store data.
      */
-    protected formatStoreToBase(data: unknown, baseContext?: BaseContext): Promise<T>;
+    protected formatStoreToBase(data: unknown, baseContext?: BaseContext): Promise<unknown>;
     /**
      * Determines whether the data is in expected input format.
      */
@@ -101,20 +101,20 @@ export declare abstract class Handler<T extends any = any> extends Validator<T> 
     /**
      * Converts data in input format to data in base format.
      */
-    protected inputToBase(data: NonNullable<T>, context: Context): Promise<NonNullable<T>>;
-    protected process: (data: NonNullable<T>, context: Context) => Promise<NonNullable<T>>;
+    protected inputToBase(data: unknown, context: Context): Promise<unknown>;
+    protected process: (data: unknown, context: Context) => Promise<unknown>;
     /**
      * Converts data in base format to data in store format.
      */
-    protected baseToStore(data: NonNullable<T>, context: Context): Promise<unknown>;
+    protected baseToStore(data: unknown, context: Context): Promise<unknown>;
     /**
      * Converts data in base format to data in output format.
      */
-    protected baseToOutput(data: NonNullable<T>, context: Context): Promise<unknown>;
+    protected baseToOutput(data: unknown, context: Context): Promise<unknown>;
     /**
      * Converts data in store format to data in base format.
      */
-    protected storeToBase(data: unknown, context: Context): Promise<NonNullable<T>>;
+    protected storeToBase(data: unknown, context: Context): Promise<unknown>;
     /**
      * Returns "store" flag value.
      */

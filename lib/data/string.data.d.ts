@@ -1,11 +1,8 @@
 import * as Data from "..";
-export declare namespace $String {
-    type Config<T extends null | string> = Data.Config<T>;
-}
 /**
  * The string data handler class.
  */
-export declare class $String<T extends null | string> extends Data.Handler<T> {
+declare class StringHandler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
@@ -43,13 +40,32 @@ export declare class $String<T extends null | string> extends Data.Handler<T> {
     /**
      * {@inheritdoc}
      */
-    protected inputToBase(data: NonNullable<T>, context: Data.Context): Promise<NonNullable<T>>;
-    /**
-     * Configures the data handler.
-     */
-    static conf(config?: $String.Config<string>): Data.Definition;
-    /**
-     * Initializes the data handler.
-     */
-    static init<T extends null | string = string>(config?: $String.Config<T>): $String<T>;
+    protected inputToBase(data: string, context: Data.Context): Promise<string>;
 }
+export declare namespace $String {
+    type Config<T = string> = Data.Config<T>;
+    const Handler: typeof StringHandler;
+    const constraint: {
+        trimmed: Data.Constraint<string>;
+        length: {
+            eq: (length: number) => Data.Constraint<string>;
+            gt: (length: number) => Data.Constraint<string>;
+            gte: (length: number) => Data.Constraint<string>;
+            lt: (length: number) => Data.Constraint<string>;
+            lte: (length: number) => Data.Constraint<string>;
+            neq: (length: number) => Data.Constraint<string>;
+        };
+    };
+    const preparer: Data.Preparer.Library;
+    const processor: {
+        trim: (data: string) => string;
+        lower: (data: string) => string;
+        upper: (data: string) => string;
+    };
+    function conf(config?: Config): {
+        Handler: typeof StringHandler;
+        config: Config<string>;
+    };
+    function init(config?: Config): StringHandler;
+}
+export {};
