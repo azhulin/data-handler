@@ -38,15 +38,15 @@ class ObjectHandler extends Data.Handler {
   /**
    * Returns prepared schema.
    */
-  protected async getSchema(format: Data.Format, context: Data.Context): Promise<Data.Schema> {
-    return this._schema ?? (this._schema = await this.prepareSchema(format, context))
+  protected async getSchema(format: Data.Format): Promise<Data.Schema> {
+    return this._schema[format] ?? (this._schema[format] = await this.prepareSchema(format))
   }
-  private _schema?: Data.Schema
+  private _schema: { [format in Data.Format]?: Data.Schema } = {}
 
   /**
    * Prepares the schema.
    */
-  protected async prepareSchema(format: Data.Format, context: Data.Context): Promise<Data.Schema> {
+  protected async prepareSchema(format: Data.Format): Promise<Data.Schema> {
     return this.schema
   }
 
@@ -62,7 +62,7 @@ class ObjectHandler extends Data.Handler {
    */
   protected async inputToBase(data: Record<string, any>, context: Data.Context): Promise<Record<string, any>> {
     const format = Data.Format.base
-    const schema = await this.getSchema(format, context)
+    const schema = await this.getSchema(format)
     Object.keys(data).filter(key => !(key in schema))
       .forEach(key => this.warn(new Data.ErrorIgnored([...this.path, key])))
     let result = await this.convert(format, data, context)
@@ -103,7 +103,7 @@ class ObjectHandler extends Data.Handler {
   protected async convert(format: Exclude<Data.Format, Data.Format.input>, data: Record<string, any>, context: Data.Context): Promise<Record<string, any>> {
     const result: Record<string, any> = {}
     this.result = Data.set(this.result, this.path, result)
-    const schema = await this.getSchema(format, context)
+    const schema = await this.getSchema(format)
     const { base, store, output } = Data.Format
     const map = { [base]: "toBase", [store]: "toStore", [output]: "toOutput" }
     const method = map[format] as "toBase" | "toStore" | "toOutput"

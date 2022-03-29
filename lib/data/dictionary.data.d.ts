@@ -27,7 +27,7 @@ declare class DictionaryHandler extends $Object.Handler {
     /**
      * {@inheritdoc}
      */
-    protected prepareSchema(format: Data.Format, context: Data.Context): Promise<Data.Schema>;
+    protected prepareSchema(format: Data.Format): Promise<Data.Schema>;
 }
 export declare namespace $Dictionary {
     type Config<T = Record<string, any>> = Omit<$Object.Config<T>, "schema" | "reduce"> & {

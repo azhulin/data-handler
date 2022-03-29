@@ -26,12 +26,12 @@ declare class ObjectHandler extends Data.Handler {
     /**
      * Returns prepared schema.
      */
-    protected getSchema(format: Data.Format, context: Data.Context): Promise<Data.Schema>;
-    private _schema?;
+    protected getSchema(format: Data.Format): Promise<Data.Schema>;
+    private _schema;
     /**
      * Prepares the schema.
      */
-    protected prepareSchema(format: Data.Format, context: Data.Context): Promise<Data.Schema>;
+    protected prepareSchema(format: Data.Format): Promise<Data.Schema>;
     /**
      * {@inheritdoc}
      */

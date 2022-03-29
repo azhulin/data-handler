@@ -48,12 +48,12 @@ class DictionaryHandler extends $Object.Handler {
   /**
    * {@inheritdoc}
    */
-  protected async prepareSchema(format: Data.Format, context: Data.Context): Promise<Data.Schema> {
+  protected async prepareSchema(format: Data.Format): Promise<Data.Schema> {
     const handler = this.initHandler(this.key)
     for (const value of Object.keys(this.data as Record<string, any>)) {
       let key
       try {
-        key = await handler.initData(this.format, value).formatData(format, context)
+        key = await handler.initData(this.format, value).formatData(format)
       }
       catch (error) {
         if (error instanceof Data.ErrorExpected) {
