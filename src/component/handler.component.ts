@@ -268,7 +268,7 @@ export abstract class Handler extends Validator {
   /**
    * {@inheritdoc}
    */
-  protected initHandler(definition: Definition, path: Path): Handler {
+  protected initHandler(definition: Definition, path: Path = []): Handler {
     return super.initHandler(definition, path) as Handler
   }
 

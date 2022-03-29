@@ -5,6 +5,7 @@ export * from "./number-option.data";
 export * from "./number-option-list.data";
 export * from "./integer.data";
 export * from "./object.data";
+export * from "./dictionary.data";
 export * from "./string.data";
 export * from "./string-option.data";
 export * from "./string-option-list.data";

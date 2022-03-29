@@ -91,7 +91,7 @@ class ListHandler extends Data.Handler {
     super(settings)
     const config = (settings.config ?? {}) as $List.Config
     if (!config.item) {
-      throw new Data.ErrorUnexpected(`List configuration is invalid. Missing 'item' property.`)
+      throw new Data.ErrorUnexpected("List configuration is invalid. Missing 'item' property.")
     }
     this.item = config.item
     const { id, name } = this.getHandler()

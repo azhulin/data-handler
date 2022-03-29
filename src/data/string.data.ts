@@ -22,7 +22,7 @@ class StringHandler extends Data.Handler {
     ...Data.Handler.constraint,
     trimmed: new Data.Constraint<string>(
       "trimmed",
-      (data: string) => data === data.trim() ? null : "Value should be trimmed.",
+      data => data === data.trim() ? null : "Value should be trimmed.",
     ),
     length: {
       eq: (length: number) => new Data.Constraint<string>(

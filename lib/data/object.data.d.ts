@@ -16,11 +16,6 @@ declare class ObjectHandler extends Data.Handler {
      */
     protected schema: Data.Schema;
     /**
-     * The prepared schema.
-     */
-    protected get preparedSchema(): Data.Schema;
-    private _preparedSchema?;
-    /**
      * Whether to use default value, if all schema keys are optional and equal to Null.
      */
     protected reduce: boolean;
@@ -29,9 +24,14 @@ declare class ObjectHandler extends Data.Handler {
      */
     constructor(settings: Data.Settings);
     /**
+     * Returns prepared schema.
+     */
+    protected getSchema(format: Data.Format, context: Data.Context): Promise<Data.Schema>;
+    private _schema?;
+    /**
      * Prepares the schema.
      */
-    protected prepareSchema(): Data.Schema;
+    protected prepareSchema(format: Data.Format, context: Data.Context): Promise<Data.Schema>;
     /**
      * {@inheritdoc}
      */
@@ -55,11 +55,7 @@ declare class ObjectHandler extends Data.Handler {
     /**
      * Performs format conversion.
      */
-    protected convert(method: "toBase" | "toStore" | "toOutput", data: Record<string, any>, context: Data.Context): Promise<Record<string, any>>;
-    /**
-     * Returns data handler.
-     */
-    protected getHandler(key: string, data: unknown): Data.Handler;
+    protected convert(format: Exclude<Data.Format, Data.Format.input>, data: Record<string, any>, context: Data.Context): Promise<Record<string, any>>;
 }
 export declare namespace $Object {
     type Config<T extends Record<string, any> = Record<string, any>> = Data.Config<T> & {

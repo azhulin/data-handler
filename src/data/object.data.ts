@@ -21,14 +21,6 @@ class ObjectHandler extends Data.Handler {
   protected schema: Data.Schema = {}
 
   /**
-   * The prepared schema.
-   */
-  protected get preparedSchema(): Data.Schema {
-    return this._preparedSchema ?? (this._preparedSchema = this.prepareSchema())
-  }
-  private _preparedSchema?: Data.Schema
-
-  /**
    * Whether to use default value, if all schema keys are optional and equal to Null.
    */
   protected reduce: boolean = false
@@ -44,9 +36,17 @@ class ObjectHandler extends Data.Handler {
   }
 
   /**
+   * Returns prepared schema.
+   */
+  protected async getSchema(format: Data.Format, context: Data.Context): Promise<Data.Schema> {
+    return this._schema ?? (this._schema = await this.prepareSchema(format, context))
+  }
+  private _schema?: Data.Schema
+
+  /**
    * Prepares the schema.
    */
-  protected prepareSchema(): Data.Schema {
+  protected async prepareSchema(format: Data.Format, context: Data.Context): Promise<Data.Schema> {
     return this.schema
   }
 
@@ -61,9 +61,11 @@ class ObjectHandler extends Data.Handler {
    * {@inheritdoc}
    */
   protected async inputToBase(data: Record<string, any>, context: Data.Context): Promise<Record<string, any>> {
-    Object.keys(data).filter(key => !(key in this.preparedSchema))
+    const format = Data.Format.base
+    const schema = await this.getSchema(format, context)
+    Object.keys(data).filter(key => !(key in schema))
       .forEach(key => this.warn(new Data.ErrorIgnored([...this.path, key])))
-    let result = await this.convert("toBase", data, context)
+    let result = await this.convert(format, data, context)
     if (this.reduce && Object.values(result!).every(value => null === value)
         && !await this.isRequired(context)) {
       result = await this.getDefault(context) as Record<string, any>
@@ -75,7 +77,7 @@ class ObjectHandler extends Data.Handler {
    * {@inheritdoc}
    */
   protected async baseToStore(data: Record<string, any>, context: Data.Context): Promise<any> {
-    const result = await this.convert("toStore", data, context)
+    const result = await this.convert(Data.Format.store, data, context)
     return super.baseToStore(result, context)
   }
 
@@ -83,7 +85,7 @@ class ObjectHandler extends Data.Handler {
    * {@inheritdoc}
    */
   protected async baseToOutput(data: Record<string, any>, context: Data.Context): Promise<any> {
-    const result = await this.convert("toOutput", data, context)
+    const result = await this.convert(Data.Format.output, data, context)
     return super.baseToOutput(result, context)
   }
 
@@ -91,29 +93,27 @@ class ObjectHandler extends Data.Handler {
    * {@inheritdoc}
    */
   protected async storeToBase(data: Record<string, any>, context: Data.Context): Promise<Record<string, any>> {
-    const result = await this.convert("toBase", data, context)
+    const result = await this.convert(Data.Format.base, data, context)
     return super.storeToBase(result, context) as Promise<Record<string, any>>
   }
 
   /**
    * Performs format conversion.
    */
-  protected async convert(method: "toBase" | "toStore" | "toOutput", data: Record<string, any>, context: Data.Context): Promise<Record<string, any>> {
+  protected async convert(format: Exclude<Data.Format, Data.Format.input>, data: Record<string, any>, context: Data.Context): Promise<Record<string, any>> {
     const result: Record<string, any> = {}
     this.result = Data.set(this.result, this.path, result)
-    for (const key of Object.keys(this.preparedSchema)) {
-      const value = await this.getHandler(key, data[key])[method](context)
+    const schema = await this.getSchema(format, context)
+    const { base, store, output } = Data.Format
+    const map = { [base]: "toBase", [store]: "toStore", [output]: "toOutput" }
+    const method = map[format] as "toBase" | "toStore" | "toOutput"
+    for (const [key, definition] of Object.entries(schema)) {
+      const handler = this.initHandler(definition, [...this.path, key])
+        .initData(this.format, data[key])
+      const value = await handler[method](context)
       undefined !== value && (result[key] = value)
     }
     return result
-  }
-
-  /**
-   * Returns data handler.
-   */
-  protected getHandler(key: string, data: unknown): Data.Handler {
-    return this.initHandler(this.preparedSchema[key], [...this.path, key])
-      .initData(this.format, data)
   }
 
 }
