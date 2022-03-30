@@ -29,12 +29,12 @@ class DictionaryHandler extends $Object.Handler {
   /**
    * The dictionary key data definition.
    */
-  protected key: Data.Definition
+  protected key?: Data.Definition
 
   /**
    * The dictionary value data definition.
    */
-  protected value: Data.Definition
+  protected value?: Data.Definition
 
   /**
    * {@inheritdoc}
@@ -42,23 +42,23 @@ class DictionaryHandler extends $Object.Handler {
   public constructor(settings: Data.Settings) {
     super(settings)
     const { key, value } = (settings.config ?? {}) as $Dictionary.Config
-    if (!key) {
-      throw new Data.ErrorUnexpected(`${this.label} configuration is invalid. Missing 'key' property.`)
-    }
-    if (!value) {
-      throw new Data.ErrorUnexpected(`${this.label} configuration is invalid. Missing 'value' property.`)
-    }
-    if (key.Handler !== $String.Handler && !(key.Handler.prototype instanceof $String.Handler)) {
-      throw new Data.ErrorUnexpected(`${this.label} configuration is invalid. Key handler must inherit a string handler.`)
-    }
-    this.key = key
-    this.value = value
+    key && (this.key = key)
+    value && (this.value = value)
   }
 
   /**
    * {@inheritdoc}
    */
   protected async prepareSchema(format: Data.Format): Promise<Data.Schema> {
+    if (!this.key) {
+      throw new Data.ErrorUnexpected(`${this.label} configuration is invalid. Missing 'key' property.`)
+    }
+    if (!this.value) {
+      throw new Data.ErrorUnexpected(`${this.label} configuration is invalid. Missing 'value' property.`)
+    }
+    if (this.key.Handler !== $String.Handler && !(this.key.Handler.prototype instanceof $String.Handler)) {
+      throw new Data.ErrorUnexpected(`${this.label} configuration is invalid. Key handler must inherit a string handler.`)
+    }
     const handler = this.initHandler(this.key)
     for (const value of Object.keys(this.data as Record<string, any>)) {
       let key
