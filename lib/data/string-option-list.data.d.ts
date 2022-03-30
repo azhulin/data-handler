@@ -35,12 +35,12 @@ export declare namespace $StringOptionList {
     const Handler: typeof StringOptionListHandler;
     const constraint: {
         length: {
-            eq: (length: number) => Data.Constraint<any[]>;
-            gt: (length: number) => Data.Constraint<any[]>;
-            gte: (length: number) => Data.Constraint<any[]>;
-            lt: (length: number) => Data.Constraint<any[]>;
-            lte: (length: number) => Data.Constraint<any[]>;
-            neq: (length: number) => Data.Constraint<any[]>;
+            eq: (value: number) => Data.Constraint<any[]>;
+            gt: (value: number) => Data.Constraint<any[]>;
+            gte: (value: number) => Data.Constraint<any[]>;
+            lt: (value: number) => Data.Constraint<any[]>;
+            lte: (value: number) => Data.Constraint<any[]>;
+            neq: (value: number) => Data.Constraint<any[]>;
         };
         unique: Data.Constraint<any[]>;
     };

@@ -38,12 +38,12 @@ export declare namespace $StringOption {
     const constraint: {
         trimmed: Data.Constraint<string>;
         length: {
-            eq: (length: number) => Data.Constraint<string>;
-            gt: (length: number) => Data.Constraint<string>;
-            gte: (length: number) => Data.Constraint<string>;
-            lt: (length: number) => Data.Constraint<string>;
-            lte: (length: number) => Data.Constraint<string>;
-            neq: (length: number) => Data.Constraint<string>;
+            eq: (value: number) => Data.Constraint<string>;
+            gt: (value: number) => Data.Constraint<string>;
+            gte: (value: number) => Data.Constraint<string>;
+            lt: (value: number) => Data.Constraint<string>;
+            lte: (value: number) => Data.Constraint<string>;
+            neq: (value: number) => Data.Constraint<string>;
         };
     };
     const preparer: Data.Preparer.Library;

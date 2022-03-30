@@ -28,32 +28,9 @@ class ListHandler extends Data.Handler {
    */
   public static constraint = {
     ...Data.Handler.constraint,
-    length: {
-      eq: (length: number) => new Data.Constraint<any[]>(
-        `length=${length}`,
-        data => data.length === length ? null : `Length should be equal to ${length}.`,
-      ),
-      gt: (length: number) => new Data.Constraint<any[]>(
-        `length>${length}`,
-        data => data.length > length ? null : `Length should be greater than ${length}.`,
-      ),
-      gte: (length: number) => new Data.Constraint<any[]>(
-        `length>=${length}`,
-        data => data.length >= length ? null : `Length should be greater than or equal to ${length}.`,
-      ),
-      lt: (length: number) => new Data.Constraint<any[]>(
-        `length<${length}`,
-        data => data.length < length ? null : `Length should be lesser than ${length}.`,
-      ),
-      lte: (length: number) => new Data.Constraint<any[]>(
-        `length<=${length}`,
-        data => data.length <= length ? null : `Length should be lesser than or equal to ${length}.`,
-      ),
-      neq: (length: number) => new Data.Constraint<any[]>(
-        `length<>${length}`,
-        data => data.length !== length ? null : `Length should not be equal to ${length}.`,
-      ),
-    },
+    length: Data.inequalityConstraints<any[]>(
+      "length", data => data.length, "Length",
+    ),
     unique: new Data.Constraint<any[]>(
       "unique",
       data => {

@@ -41,30 +41,7 @@ class NumberHandler extends Data.Handler {
    */
   public static constraint = {
     ...Data.Handler.constraint,
-    eq: (value: number) => new Data.Constraint<number>(
-      `=${value}`,
-      data => data === value ? null : `Value should be equal to ${value}.`,
-    ),
-    gt: (value: number) => new Data.Constraint<number>(
-      `>${value}`,
-      data => data > value ? null : `Value should be greater than ${value}.`,
-    ),
-    gte: (value: number) => new Data.Constraint<number>(
-      `>=${value}`,
-      data => data >= value ? null : `Value should be greater than or equal to ${value}.`,
-    ),
-    lt: (value: number) => new Data.Constraint<number>(
-      `<${value}`,
-      data => data < value ? null : `Value should be lesser than ${value}.`,
-    ),
-    lte: (value: number) => new Data.Constraint<number>(
-      `<=${value}`,
-      data => data <= value ? null : `Value should be lesser than or equal to ${value}.`,
-    ),
-    neq: (value: number) => new Data.Constraint<number>(
-      `<>${value}`,
-      data => data !== value ? null : `Value should not be equal to ${value}.`,
-    ),
+    ...Data.inequalityConstraints<number>("", data => data, "Value"),
   }
 
   /**

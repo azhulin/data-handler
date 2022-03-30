@@ -24,32 +24,9 @@ class StringHandler extends Data.Handler {
       "trimmed",
       data => data === data.trim() ? null : "Value should be trimmed.",
     ),
-    length: {
-      eq: (length: number) => new Data.Constraint<string>(
-        `length=${length}`,
-        data => data.length === length ? null : `Length should be equal to ${length}.`,
-      ),
-      gt: (length: number) => new Data.Constraint<string>(
-        `length>${length}`,
-        data => data.length > length ? null : `Length should be greater than ${length}.`,
-      ),
-      gte: (length: number) => new Data.Constraint<string>(
-        `length>=${length}`,
-        data => data.length >= length ? null : `Length should be greater than or equal to ${length}.`,
-      ),
-      lt: (length: number) => new Data.Constraint<string>(
-        `length<${length}`,
-        data => data.length < length ? null : `Length should be lesser than ${length}.`,
-      ),
-      lte: (length: number) => new Data.Constraint<string>(
-        `length<=${length}`,
-        data => data.length <= length ? null : `Length should be lesser than or equal to ${length}.`,
-      ),
-      neq: (length: number) => new Data.Constraint<string>(
-        `length<>${length}`,
-        data => data.length !== length ? null : `Length should not be equal to ${length}.`,
-      ),
-    },
+    length: Data.inequalityConstraints<string>(
+      "length", data => data.length, "Length",
+    ),
   }
 
   /**

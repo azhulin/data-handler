@@ -17,6 +17,16 @@ class DictionaryHandler extends $Object.Handler {
   public get label(): string { return "Dictionary" }
 
   /**
+   * {@inheritdoc}
+   */
+  public static constraint = {
+    ...$Object.Handler.constraint,
+    keys_number: Data.inequalityConstraints<Record<string, any>>(
+      "keys_number", data => Object.keys(data).length, "Number of keys",
+    ),
+  }
+
+  /**
    * The dictionary key data definition.
    */
   protected key: Data.Definition

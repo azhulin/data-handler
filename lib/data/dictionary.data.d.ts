@@ -13,6 +13,19 @@ declare class DictionaryHandler extends $Object.Handler {
      */
     get label(): string;
     /**
+     * {@inheritdoc}
+     */
+    static constraint: {
+        keys_number: {
+            eq: (value: number) => Data.Constraint<Record<string, any>>;
+            gt: (value: number) => Data.Constraint<Record<string, any>>;
+            gte: (value: number) => Data.Constraint<Record<string, any>>;
+            lt: (value: number) => Data.Constraint<Record<string, any>>;
+            lte: (value: number) => Data.Constraint<Record<string, any>>;
+            neq: (value: number) => Data.Constraint<Record<string, any>>;
+        };
+    };
+    /**
      * The dictionary key data definition.
      */
     protected key: Data.Definition;
@@ -35,7 +48,16 @@ export declare namespace $Dictionary {
         value: Data.Definition;
     };
     const Handler: typeof DictionaryHandler;
-    const constraint: Data.Constraint.Library;
+    const constraint: {
+        keys_number: {
+            eq: (value: number) => Data.Constraint<Record<string, any>>;
+            gt: (value: number) => Data.Constraint<Record<string, any>>;
+            gte: (value: number) => Data.Constraint<Record<string, any>>;
+            lt: (value: number) => Data.Constraint<Record<string, any>>;
+            lte: (value: number) => Data.Constraint<Record<string, any>>;
+            neq: (value: number) => Data.Constraint<Record<string, any>>;
+        };
+    };
     const preparer: Data.Preparer.Library;
     const processor: Data.Processor.Library;
     function conf<T extends Record<string, any> = Record<string, any>>(config: Config<T>): {
