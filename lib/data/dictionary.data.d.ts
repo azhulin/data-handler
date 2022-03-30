@@ -28,11 +28,11 @@ declare class DictionaryHandler extends $Object.Handler {
     /**
      * The dictionary key data definition.
      */
-    protected key: Data.Definition;
+    protected key?: Data.Definition;
     /**
      * The dictionary value data definition.
      */
-    protected value: Data.Definition;
+    protected value?: Data.Definition;
     /**
      * {@inheritdoc}
      */
