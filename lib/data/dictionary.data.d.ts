@@ -16,9 +16,11 @@ declare class DictionaryHandler extends $Object.Handler {
      * {@inheritdoc}
      */
     static constraint: {
-        keys_number: {
+        items_number: {
             eq: (value: number) => Data.Constraint<Record<string, any>>;
-            gt: (value: number) => Data.Constraint<Record<string, any>>;
+            gt: (value: number) => Data.Constraint<Record<string, any>>; /**
+             * The dictionary key data definition.
+             */
             gte: (value: number) => Data.Constraint<Record<string, any>>;
             lt: (value: number) => Data.Constraint<Record<string, any>>;
             lte: (value: number) => Data.Constraint<Record<string, any>>;
@@ -49,9 +51,11 @@ export declare namespace $Dictionary {
     };
     const Handler: typeof DictionaryHandler;
     const constraint: {
-        keys_number: {
+        items_number: {
             eq: (value: number) => Data.Constraint<Record<string, any>>;
-            gt: (value: number) => Data.Constraint<Record<string, any>>;
+            gt: (value: number) => Data.Constraint<Record<string, any>>; /**
+             * The dictionary key data definition.
+             */
             gte: (value: number) => Data.Constraint<Record<string, any>>;
             lt: (value: number) => Data.Constraint<Record<string, any>>;
             lte: (value: number) => Data.Constraint<Record<string, any>>;
