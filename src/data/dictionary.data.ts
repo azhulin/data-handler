@@ -21,8 +21,8 @@ class DictionaryHandler extends $Object.Handler {
    */
   public static constraint = {
     ...$Object.Handler.constraint,
-    keys_number: Data.inequalityConstraints<Record<string, any>>(
-      "keys_number", data => Object.keys(data).length, "Number of keys",
+    items_number: Data.inequalityConstraints<Record<string, any>>(
+      "items_number", data => Object.keys(data).length, "Number of items",
     ),
   }
 
