@@ -126,7 +126,7 @@ export abstract class Validator {
   public warnings: Error[] = []
 
   /**
-   * Constructor for the Handler object.
+   * Constructor for the Validator object.
    */
   public constructor({ config = {}, path, source, result, storage, warnings }: Settings) {
     this.input = config.input ?? this.input

@@ -11,11 +11,11 @@ export class Constraint<T> {
   public constructor(
     public readonly id: string,
     public readonly func: Constraint.Func<T>,
-    public skip: boolean = false,
+    public readonly skip: boolean = false,
   ) {}
 
   /**
-   * Sets skip on update flag.
+   * Skips constraint run on update operation if the value is not changed.
    */
   public skipOnUpdate(skip: boolean = true): Constraint<T> {
     return new Constraint<T>(this.id, this.func, skip)

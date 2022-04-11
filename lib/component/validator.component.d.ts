@@ -91,7 +91,7 @@ export declare abstract class Validator {
      */
     warnings: Error[];
     /**
-     * Constructor for the Handler object.
+     * Constructor for the Validator object.
      */
     constructor({ config, path, source, result, storage, warnings }: Settings);
     /**

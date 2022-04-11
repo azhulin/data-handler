@@ -21,6 +21,9 @@ declare class StringHandler extends Data.Handler {
             gt: (value: number) => Data.Constraint<string>;
             gte: (value: number) => Data.Constraint<string>;
             lt: (value: number) => Data.Constraint<string>;
+            /**
+             * {@inheritdoc}
+             */
             lte: (value: number) => Data.Constraint<string>;
             neq: (value: number) => Data.Constraint<string>;
         };
@@ -52,6 +55,9 @@ export declare namespace $String {
             gt: (value: number) => Data.Constraint<string>;
             gte: (value: number) => Data.Constraint<string>;
             lt: (value: number) => Data.Constraint<string>;
+            /**
+             * {@inheritdoc}
+             */
             lte: (value: number) => Data.Constraint<string>;
             neq: (value: number) => Data.Constraint<string>;
         };

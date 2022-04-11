@@ -16,9 +16,8 @@ class NumberOptionHandler extends $Number.Handler {
    */
   protected constraints: Data.Constraint.List<number> = [
     ...this.constraints,
-    new Data.Constraint(
-      "option",
-      data => this.optionKeys().includes(data)
+    new Data.Constraint("option", data =>
+      this.optionKeys().includes(data)
         ? null
         : [`${this.label} options do not contain the specified value.`, {
             type: this.id,

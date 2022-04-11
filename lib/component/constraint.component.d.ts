@@ -5,13 +5,13 @@ import type { Context } from "../interface";
 export declare class Constraint<T> {
     readonly id: string;
     readonly func: Constraint.Func<T>;
-    skip: boolean;
+    readonly skip: boolean;
     /**
      * Constructor for the Constraint object.
      */
     constructor(id: string, func: Constraint.Func<T>, skip?: boolean);
     /**
-     * Sets skip on update flag.
+     * Skips constraint run on update operation if the value is not changed.
      */
     skipOnUpdate(skip?: boolean): Constraint<T>;
 }

@@ -31,19 +31,16 @@ class ListHandler extends Data.Handler {
     length: Data.inequalityConstraints<any[]>(
       "length", data => data.length, "Length",
     ),
-    unique: new Data.Constraint<any[]>(
-      "unique",
-      data => {
-        const items = new Set()
-        for (const [index, item] of data.map(i => JSON.stringify(i)).entries()) {
-          if (items.has(item)) {
-            return [`Values are not unique.`, { index }]
-          }
-          items.add(item)
+    unique: new Data.Constraint<any[]>("unique", data => {
+      const items = new Set()
+      for (const [index, item] of data.map(i => JSON.stringify(i)).entries()) {
+        if (items.has(item)) {
+          return [`Values are not unique.`, { index }]
         }
-        return null
+        items.add(item)
       }
-    ),
+      return null
+    }),
   }
 
   /**

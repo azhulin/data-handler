@@ -20,9 +20,8 @@ class StringHandler extends Data.Handler {
    */
   public static constraint = {
     ...Data.Handler.constraint,
-    trimmed: new Data.Constraint<string>(
-      "trimmed",
-      data => data === data.trim() ? null : "Value should be trimmed.",
+    trimmed: new Data.Constraint<string>("trimmed", data =>
+      data === data.trim() ? null : "Value should be trimmed.",
     ),
     length: Data.inequalityConstraints<string>(
       "length", data => data.length, "Length",

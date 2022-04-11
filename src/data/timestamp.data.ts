@@ -26,13 +26,11 @@ class TimestampHandler extends $Number.Handler {
    */
   public static constraint = {
     ...$Number.constraint,
-    future: new Data.Constraint<number>(
-      ">now",
-      data => data > Date.now() ? null : "Future date expected.",
+    future: new Data.Constraint<number>(">now", data =>
+      data > Date.now() ? null : "Future date expected.",
     ),
-    past: new Data.Constraint<number>(
-      "<now",
-      data => data < Date.now() ? null : "Past date expected.",
+    past: new Data.Constraint<number>("<now", data =>
+      data < Date.now() ? null : "Past date expected.",
     ),
   }
 
