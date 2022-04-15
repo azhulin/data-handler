@@ -1,5 +1,5 @@
-import { fieldToPath } from "."
 import { ErrorUnexpected } from "../error"
+import { fieldToPath } from "../util"
 
 import type { Path } from "../type"
 

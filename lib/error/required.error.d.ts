@@ -1,4 +1,4 @@
-import { ErrorExpected } from ".";
+import { ErrorExpected } from "../error";
 import type { Validator } from "../component";
 import type { Path } from "../type";
 /**

@@ -1,4 +1,4 @@
-import { ErrorExpected } from ".";
+import { ErrorExpected } from "../error";
 import type { Path } from "../type";
 /**
  * The data adapted error.

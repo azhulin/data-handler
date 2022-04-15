@@ -36,7 +36,7 @@ export declare namespace $Integer {
         neq: (value: number) => import("..").Constraint<number>;
     };
     const preparer: import("..").Preparer.Library;
-    const processor: import("..").Processor.Library;
+    const processor: import("..").Processor.Library<any>;
     function conf(config?: Config): {
         Handler: typeof IntegerHandler;
         config: Config;

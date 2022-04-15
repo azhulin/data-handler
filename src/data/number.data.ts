@@ -47,9 +47,8 @@ class NumberHandler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  public constructor(settings: Data.Settings) {
-    super(settings)
-    const config = (settings.config ?? {}) as $Number.Config
+  public constructor(config: $Number.Config, settings?: Data.Settings) {
+    super(config, settings)
     this.decimals = config.decimals ?? this.decimals
     if (null !== this.decimals && !Data.isIndex(this.decimals)) {
       throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Invalid 'decimals' property.`)
@@ -85,5 +84,5 @@ export namespace $Number {
   export const preparer = Handler.preparer
   export const processor = Handler.processor
   export function conf(config: Config = {}) { return { Handler, config } }
-  export function init(config: Config = {}) { return new Handler({ config }) }
+  export function init(config: Config = {}) { return new Handler(config) }
 }

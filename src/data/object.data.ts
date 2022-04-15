@@ -28,9 +28,8 @@ class ObjectHandler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  public constructor(settings: Data.Settings) {
-    super(settings)
-    const config = (settings.config ?? {}) as $Object.Config
+  public constructor(config: $Object.Config, settings?: Data.Settings) {
+    super(config, settings)
     this.schema = config.schema ?? this.schema
     this.reduce = config.reduce ?? this.reduce
   }
@@ -119,8 +118,8 @@ class ObjectHandler extends Data.Handler {
 }
 
 export namespace $Object {
-  export type Config<T extends Record<string, any> = Record<string, any>> = Data.Config<T> & {
-    schema: Data.Schema
+  export type Config<T = any> = Data.Config<T> & {
+    schema?: Data.Schema
     reduce?: boolean
   }
   export const Handler = ObjectHandler
@@ -128,5 +127,5 @@ export namespace $Object {
   export const preparer = Handler.preparer
   export const processor = Handler.processor
   export function conf<T extends Record<string, any> = Record<string, any>>(config: Config<T>) { return { Handler, config } }
-  export function init<T extends Record<string, any> = Record<string, any>>(config: Config<T>) { return new Handler({ config }) }
+  export function init<T extends Record<string, any> = Record<string, any>>(config: Config<T>) { return new Handler(config) }
 }

@@ -39,9 +39,9 @@ class DictionaryHandler extends $Object.Handler {
   /**
    * {@inheritdoc}
    */
-  public constructor(settings: Data.Settings) {
-    super(settings)
-    const { key, value } = (settings.config ?? {}) as $Dictionary.Config
+  public constructor(config: $Dictionary.Config, settings?: Data.Settings) {
+    super(config, settings)
+    const { key, value } = config
     key && (this.key = key)
     value && (this.value = value)
   }
@@ -82,7 +82,7 @@ class DictionaryHandler extends $Object.Handler {
 }
 
 export namespace $Dictionary {
-  export type Config<T = Record<string, any>> = Omit<$Object.Config<T>, "schema" | "reduce"> & {
+  export type Config<T = any> = Omit<$Object.Config<T>, "schema" | "reduce"> & {
     key: Data.Definition
     value: Data.Definition
   }
@@ -91,5 +91,5 @@ export namespace $Dictionary {
   export const preparer = Handler.preparer
   export const processor = Handler.processor
   export function conf<T extends Record<string, any> = Record<string, any>>(config: Config<T>) { return { Handler, config } }
-  export function init<T extends Record<string, any> = Record<string, any>>(config: Config<T>) { return new Handler({ config }) }
+  export function init<T extends Record<string, any> = Record<string, any>>(config: Config<T>) { return new Handler(config) }
 }

@@ -1,16 +1,15 @@
-import { isIndex, isObject } from "."
 import { ErrorUnexpected } from "../error"
+import { isIndex, isObject } from "../util"
 
 import type { Path } from "../type"
 
 /**
  * Sets data value by path.
  */
-export function set(data: unknown, path: Path, item: unknown): unknown {
+export function set(data: unknown, [...path]: Path, item: unknown): unknown {
   if (!path.length) {
     return item
   }
-  path = [...path]
   const last = path.pop()!
   let value: any = data
   for (const key of path) {

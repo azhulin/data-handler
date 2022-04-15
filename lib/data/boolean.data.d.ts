@@ -19,9 +19,9 @@ declare class BooleanHandler extends Data.Handler {
 export declare namespace $Boolean {
     type Config<T = boolean> = Data.Config<T>;
     const Handler: typeof BooleanHandler;
-    const constraint: Data.Constraint.Library;
+    const constraint: Data.Constraint.Library<any>;
     const preparer: Data.Preparer.Library;
-    const processor: Data.Processor.Library;
+    const processor: Data.Processor.Library<any>;
     function conf(config?: Config): {
         Handler: typeof BooleanHandler;
         config: Config<boolean>;

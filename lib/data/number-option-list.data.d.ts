@@ -25,10 +25,10 @@ declare class NumberOptionListHandler extends $List.Handler {
     /**
      * {@inheritdoc}
      */
-    constructor(settings: Data.Settings);
+    constructor(config: $NumberOptionList.Config, settings?: Data.Settings);
 }
 export declare namespace $NumberOptionList {
-    type Config<T extends any[] = number[]> = Omit<$List.Config<T>, "item"> & {
+    type Config<T = number[]> = Omit<$List.Config<T>, "item"> & {
         options: $NumberOption.Options;
         preserve?: boolean;
     };

@@ -34,9 +34,8 @@ class NumberOptionHandler extends $Number.Handler {
   /**
    * {@inheritdoc}
    */
-  public constructor(settings: Data.Settings) {
-    super(settings)
-    const config = (settings.config ?? {}) as $NumberOption.Config
+  public constructor(config: $NumberOption.Config, settings?: Data.Settings) {
+    super(config, settings)
     this.options = config.options ?? this.options
     if (!this.optionKeys().every(key => super.isValid(key))) {
       throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Option keys don't match key type.`)
@@ -60,7 +59,7 @@ class NumberOptionHandler extends $Number.Handler {
 }
 
 export namespace $NumberOption {
-  export type Config = Omit<$Number.Config, "decimals"> & {
+  export interface Config extends Omit<$Number.Config, "decimals"> {
     options: Options
   }
   export type Options = number[] | Map<number, string>
@@ -69,5 +68,5 @@ export namespace $NumberOption {
   export const preparer = Handler.preparer
   export const processor = Handler.processor
   export function conf(config: Config) { return { Handler, config } }
-  export function init(config: Config) { return new Handler({ config }) }
+  export function init(config: Config) { return new Handler(config) }
 }

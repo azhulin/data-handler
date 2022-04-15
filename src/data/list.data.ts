@@ -61,9 +61,8 @@ class ListHandler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  public constructor(settings: Data.Settings) {
-    super(settings)
-    const config = (settings.config ?? {}) as $List.Config
+  public constructor(config: $List.Config, settings?: Data.Settings) {
+    super(config, settings)
     if (!config.item) {
       throw new Data.ErrorUnexpected("List configuration is invalid. Missing 'item' property.")
     }
@@ -138,7 +137,7 @@ class ListHandler extends Data.Handler {
 }
 
 export namespace $List {
-  export type Config<T extends any[] = any[]> = Data.Config<T> & {
+  export type Config<T = any> = Data.Config<T> & {
     item: Data.Definition
   }
   export const Handler = ListHandler
@@ -146,5 +145,5 @@ export namespace $List {
   export const preparer = Handler.preparer
   export const processor = Handler.processor
   export function conf<T extends any[] = any[]>(config: Config<T>) { return { Handler, config } }
-  export function init<T extends any[] = any[]>(config: Config<T>) { return new Handler({ config }) }
+  export function init<T extends any[] = any[]>(config: Config<T>) { return new Handler(config) }
 }

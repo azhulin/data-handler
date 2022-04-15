@@ -19,7 +19,7 @@ declare class NumberOptionHandler extends $Number.Handler {
     /**
      * {@inheritdoc}
      */
-    constructor(settings: Data.Settings);
+    constructor(config: $NumberOption.Config, settings?: Data.Settings);
     /**
      * Returns option keys.
      */
@@ -30,9 +30,9 @@ declare class NumberOptionHandler extends $Number.Handler {
     static optionKeys(options: $NumberOption.Options): number[];
 }
 export declare namespace $NumberOption {
-    type Config = Omit<$Number.Config, "decimals"> & {
+    interface Config extends Omit<$Number.Config, "decimals"> {
         options: Options;
-    };
+    }
     type Options = number[] | Map<number, string>;
     const Handler: typeof NumberOptionHandler;
     const constraint: {
@@ -44,7 +44,7 @@ export declare namespace $NumberOption {
         neq: (value: number) => Data.Constraint<number>;
     };
     const preparer: Data.Preparer.Library;
-    const processor: Data.Processor.Library;
+    const processor: Data.Processor.Library<any>;
     function conf(config: Config): {
         Handler: typeof NumberOptionHandler;
         config: Config;

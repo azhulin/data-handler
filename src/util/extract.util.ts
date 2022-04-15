@@ -1,4 +1,4 @@
-import { isIndex, isObject } from "."
+import { isIndex, isObject } from "../util"
 
 import type { Path } from "../type"
 

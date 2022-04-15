@@ -5,8 +5,8 @@ import {
 } from "../error"
 import { extract, pathResolve } from "../util"
 
-import type { BaseContext, Context, Settings } from "../interface"
-import type { Default, Definition, Path, Preparer, Processor, Property } from "../type"
+import type { Config, Context, Options, Settings } from "../interface"
+import type { Default, Path, Preparer, Processor, Property } from "../type"
 
 /**
  * The data validator class.
@@ -56,7 +56,6 @@ export abstract class Validator {
     read: context => this.getValue(this.default.value, context),
     create: context => this.getValue(this.default.value, context),
     update: context => (context.original() as any ?? this.default.value),
-    integrate: context => this.getValue(this.default.update, context),
     nulled: context => this.getValue(this.default.create, context),
   }
 
@@ -73,7 +72,7 @@ export abstract class Validator {
   /**
    * An array of data preparers.
    */
-  protected preparers: Preparer<any>[] = []
+  protected preparers: Preparer[] = []
 
   /**
    * An array of data preprocessors.
@@ -94,7 +93,7 @@ export abstract class Validator {
    * Custom preparers, preprocessors, constraints, postprocessors.
    */
   protected custom: {
-    preparers?: Preparer<any>[]
+    preparers?: Preparer[]
     preprocessors?: Processor<any>[]
     constraints?: Constraint.List<any>
     postprocessors?: Processor<any>[]
@@ -128,7 +127,7 @@ export abstract class Validator {
   /**
    * Constructor for the Validator object.
    */
-  public constructor({ config = {}, path, source, result, storage, warnings }: Settings) {
+  public constructor(config: Config, settings: Settings = {}) {
     this.input = config.input ?? this.input
     this.require = config.require ?? this.require
     this.default = { ...this.default, ...config.default }
@@ -148,6 +147,7 @@ export abstract class Validator {
       ...this.custom.postprocessors ?? [],
       ...config.postprocessors ?? [],
     ]
+    const { path, source, result, storage, warnings } = settings
     this.path = path ?? this.path
     this.source = source
     this.result = result
@@ -170,9 +170,9 @@ export abstract class Validator {
   /**
    * Returns validated data.
    */
-  public async validate(data: unknown, baseContext?: BaseContext): Promise<unknown> {
+  public async validate(data: unknown, options?: Options): Promise<unknown> {
     this.reset(data)
-    const context = await this.getContext(baseContext)
+    const context = await this.getContext(options)
     if (!await this.isInputable(context)) {
       !this.isOmitted(data) && this.inSource()
         && this.warn(new ErrorIgnored(this.path))
@@ -180,7 +180,7 @@ export abstract class Validator {
     }
     else if (this.isOmitted(data)) {
       const required = await this.isRequired(context)
-      if (required && !context.update && !context.integrate) {
+      if (required && !context.update) {
         throw new ErrorRequired(this.path, this)
       }
       data = await this.getDefault(context)
@@ -207,19 +207,17 @@ export abstract class Validator {
   /**
    * Returns the context.
    */
-  protected async getContext(context?: BaseContext): Promise<Context> {
-    const { create, update, integrate } = Operation
-    const { operation = create, data } = context ?? {}
-    if ([update, integrate].includes(operation) && !data) {
+  protected async getContext(options: Options = {}): Promise<Context> {
+    const { operation = Operation.create, data } = options
+    const update = Operation.update === operation
+    if (update && !data) {
       throw new ErrorUnexpected(`Context data is required for the ${operation} operation.`)
     }
     return {
-      ...context,
+      ...options,
       operation,
-      create: false,
-      update: false,
-      integrate: false,
-      [operation]: true,
+      create: !update,
+      update,
       handler: this,
       path: this.path,
       source: field => extract(this.source, pathResolve(this.path, field)),
@@ -366,15 +364,6 @@ export abstract class Validator {
     return "function" === typeof property
       ? (property as Property.Dynamic<P, C>)(context)
       : property as Property.Static<P>
-  }
-
-  /**
-   * Returns the data handler for specified data definition.
-   */
-  protected initHandler(definition: Definition, path: Path): Validator {
-    const { Handler, config } = "config" in definition ? definition : { ...definition, config: {} }
-    const { source, result, storage, warnings } = this
-    return new Handler({ config, path, source, result, storage, warnings })
   }
 
   /**

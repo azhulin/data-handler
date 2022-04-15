@@ -1,4 +1,4 @@
 /**
  * The data path.
  */
-export type Path = (number | string)[]
+export type Path = Array<number | string>

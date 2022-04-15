@@ -1,9 +1,9 @@
-import { Validator } from "."
-import { ErrorUnexpected, ErrorUnexpectedFormatting } from "../error"
+import { Validator } from "../component"
 import { Format } from "../enum"
+import { ErrorUnexpected, ErrorUnexpectedFormatting } from "../error"
 
+import type { Config, Context, Options, Settings } from "../interface"
 import type { Definition, Path, Property } from "../type"
-import type { BaseContext, Context, Settings } from "../interface"
 
 /**
  * The data handler class.
@@ -33,9 +33,8 @@ export abstract class Handler extends Validator {
   /**
    * Constructor for the Handler object.
    */
-  public constructor(settings: Settings) {
-    super(settings)
-    const config = settings.config ?? {}
+  public constructor(config: Config, settings?: Settings) {
+    super(config, settings)
     this.store = config.store ?? this.store
     this.output = config.output ?? this.output
   }
@@ -43,8 +42,8 @@ export abstract class Handler extends Validator {
   /**
    * {@inheritdoc}
    */
-  public async validate(data: unknown, baseContext?: BaseContext): Promise<unknown> {
-    return this.inInput(data).toBase(baseContext)
+  public async validate(data: unknown, options?: Options): Promise<unknown> {
+    return this.inInput(data).toBase(options)
   }
 
   /**
@@ -81,46 +80,46 @@ export abstract class Handler extends Validator {
   /**
    * Returns the data in base format.
    */
-  public async toBase(baseContext?: BaseContext): Promise<unknown> {
-    return this.formatData(Format.base, baseContext) as Promise<unknown>
+  public async toBase(options?: Options): Promise<unknown> {
+    return this.formatData(Format.base, options) as Promise<unknown>
   }
 
   /**
    * Returns the data in store format.
    */
-  public async toStore(baseContext?: BaseContext): Promise<unknown> {
-    return this.formatData(Format.store, baseContext)
+  public async toStore(options?: Options): Promise<unknown> {
+    return this.formatData(Format.store, options)
   }
 
   /**
    * Returns the data in output format.
    */
-  public async toOutput(baseContext?: BaseContext): Promise<unknown> {
-    return this.formatData(Format.output, baseContext)
+  public async toOutput(options?: Options): Promise<unknown> {
+    return this.formatData(Format.output, options)
   }
 
   /**
    * Returns data in specified format.
    */
-  public async formatData(format: Format, baseContext?: BaseContext): Promise<unknown> {
+  public async formatData(format: Format, options?: Options): Promise<unknown> {
     if (this.format === format) {
       return this.data
     }
     this.reset(this.data)
     switch (this.format + format) {
       case Format.input + Format.base:
-        this.data = await this.formatInputToBase(this.data, baseContext)
+        this.data = await this.formatInputToBase(this.data, options)
         break
 
       case Format.store + Format.base:
-        this.data = await this.formatStoreToBase(this.data, baseContext)
+        this.data = await this.formatStoreToBase(this.data, options)
         break
 
       case Format.base + Format.store:
-        return this.formatBaseToStore(this.data, baseContext)
+        return this.formatBaseToStore(this.data, options)
 
       case Format.base + Format.output:
-        return this.formatBaseToOutput(this.data, baseContext)
+        return this.formatBaseToOutput(this.data, options)
 
       default:
         throw new ErrorUnexpected("Invalid data format conversion.")
@@ -146,15 +145,15 @@ export abstract class Handler extends Validator {
   /**
    * Returns the data in base format from data in input format.
    */
-  protected async formatInputToBase(data: unknown, baseContext?: BaseContext): Promise<unknown> {
-    return super.validate(data, baseContext)
+  protected async formatInputToBase(data: unknown, options?: Options): Promise<unknown> {
+    return super.validate(data, options)
   }
 
   /**
    * Returns store data from base data.
    */
-  protected async formatBaseToStore(data: unknown, baseContext?: BaseContext): Promise<unknown> {
-    const context = await this.getContext(baseContext)
+  protected async formatBaseToStore(data: unknown, options?: Options): Promise<unknown> {
+    const context = await this.getContext(options)
     if (!await this.isStorable(context)) {
       return undefined
     }
@@ -170,8 +169,8 @@ export abstract class Handler extends Validator {
   /**
    * Returns output data from base data.
    */
-  protected async formatBaseToOutput(data: unknown, baseContext?: BaseContext): Promise<unknown> {
-    const context = await this.getContext(baseContext)
+  protected async formatBaseToOutput(data: unknown, options?: Options): Promise<unknown> {
+    const context = await this.getContext(options)
     if (!await this.isOutputable(context)) {
       return undefined
     }
@@ -187,8 +186,8 @@ export abstract class Handler extends Validator {
   /**
    * Returns base data from store data.
    */
-  protected async formatStoreToBase(data: unknown, baseContext?: BaseContext): Promise<unknown> {
-    const context = await this.getContext(baseContext)
+  protected async formatStoreToBase(data: unknown, options?: Options): Promise<unknown> {
+    const context = await this.getContext(options)
     if (!await this.isStorable(context) || this.isOmitted(data)) {
       data = await this.getDefault(context, "read")
     }
@@ -266,10 +265,12 @@ export abstract class Handler extends Validator {
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the data handler for specified data definition.
    */
   protected initHandler(definition: Definition, path: Path = []): Handler {
-    return super.initHandler(definition, path) as Handler
+    const { Handler, config } = "config" in definition ? definition : { ...definition, config: {} }
+    const { source, result, storage, warnings } = this
+    return new Handler(config, { path, source, result, storage, warnings })
   }
 
 }

@@ -19,7 +19,7 @@ declare class StringOptionHandler extends $String.Handler {
     /**
      * {@inheritdoc}
      */
-    constructor(settings: Data.Settings);
+    constructor(config: $StringOption.Config, settings?: Data.Settings);
     /**
      * Returns option keys.
      */

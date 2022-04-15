@@ -1,4 +1,4 @@
-import { ErrorData } from ".";
+import { ErrorData } from "../error";
 /**
  * The unexpected data error.
  *

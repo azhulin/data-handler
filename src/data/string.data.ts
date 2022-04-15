@@ -65,5 +65,5 @@ export namespace $String {
   export const preparer = Handler.preparer
   export const processor = Handler.processor
   export function conf(config: Config = {}) { return { Handler, config } }
-  export function init(config: Config = {}) { return new Handler({ config }) }
+  export function init(config: Config = {}) { return new Handler(config) }
 }

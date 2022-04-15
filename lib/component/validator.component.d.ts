@@ -1,6 +1,6 @@
 import { Constraint } from "../component";
-import type { BaseContext, Context, Settings } from "../interface";
-import type { Default, Definition, Path, Preparer, Processor, Property } from "../type";
+import type { Config, Context, Options, Settings } from "../interface";
+import type { Default, Path, Preparer, Processor, Property } from "../type";
 /**
  * The data validator class.
  */
@@ -48,7 +48,7 @@ export declare abstract class Validator {
     /**
      * An array of data preparers.
      */
-    protected preparers: Preparer<any>[];
+    protected preparers: Preparer[];
     /**
      * An array of data preprocessors.
      */
@@ -65,7 +65,7 @@ export declare abstract class Validator {
      * Custom preparers, preprocessors, constraints, postprocessors.
      */
     protected custom: {
-        preparers?: Preparer<any>[];
+        preparers?: Preparer[];
         preprocessors?: Processor<any>[];
         constraints?: Constraint.List<any>;
         postprocessors?: Processor<any>[];
@@ -93,7 +93,7 @@ export declare abstract class Validator {
     /**
      * Constructor for the Validator object.
      */
-    constructor({ config, path, source, result, storage, warnings }: Settings);
+    constructor(config: Config, settings?: Settings);
     /**
      * Resets the handler state.
      */
@@ -101,11 +101,11 @@ export declare abstract class Validator {
     /**
      * Returns validated data.
      */
-    validate(data: unknown, baseContext?: BaseContext): Promise<unknown>;
+    validate(data: unknown, options?: Options): Promise<unknown>;
     /**
      * Returns the context.
      */
-    protected getContext(context?: BaseContext): Promise<Context>;
+    protected getContext(options?: Options): Promise<Context>;
     /**
      * Prepares the data.
      */
@@ -170,10 +170,6 @@ export declare abstract class Validator {
      * Returns dynamic context property value.
      */
     protected getValue<P = unknown, C = Context>(property: Property<P, C>, context: C): Promise<P>;
-    /**
-     * Returns the data handler for specified data definition.
-     */
-    protected initHandler(definition: Definition, path: Path): Validator;
     /**
      * Adds a warning.
      */

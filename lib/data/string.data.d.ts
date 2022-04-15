@@ -19,11 +19,11 @@ declare class StringHandler extends Data.Handler {
         length: {
             eq: (value: number) => Data.Constraint<string>;
             gt: (value: number) => Data.Constraint<string>;
-            gte: (value: number) => Data.Constraint<string>;
-            lt: (value: number) => Data.Constraint<string>;
             /**
              * {@inheritdoc}
              */
+            gte: (value: number) => Data.Constraint<string>;
+            lt: (value: number) => Data.Constraint<string>;
             lte: (value: number) => Data.Constraint<string>;
             neq: (value: number) => Data.Constraint<string>;
         };
@@ -53,11 +53,11 @@ export declare namespace $String {
         length: {
             eq: (value: number) => Data.Constraint<string>;
             gt: (value: number) => Data.Constraint<string>;
-            gte: (value: number) => Data.Constraint<string>;
-            lt: (value: number) => Data.Constraint<string>;
             /**
              * {@inheritdoc}
              */
+            gte: (value: number) => Data.Constraint<string>;
+            lt: (value: number) => Data.Constraint<string>;
             lte: (value: number) => Data.Constraint<string>;
             neq: (value: number) => Data.Constraint<string>;
         };

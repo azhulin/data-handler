@@ -1,4 +1,4 @@
-import { ErrorUnexpected } from ".";
+import { ErrorUnexpected } from "../error";
 import type { Format } from "../enum";
 import type { Path } from "../type";
 /**

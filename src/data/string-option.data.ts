@@ -34,9 +34,8 @@ class StringOptionHandler extends $String.Handler {
   /**
    * {@inheritdoc}
    */
-  public constructor(settings: Data.Settings) {
-    super(settings)
-    const config = (settings.config ?? {}) as $StringOption.Config
+  public constructor(config: $StringOption.Config, settings?: Data.Settings) {
+    super(config, settings)
     this.options = config.options ?? this.options
     if (!this.optionKeys().every(key => super.isValid(key))) {
       throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Option keys don't match key type.`)
@@ -69,5 +68,5 @@ export namespace $StringOption {
   export const preparer = Handler.preparer
   export const processor = Handler.processor
   export function conf(config: Config) { return { Handler, config } }
-  export function init(config: Config) { return new Handler({ config }) }
+  export function init(config: Config) { return new Handler(config) }
 }

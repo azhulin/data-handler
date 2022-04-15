@@ -22,7 +22,7 @@ declare class ObjectHandler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
-    constructor(settings: Data.Settings);
+    constructor(config: $Object.Config, settings?: Data.Settings);
     /**
      * Returns prepared schema.
      */
@@ -58,14 +58,14 @@ declare class ObjectHandler extends Data.Handler {
     protected convert(format: Exclude<Data.Format, Data.Format.input>, data: Record<string, any>, context: Data.Context): Promise<Record<string, any>>;
 }
 export declare namespace $Object {
-    type Config<T extends Record<string, any> = Record<string, any>> = Data.Config<T> & {
-        schema: Data.Schema;
+    type Config<T = any> = Data.Config<T> & {
+        schema?: Data.Schema;
         reduce?: boolean;
     };
     const Handler: typeof ObjectHandler;
-    const constraint: Data.Constraint.Library;
+    const constraint: Data.Constraint.Library<any>;
     const preparer: Data.Preparer.Library;
-    const processor: Data.Processor.Library;
+    const processor: Data.Processor.Library<any>;
     function conf<T extends Record<string, any> = Record<string, any>>(config: Config<T>): {
         Handler: typeof ObjectHandler;
         config: Config<T>;

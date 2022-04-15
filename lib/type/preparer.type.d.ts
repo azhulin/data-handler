@@ -2,7 +2,9 @@ import type { Context } from "../interface";
 /**
  * The data preparer.
  */
-export declare type Preparer<T> = (data: any, context: Context) => T;
+export declare type Preparer = (data: unknown, context: Context) => unknown;
 export declare namespace Preparer {
-    type Library = Record<string, Preparer<any>>;
+    type Library = {
+        [key: string]: Preparer | ((...args: any) => Preparer) | Library;
+    };
 }

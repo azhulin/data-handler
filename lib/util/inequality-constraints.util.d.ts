@@ -1,4 +1,4 @@
-import { Constraint } from "..";
+import { Constraint } from "../component";
 /**
  * Generates an inequality constraints.
  */

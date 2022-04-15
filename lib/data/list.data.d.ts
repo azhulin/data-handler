@@ -24,6 +24,9 @@ declare class ListHandler extends Data.Handler {
             gt: (value: number) => Data.Constraint<any[]>;
             gte: (value: number) => Data.Constraint<any[]>;
             lt: (value: number) => Data.Constraint<any[]>;
+            /**
+             * The list item definition.
+             */
             lte: (value: number) => Data.Constraint<any[]>;
             neq: (value: number) => Data.Constraint<any[]>;
         };
@@ -44,7 +47,7 @@ declare class ListHandler extends Data.Handler {
     /**
      * {@inheritdoc}
      */
-    constructor(settings: Data.Settings);
+    constructor(config: $List.Config, settings?: Data.Settings);
     /**
      * {@inheritdoc}
      */
@@ -75,7 +78,7 @@ declare class ListHandler extends Data.Handler {
     protected getHandler(index?: number, data?: unknown): Data.Handler;
 }
 export declare namespace $List {
-    type Config<T extends any[] = any[]> = Data.Config<T> & {
+    type Config<T = any> = Data.Config<T> & {
         item: Data.Definition;
     };
     const Handler: typeof ListHandler;
@@ -85,13 +88,16 @@ export declare namespace $List {
             gt: (value: number) => Data.Constraint<any[]>;
             gte: (value: number) => Data.Constraint<any[]>;
             lt: (value: number) => Data.Constraint<any[]>;
+            /**
+             * The list item definition.
+             */
             lte: (value: number) => Data.Constraint<any[]>;
             neq: (value: number) => Data.Constraint<any[]>;
         };
         unique: Data.Constraint<any[]>;
     };
     const preparer: Data.Preparer.Library;
-    const processor: Data.Processor.Library;
+    const processor: Data.Processor.Library<any>;
     function conf<T extends any[] = any[]>(config: Config<T>): {
         Handler: typeof ListHandler;
         config: Config<T>;

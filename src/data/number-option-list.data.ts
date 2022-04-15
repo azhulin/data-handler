@@ -38,17 +38,13 @@ class NumberOptionListHandler extends $List.Handler {
   /**
    * {@inheritdoc}
    */
-  public constructor(settings: Data.Settings) {
+  public constructor(config: $NumberOptionList.Config, settings?: Data.Settings) {
     super({
-      ...settings,
-      config: <$List.Config>{
-        ...settings.config,
-        item: $NumberOption.conf({
-          options: (settings.config as $NumberOption.Config).options,
-        }),
-      },
-    })
-    const config = (settings.config ?? {}) as $NumberOptionList.Config
+      ...config,
+      item: $NumberOption.conf({
+        options: config.options,
+      }),
+    }, settings)
     this.options = config.options ?? this.options
     this.preserve = config.preserve ?? this.preserve
     this.preserve || this.postprocessors.push($NumberOptionList.processor.order)
@@ -57,7 +53,7 @@ class NumberOptionListHandler extends $List.Handler {
 }
 
 export namespace $NumberOptionList {
-  export type Config<T extends any[] = number[]> = Omit<$List.Config<T>, "item"> & {
+  export type Config<T = number[]> = Omit<$List.Config<T>, "item"> & {
     options: $NumberOption.Options
     preserve?: boolean
   }
@@ -66,5 +62,5 @@ export namespace $NumberOptionList {
   export const preparer = Handler.preparer
   export const processor = Handler.processor
   export function conf(config: Config) { return { Handler, config } }
-  export function init(config: Config) { return new Handler({ config }) }
+  export function init(config: Config) { return new Handler(config) }
 }

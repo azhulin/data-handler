@@ -1,5 +1,5 @@
 import type { Constraint } from "../component"
-import type { Context } from "."
+import type { Context } from "../interface"
 import type { Default, Preparer, Processor, Property } from "../type"
 
 /**
@@ -11,7 +11,7 @@ export interface Config<T = any> {
   output?: Property<boolean, Context>
   require?: Property<boolean, Context>
   default?: Partial<Default<null | T>>
-  preparers?: Preparer<T>[]
+  preparers?: Preparer[]
   preprocessors?: Processor<T>[]
   constraints?: Constraint.List<T>
   postprocessors?: Processor<T>[]

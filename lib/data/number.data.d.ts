@@ -28,14 +28,15 @@ declare class NumberHandler extends Data.Handler {
         gte: (value: number) => Data.Constraint<number>;
         lt: (value: number) => Data.Constraint<number>;
         lte: (value: number) => Data.Constraint<number>;
-        neq: (value: number) => Data.Constraint<number>; /**
+        /**
          * {@inheritdoc}
          */
+        neq: (value: number) => Data.Constraint<number>;
     };
     /**
      * {@inheritdoc}
      */
-    constructor(settings: Data.Settings);
+    constructor(config: $Number.Config, settings?: Data.Settings);
     /**
      * {@inheritdoc}
      */
@@ -56,12 +57,13 @@ export declare namespace $Number {
         gte: (value: number) => Data.Constraint<number>;
         lt: (value: number) => Data.Constraint<number>;
         lte: (value: number) => Data.Constraint<number>;
-        neq: (value: number) => Data.Constraint<number>; /**
+        /**
          * {@inheritdoc}
          */
+        neq: (value: number) => Data.Constraint<number>;
     };
     const preparer: Data.Preparer.Library;
-    const processor: Data.Processor.Library;
+    const processor: Data.Processor.Library<any>;
     function conf(config?: Config): {
         Handler: typeof NumberHandler;
         config: Config<number>;

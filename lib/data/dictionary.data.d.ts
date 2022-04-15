@@ -17,10 +17,11 @@ declare class DictionaryHandler extends $Object.Handler {
      */
     static constraint: {
         items_number: {
-            eq: (value: number) => Data.Constraint<Record<string, any>>;
-            gt: (value: number) => Data.Constraint<Record<string, any>>; /**
-             * The dictionary key data definition.
+            /**
+             * {@inheritdoc}
              */
+            eq: (value: number) => Data.Constraint<Record<string, any>>;
+            gt: (value: number) => Data.Constraint<Record<string, any>>;
             gte: (value: number) => Data.Constraint<Record<string, any>>;
             lt: (value: number) => Data.Constraint<Record<string, any>>;
             lte: (value: number) => Data.Constraint<Record<string, any>>;
@@ -38,24 +39,25 @@ declare class DictionaryHandler extends $Object.Handler {
     /**
      * {@inheritdoc}
      */
-    constructor(settings: Data.Settings);
+    constructor(config: $Dictionary.Config, settings?: Data.Settings);
     /**
      * {@inheritdoc}
      */
     protected prepareSchema(format: Data.Format): Promise<Data.Schema>;
 }
 export declare namespace $Dictionary {
-    type Config<T = Record<string, any>> = Omit<$Object.Config<T>, "schema" | "reduce"> & {
+    type Config<T = any> = Omit<$Object.Config<T>, "schema" | "reduce"> & {
         key: Data.Definition;
         value: Data.Definition;
     };
     const Handler: typeof DictionaryHandler;
     const constraint: {
         items_number: {
-            eq: (value: number) => Data.Constraint<Record<string, any>>;
-            gt: (value: number) => Data.Constraint<Record<string, any>>; /**
-             * The dictionary key data definition.
+            /**
+             * {@inheritdoc}
              */
+            eq: (value: number) => Data.Constraint<Record<string, any>>;
+            gt: (value: number) => Data.Constraint<Record<string, any>>;
             gte: (value: number) => Data.Constraint<Record<string, any>>;
             lt: (value: number) => Data.Constraint<Record<string, any>>;
             lte: (value: number) => Data.Constraint<Record<string, any>>;
@@ -63,7 +65,7 @@ export declare namespace $Dictionary {
         };
     };
     const preparer: Data.Preparer.Library;
-    const processor: Data.Processor.Library;
+    const processor: Data.Processor.Library<any>;
     function conf<T extends Record<string, any> = Record<string, any>>(config: Config<T>): {
         Handler: typeof DictionaryHandler;
         config: Config<T>;

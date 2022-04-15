@@ -22,7 +22,9 @@ declare class TimestampHandler extends $Number.Handler {
     static constraint: {
         future: Data.Constraint<number>;
         past: Data.Constraint<number>;
-        eq: (value: number) => Data.Constraint<number>;
+        eq: (value: number) => Data.Constraint<number>; /**
+         * {@inheritdoc}
+         */
         gt: (value: number) => Data.Constraint<number>;
         gte: (value: number) => Data.Constraint<number>;
         lt: (value: number) => Data.Constraint<number>;
@@ -44,7 +46,9 @@ export declare namespace $Timestamp {
     const constraint: {
         future: Data.Constraint<number>;
         past: Data.Constraint<number>;
-        eq: (value: number) => Data.Constraint<number>;
+        eq: (value: number) => Data.Constraint<number>; /**
+         * {@inheritdoc}
+         */
         gt: (value: number) => Data.Constraint<number>;
         gte: (value: number) => Data.Constraint<number>;
         lt: (value: number) => Data.Constraint<number>;
@@ -52,7 +56,7 @@ export declare namespace $Timestamp {
         neq: (value: number) => Data.Constraint<number>;
     };
     const preparer: Data.Preparer.Library;
-    const processor: Data.Processor.Library;
+    const processor: Data.Processor.Library<any>;
     function conf(config?: Config): {
         Handler: typeof TimestampHandler;
         config: Config;

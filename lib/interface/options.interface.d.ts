@@ -1,8 +1,8 @@
 import type { Operation } from "../enum";
 /**
- * The base data context.
+ * The data options.
  */
-export interface BaseContext {
+export interface Options {
     operation?: Operation;
     data?: unknown;
     [key: string]: unknown;

@@ -1,7 +1,7 @@
-import { Validator } from ".";
+import { Validator } from "../component";
 import { Format } from "../enum";
+import type { Config, Context, Options, Settings } from "../interface";
 import type { Definition, Path, Property } from "../type";
-import type { BaseContext, Context, Settings } from "../interface";
 /**
  * The data handler class.
  */
@@ -25,11 +25,11 @@ export declare abstract class Handler extends Validator {
     /**
      * Constructor for the Handler object.
      */
-    constructor(settings: Settings);
+    constructor(config: Config, settings?: Settings);
     /**
      * {@inheritdoc}
      */
-    validate(data: unknown, baseContext?: BaseContext): Promise<unknown>;
+    validate(data: unknown, options?: Options): Promise<unknown>;
     /**
      * Initializes the handler with data in input format.
      */
@@ -49,19 +49,19 @@ export declare abstract class Handler extends Validator {
     /**
      * Returns the data in base format.
      */
-    toBase(baseContext?: BaseContext): Promise<unknown>;
+    toBase(options?: Options): Promise<unknown>;
     /**
      * Returns the data in store format.
      */
-    toStore(baseContext?: BaseContext): Promise<unknown>;
+    toStore(options?: Options): Promise<unknown>;
     /**
      * Returns the data in output format.
      */
-    toOutput(baseContext?: BaseContext): Promise<unknown>;
+    toOutput(options?: Options): Promise<unknown>;
     /**
      * Returns data in specified format.
      */
-    formatData(format: Format, baseContext?: BaseContext): Promise<unknown>;
+    formatData(format: Format, options?: Options): Promise<unknown>;
     /**
      * Returns the current data format.
      */
@@ -73,19 +73,19 @@ export declare abstract class Handler extends Validator {
     /**
      * Returns the data in base format from data in input format.
      */
-    protected formatInputToBase(data: unknown, baseContext?: BaseContext): Promise<unknown>;
+    protected formatInputToBase(data: unknown, options?: Options): Promise<unknown>;
     /**
      * Returns store data from base data.
      */
-    protected formatBaseToStore(data: unknown, baseContext?: BaseContext): Promise<unknown>;
+    protected formatBaseToStore(data: unknown, options?: Options): Promise<unknown>;
     /**
      * Returns output data from base data.
      */
-    protected formatBaseToOutput(data: unknown, baseContext?: BaseContext): Promise<unknown>;
+    protected formatBaseToOutput(data: unknown, options?: Options): Promise<unknown>;
     /**
      * Returns base data from store data.
      */
-    protected formatStoreToBase(data: unknown, baseContext?: BaseContext): Promise<unknown>;
+    protected formatStoreToBase(data: unknown, options?: Options): Promise<unknown>;
     /**
      * Determines whether the data is in expected input format.
      */
@@ -124,7 +124,7 @@ export declare abstract class Handler extends Validator {
      */
     protected isOutputable(context: Context): Promise<boolean>;
     /**
-     * {@inheritdoc}
+     * Returns the data handler for specified data definition.
      */
     protected initHandler(definition: Definition, path?: Path): Handler;
 }
