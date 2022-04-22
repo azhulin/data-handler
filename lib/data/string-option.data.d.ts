@@ -31,7 +31,7 @@ declare class StringOptionHandler extends $String.Handler {
 }
 export declare namespace $StringOption {
     type Config = $String.Config & {
-        options: Options;
+        options?: Options;
     };
     type Options = string[] | Record<string, string>;
     const Handler: typeof StringOptionHandler;
@@ -52,10 +52,10 @@ export declare namespace $StringOption {
         lower: (data: string) => string;
         upper: (data: string) => string;
     };
-    function conf(config: Config): {
+    function conf(config?: Config): {
         Handler: typeof StringOptionHandler;
         config: Config;
     };
-    function init(config: Config): StringOptionHandler;
+    function init(config?: Config): StringOptionHandler;
 }
 export {};

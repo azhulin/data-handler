@@ -60,13 +60,13 @@ class StringOptionHandler extends $String.Handler {
 
 export namespace $StringOption {
   export type Config = $String.Config & {
-    options: Options
+    options?: Options
   }
   export type Options = string[] | Record<string, string>
   export const Handler = StringOptionHandler
   export const constraint = Handler.constraint
   export const preparer = Handler.preparer
   export const processor = Handler.processor
-  export function conf(config: Config) { return { Handler, config } }
-  export function init(config: Config) { return new Handler(config) }
+  export function conf(config: Config = {}) { return { Handler, config } }
+  export function init(config: Config = {}) { return new Handler(config) }
 }

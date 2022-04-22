@@ -31,7 +31,7 @@ declare class NumberOptionHandler extends $Number.Handler {
 }
 export declare namespace $NumberOption {
     interface Config extends Omit<$Number.Config, "decimals"> {
-        options: Options;
+        options?: Options;
     }
     type Options = number[] | Map<number, string>;
     const Handler: typeof NumberOptionHandler;
@@ -45,10 +45,10 @@ export declare namespace $NumberOption {
     };
     const preparer: Data.Preparer.Library;
     const processor: Data.Processor.Library<any>;
-    function conf(config: Config): {
+    function conf(config?: Config): {
         Handler: typeof NumberOptionHandler;
         config: Config;
     };
-    function init(config: Config): NumberOptionHandler;
+    function init(config?: Config): NumberOptionHandler;
 }
 export {};

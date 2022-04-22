@@ -60,13 +60,13 @@ class NumberOptionHandler extends $Number.Handler {
 
 export namespace $NumberOption {
   export interface Config extends Omit<$Number.Config, "decimals"> {
-    options: Options
+    options?: Options
   }
   export type Options = number[] | Map<number, string>
   export const Handler = NumberOptionHandler
   export const constraint = Handler.constraint
   export const preparer = Handler.preparer
   export const processor = Handler.processor
-  export function conf(config: Config) { return { Handler, config } }
-  export function init(config: Config) { return new Handler(config) }
+  export function conf(config: Config = {}) { return { Handler, config } }
+  export function init(config: Config = {}) { return new Handler(config) }
 }
