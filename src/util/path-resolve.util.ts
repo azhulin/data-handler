@@ -1,15 +1,15 @@
 import { ErrorUnexpected } from "../error"
 import { fieldToPath } from "../util"
 
-import type { Path } from "../type"
+import type { FieldRelative, Path } from "../type"
 
 /**
  * Returns the modified path.
  */
-export function pathResolve(path: Path, field: string = ""): Path {
-  if ("*" === field) {
-    return []
-  }
+export function pathResolve(path: Path, field: FieldRelative = ""): Path {
+  //if ("*" === field) {
+  //  return []
+  //}
   const regexp = /^\^([0-9]+)?/
   const match = field.match(regexp)
   const up = match ? +(match[1] ?? 1) : 0

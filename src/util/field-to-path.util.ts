@@ -1,11 +1,11 @@
 import { ErrorUnexpected } from "../error"
 
-import type { Path } from "../type"
+import type { Field, Path } from "../type"
 
 /**
- * Converts a string to a data path.
+ * Converts a data field to a data path.
  */
-export function fieldToPath(field?: string): Path {
+export function fieldToPath(field?: Field): Path {
   if (!field) {
     return []
   }

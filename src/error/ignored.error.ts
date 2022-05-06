@@ -4,16 +4,22 @@ import type { Path } from "../type"
 
 /**
  * The data ignored error.
+ *
+ * This error can be used to generate a warning when the redundant data is
+ * provided in the input. For example, when provided an object with a key that
+ * is not described in the data schema.
  */
 export class ErrorIgnored extends ErrorExpected {
 
   /**
    * {@inheritdoc}
    */
-  public type: string = "data.ignored"
+  public type: string = `${this.type}.ignored`
 
   /**
    * Constructor for the ErrorIgnored object.
+   *
+   * @param path - The path of the data in the data tree.
    */
   public constructor(path: Path) {
     super("Value is ignored.", path)
@@ -23,7 +29,7 @@ export class ErrorIgnored extends ErrorExpected {
    * {@inheritdoc}
    */
   public toString(): string {
-    return `Value of the field ${this.getField()} is ignored.`
+    return `Value of the field ${this.field()} is ignored.`
   }
 
 }

@@ -3,13 +3,13 @@ import { ErrorData } from "../error"
 /**
  * The unexpected data error.
  *
- * Errors not related to the data validation itself, e.g. checking a non-existing data constraint.
+ * Error not related to the data validation itself, e.g. invalid data handler configuration.
  */
 export class ErrorUnexpected extends ErrorData {
 
   /**
    * {@inheritdoc}
    */
-  public type: string = "data.unexpected"
+  public type: string = `${this.type}.unexpected`
 
 }

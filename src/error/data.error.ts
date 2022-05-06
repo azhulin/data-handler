@@ -1,4 +1,6 @@
-import type { Path } from "../type"
+import { pathToField } from "../util"
+
+import type { Field, Path } from "../type"
 
 /**
  * The base data error.
@@ -11,7 +13,7 @@ export abstract class ErrorData extends Error {
   public type: string = "data"
 
   /**
-   * The path of the data in the data tree.
+   * The path of the data in the data tree the error occured for.
    */
   public path: Path
 
@@ -22,20 +24,26 @@ export abstract class ErrorData extends Error {
 
   /**
    * Constructor for the ErrorData object.
+   *
+   * @param message - The error message.
+   * @param path - The path of the data in the data tree.
    */
   public constructor(message: string, path: Path = []) {
     super(message)
     this.path = path
-    const field = this.getField() || undefined
+    const field = this.field() || undefined
     this.details = { ...this.details, field }
   }
 
   /**
-   * Returns the path of the data in the data tree as a string.
+   * Returns the data field from a data path.
+   *
+   * @param path - The data path to convert to a data field.
+   *
+   * @returns The data field.
    */
-  protected getField(path?: Path): string {
-    return (path ?? this.path).map(item =>
-      "string" === typeof item ? `.${item}` : `[${item}]`).join("")
+  protected field(path?: Path): Field {
+    return pathToField(path ?? this.path)
   }
 
 }

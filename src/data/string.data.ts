@@ -52,7 +52,7 @@ class StringHandler extends Data.Handler {
     const original = data
     data = await super.inputToBase(data, context) as string
     original !== data
-      && this.warn(new Data.ErrorAdapted(this.path, original, data))
+      && this.warnings.push(new Data.ErrorAdapted(this.path, original, data))
     return data
   }
 

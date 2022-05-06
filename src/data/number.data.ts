@@ -47,6 +47,13 @@ class NumberHandler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
+  protected postprocessors: Data.Processor.List<number> = [
+    data => null !== this.decimals ? +data.toFixed(this.decimals) : data,
+  ]
+
+  /**
+   * {@inheritdoc}
+   */
   public constructor(config: $Number.Config, settings?: Data.Settings) {
     super(config, settings)
     this.decimals = config.decimals ?? this.decimals
@@ -67,10 +74,10 @@ class NumberHandler extends Data.Handler {
    */
   protected async inputToBase(data: number, context: Data.Context): Promise<number> {
     const original = data
-    data = null !== this.decimals ? +data.toFixed(this.decimals) : data
+    data = await super.inputToBase(data, context) as number
     original !== data
-      && this.warn(new Data.ErrorAdapted(this.path, original, data))
-    return super.inputToBase(data, context) as Promise<number>
+      && this.warnings.push(new Data.ErrorAdapted(this.path, original, data))
+    return data
   }
 
 }

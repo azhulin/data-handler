@@ -1,9 +1,9 @@
-import type { Path } from "../type"
+import type { Field, Path } from "../type"
 
 /**
- * Converts a data path to a string.
+ * Converts a data path to a data field.
  */
-export function pathToField(path: Path): string {
+export function pathToField(path: Path): Field {
   return path.map(
     item => "string" === typeof item ? `.${item}` : `[${item}]`
   ).join("")

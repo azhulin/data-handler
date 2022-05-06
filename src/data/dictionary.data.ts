@@ -49,7 +49,7 @@ class DictionaryHandler extends $Object.Handler {
   /**
    * {@inheritdoc}
    */
-  protected async prepareSchema(format: Data.Format): Promise<Data.Schema> {
+  protected async prepareSchema(format: Data.Format): Promise<$Object.Schema> {
     if (!this.key) {
       throw new Data.ErrorUnexpected(`${this.label} configuration is invalid. Missing 'key' property.`)
     }

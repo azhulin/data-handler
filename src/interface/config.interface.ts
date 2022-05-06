@@ -1,6 +1,6 @@
 import type { Constraint } from "../component"
-import type { Context } from "../interface"
-import type { Default, Preparer, Processor, Property } from "../type"
+import type { Context, Default } from "../interface"
+import type { Processor, Property } from "../type"
 
 /**
  * The data handler configuration.
@@ -10,9 +10,9 @@ export interface Config<T = any> {
   store?: Property<boolean, Context>
   output?: Property<boolean, Context>
   require?: Property<boolean, Context>
-  default?: Partial<Default<null | T>>
-  preparers?: Preparer[]
-  preprocessors?: Processor<T>[]
+  default?: Partial<Default<T>>
+  preparers?: Processor.List<unknown>
+  preprocessors?: Processor.List<T>
   constraints?: Constraint.List<T>
-  postprocessors?: Processor<T>[]
+  postprocessors?: Processor.List<T>
 }

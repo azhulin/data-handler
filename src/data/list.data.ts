@@ -83,7 +83,7 @@ class ListHandler extends Data.Handler {
    * {@inheritdoc}
    */
   protected async inputToBase(data: unknown[], context: Data.Context): Promise<unknown[]> {
-    const result = await this.convert("toBase", data, context)
+    const result = await this.convert(Data.Format.base, data, context)
     return super.inputToBase(result, context) as Promise<unknown[]>
   }
 
@@ -91,7 +91,7 @@ class ListHandler extends Data.Handler {
    * {@inheritdoc}
    */
   protected async baseToStore(data: any[], context: Data.Context): Promise<unknown[]> {
-    const result = await this.convert("toStore", data, context)
+    const result = await this.convert(Data.Format.store, data, context)
     return super.baseToStore(result, context) as Promise<unknown[]>
   }
 
@@ -99,7 +99,7 @@ class ListHandler extends Data.Handler {
    * {@inheritdoc}
    */
   protected async baseToOutput(data: any[], context: Data.Context): Promise<unknown[]> {
-    const result = await this.convert("toOutput", data, context)
+    const result = await this.convert(Data.Format.output, data, context)
     return super.baseToOutput(result, context) as Promise<unknown[]>
   }
 
@@ -107,19 +107,19 @@ class ListHandler extends Data.Handler {
    * {@inheritdoc}
    */
   protected async storeToBase(data: unknown[], context: Data.Context): Promise<any[]> {
-    const result = await this.convert("toBase", data, context)
+    const result = await this.convert(Data.Format.base, data, context)
     return super.storeToBase(result, context) as Promise<any[]>
   }
 
   /**
    * Performs format conversion.
    */
-  protected async convert(method: "toBase" | "toStore" | "toOutput", data: unknown[], context: Data.Context): Promise<unknown[]> {
+  protected async convert(format: Data.Format, data: unknown[], context: Data.Context): Promise<unknown[]> {
     const result: unknown[] = []
     this.result = Data.set(this.result, this.path, result)
     const indexes = []
     for (const [index, item] of data.entries()) {
-      const value = await this.getHandler(index, item)[method](context)
+      const value = await this.getHandler(index, item).formatData(format, context)
       undefined !== value ? result[index] = value : indexes.push(index)
     }
     indexes.reduce((delta, index) => (result.splice(index - delta++, 1), delta), 0)

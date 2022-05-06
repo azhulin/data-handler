@@ -155,15 +155,15 @@ export abstract class Handler extends Validator {
   protected async formatBaseToStore(data: unknown, options?: Options): Promise<unknown> {
     const context = await this.getContext(options)
     if (!await this.isStorable(context)) {
-      return undefined
+      data = undefined
     }
-    if (this.isOmitted(data) || this.isEmpty(data)) {
-      return data
+    if (!this.isEmpty(data)) {
+      if (!this.isValidBaseData(data)) {
+        throw new ErrorUnexpectedFormatting(this.path, this.id, Format.base, Format.store, data)
+      }
+      data = this.baseToStore(data, context)
     }
-    if (this.isValidBaseData(data)) {
-      return this.baseToStore(data, context)
-    }
-    throw new ErrorUnexpectedFormatting(this.path, this.id, Format.base, Format.store, data)
+    return data
   }
 
   /**
@@ -172,15 +172,15 @@ export abstract class Handler extends Validator {
   protected async formatBaseToOutput(data: unknown, options?: Options): Promise<unknown> {
     const context = await this.getContext(options)
     if (!await this.isOutputable(context)) {
-      return undefined
+      data = undefined
     }
-    if (this.isOmitted(data) || this.isEmpty(data)) {
-      return data
+    if (!this.isEmpty(data)) {
+      if (!this.isValidBaseData(data)) {
+        throw new ErrorUnexpectedFormatting(this.path, this.id, Format.base, Format.output, data)
+      }
+      data = this.baseToOutput(data, context)
     }
-    if (this.isValidBaseData(data)) {
-      return this.baseToOutput(data, context)
-    }
-    throw new ErrorUnexpectedFormatting(this.path, this.id, Format.base, Format.output, data)
+    return data
   }
 
   /**
@@ -191,13 +191,13 @@ export abstract class Handler extends Validator {
     if (!await this.isStorable(context) || this.isOmitted(data)) {
       data = await this.getDefault(context, "read")
     }
-    if (this.isOmitted(data) || this.isEmpty(data)) {
-      return data
+    if (!this.isEmpty(data)) {
+      if (!this.isValidStoreData(data)) {
+        throw new ErrorUnexpectedFormatting(this.path, this.id, Format.store, Format.base, data)
+      }
+      data = this.storeToBase(data, context)
     }
-    if (this.isValidStoreData(data)) {
-      return this.storeToBase(data, context)
-    }
-    throw new ErrorUnexpectedFormatting(this.path, this.id, Format.store, Format.base, data)
+    return data
   }
 
   /**
@@ -225,9 +225,9 @@ export abstract class Handler extends Validator {
    * Converts data in input format to data in base format.
    */
   protected async inputToBase(data: unknown, context: Context): Promise<unknown> {
-    return super.process(data, context)
+    return super.handle(data, context)
   }
-  protected process = this.inputToBase
+  protected handle = this.inputToBase
 
   /**
    * Converts data in base format to data in store format.
@@ -254,14 +254,14 @@ export abstract class Handler extends Validator {
    * Returns "store" flag value.
    */
   protected async isStorable(context: Context): Promise<boolean> {
-    return this.getProperty<boolean>("store", context)
+    return this.getProperty<boolean>(this.store, context)
   }
 
   /**
    * Returns "output" flag value.
    */
   protected async isOutputable(context: Context): Promise<boolean> {
-    return this.getProperty<boolean>("output", context)
+    return this.getProperty<boolean>(this.output, context)
   }
 
   /**

@@ -3,6 +3,9 @@ import type { Config, Settings } from "../interface"
 
 /**
  * The data definition.
+ *
+ * The data definitions is an object containing the data handler constructor and
+ * optionally the data handler configuration.
  */
 export type Definition = Definition.Default | Definition.Configured
 

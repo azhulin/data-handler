@@ -18,7 +18,7 @@ class ObjectHandler extends Data.Handler {
   /**
    * The schema.
    */
-  protected schema: Data.Schema = {}
+  protected schema: $Object.Schema = {}
 
   /**
    * Whether to use default value, if all schema keys are optional and equal to Null.
@@ -37,15 +37,15 @@ class ObjectHandler extends Data.Handler {
   /**
    * Returns prepared schema.
    */
-  protected async getSchema(format: Data.Format): Promise<Data.Schema> {
+  protected async getSchema(format: Data.Format): Promise<$Object.Schema> {
     return this._schema[format] ?? (this._schema[format] = await this.prepareSchema(format))
   }
-  private _schema: { [format in Data.Format]?: Data.Schema } = {}
+  private _schema: { [format in Data.Format]?: $Object.Schema } = {}
 
   /**
    * Prepares the schema.
    */
-  protected async prepareSchema(format: Data.Format): Promise<Data.Schema> {
+  protected async prepareSchema(format: Data.Format): Promise<$Object.Schema> {
     return this.schema
   }
 
@@ -63,7 +63,7 @@ class ObjectHandler extends Data.Handler {
     const format = Data.Format.base
     const schema = await this.getSchema(format)
     Object.keys(data).filter(key => !(key in schema))
-      .forEach(key => this.warn(new Data.ErrorIgnored([...this.path, key])))
+      .forEach(key => this.warnings.push(new Data.ErrorIgnored([...this.path, key])))
     let result = await this.convert(format, data, context)
     if (this.reduce && Object.values(result!).every(value => null === value)
         && !await this.isRequired(context)) {
@@ -99,17 +99,14 @@ class ObjectHandler extends Data.Handler {
   /**
    * Performs format conversion.
    */
-  protected async convert(format: Exclude<Data.Format, Data.Format.input>, data: Record<string, any>, context: Data.Context): Promise<Record<string, any>> {
+  protected async convert(format: Data.Format, data: Record<string, any>, context: Data.Context): Promise<Record<string, any>> {
     const result: Record<string, any> = {}
     this.result = Data.set(this.result, this.path, result)
     const schema = await this.getSchema(format)
-    const { base, store, output } = Data.Format
-    const map = { [base]: "toBase", [store]: "toStore", [output]: "toOutput" }
-    const method = map[format] as "toBase" | "toStore" | "toOutput"
     for (const [key, definition] of Object.entries(schema)) {
       const handler = this.initHandler(definition, [...this.path, key])
         .initData(this.format, data[key])
-      const value = await handler[method](context)
+      const value = await handler.formatData(format, context)
       undefined !== value && (result[key] = value)
     }
     return result
@@ -119,9 +116,10 @@ class ObjectHandler extends Data.Handler {
 
 export namespace $Object {
   export type Config<T = any> = Data.Config<T> & {
-    schema?: Data.Schema
+    schema?: Schema
     reduce?: boolean
   }
+  export type Schema = Record<string, Data.Definition>
   export const Handler = ObjectHandler
   export const constraint = Handler.constraint
   export const preparer = Handler.preparer
