@@ -8,12 +8,12 @@ class StringHandler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  public get id(): string { return "string" }
+  public get type(): string { return "string" }
 
   /**
    * {@inheritdoc}
    */
-  public get name(): string { return "String" }
+  public get typeName(): string { return "String" }
 
   /**
    * {@inheritdoc}
@@ -21,7 +21,7 @@ class StringHandler extends Data.Handler {
   public static constraint = {
     ...Data.Handler.constraint,
     trimmed: new Data.Constraint<string>("trimmed", data =>
-      data === data.trim() ? null : "Value should be trimmed.",
+      data === data.trim() ? null : "Value must be trimmed.",
     ),
     length: Data.inequalityConstraints<string>(
       "length", data => data.length, "Length",
@@ -41,7 +41,7 @@ class StringHandler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  protected isValid(data: unknown): boolean {
+  protected isValidType(data: unknown): boolean {
     return "string" === typeof data
   }
 

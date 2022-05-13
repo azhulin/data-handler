@@ -8,12 +8,22 @@ class ListHandler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  public get id(): string { return `array<${this.itemId}>` }
+  public get id(): string { return `list.${this.itemHandler.id}` }
 
   /**
    * {@inheritdoc}
    */
-  public get name(): string { return `${this.itemName} array` }
+  public get name(): string { return `${this.itemHandler.name} list` }
+
+  /**
+   * {@inheritdoc}
+   */
+  public get type(): string { return `array<${this.itemHandler.type}>` }
+
+  /**
+   * {@inheritdoc}
+   */
+  public get typeName(): string { return `${this.itemHandler.typeName} array` }
 
   /**
    * {@inheritdoc}
@@ -49,14 +59,9 @@ class ListHandler extends Data.Handler {
   protected item: Data.Definition
 
   /**
-   * The list item type ID.
+   * The list item data handler.
    */
-  protected itemId: string
-
-  /**
-   * The list item type name.
-   */
-  protected itemName: string
+  protected itemHandler: Data.Handler
 
   /**
    * {@inheritdoc}
@@ -64,18 +69,16 @@ class ListHandler extends Data.Handler {
   public constructor(config: $List.Config, settings?: Data.Settings) {
     super(config, settings)
     if (!config.item) {
-      throw new Data.ErrorUnexpected("List configuration is invalid. Missing 'item' property.")
+      throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Missing 'item' property.`)
     }
     this.item = config.item
-    const { id, name } = this.getHandler()
-    this.itemId = id
-    this.itemName = name
+    this.itemHandler = this.getHandler()
   }
 
   /**
    * {@inheritdoc}
    */
-  protected isValid(data: unknown): boolean {
+  protected isValidType(data: unknown): boolean {
     return Array.isArray(data)
   }
 

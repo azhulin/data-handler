@@ -8,12 +8,12 @@ class ObjectHandler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  public get id(): string { return "object" }
+  public get type(): string { return "object" }
 
   /**
    * {@inheritdoc}
    */
-  public get name(): string { return "Object" }
+  public get typeName(): string { return "Object" }
 
   /**
    * The schema.
@@ -52,7 +52,7 @@ class ObjectHandler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  protected isValid(data: unknown): boolean {
+  protected isValidType(data: unknown): boolean {
     return Data.isObject(data)
   }
 

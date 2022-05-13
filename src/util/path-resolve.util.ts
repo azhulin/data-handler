@@ -4,21 +4,22 @@ import { fieldToPath } from "../util"
 import type { FieldRelative, Path } from "../type"
 
 /**
- * Returns the modified path.
+ * Returns the resolved data path after applying the specified relative data
+ * field.
+ *
+ * @param path - The data path to resolve.
+ * @param field - The relative data field to apply to the data path.
+ *
+ * @returns A resolved data path.
  */
 export function pathResolve(path: Path, field: FieldRelative = ""): Path {
-  //if ("*" === field) {
-  //  return []
-  //}
-  const regexp = /^\^([0-9]+)?/
-  const match = field.match(regexp)
-  const up = match ? +(match[1] ?? 1) : 0
-  field = field.replace(regexp, "")
-  if (up > path.length) {
-    throw new ErrorUnexpected("Unable to resolve the path, because specified offset is out of bounds.")
+  const [prefix, level] = field.match(/^\^([0-9]+)?/) ?? ["", "0"]
+  const levelsUp = +(level ?? 1)
+  if (levelsUp > path.length) {
+    throw new ErrorUnexpected("Unable to resolve the data path.")
   }
   return [
-    ...path.slice(0, up ? -up : undefined),
-    ...fieldToPath(field),
+    ...path.slice(0, levelsUp ? -levelsUp : undefined),
+    ...fieldToPath(field.replace(prefix, "")),
   ]
 }

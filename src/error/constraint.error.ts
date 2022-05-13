@@ -1,6 +1,6 @@
 import { ErrorExpected } from "../error"
 
-import type { Path } from "../type"
+import type { Validator } from "../component"
 
 /**
  * The data constraint error.
@@ -15,15 +15,15 @@ export class ErrorConstraint extends ErrorExpected {
   /**
    * Constructor for the ErrorConstraint object.
    *
-   * @param message - The error message.
-   * @param path - The path of the data in the data tree.
-   * @param type - The data type (data handler ID) of the data error occured for.
+   * @param handler - The data handler instance.
    * @param constraint - The data constraint ID.
+   * @param message - The error message.
    * @param details - The error details.
    */
-  public constructor(message: string, path: Path, type: string, constraint: string, details?: Record<string, unknown>) {
-    super(message, path)
-    this.details = { ...this.details, type, constraint, ...details }
+  public constructor(handler: Validator, constraint: string, message: string, details?: Record<string, unknown>) {
+    super(message, handler.path)
+    const { id, type } = handler
+    this.details = { ...this.details, id, type, constraint, ...details }
   }
 
 }

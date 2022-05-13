@@ -1,29 +1,31 @@
 import { ErrorUnexpected } from "../error"
-import { isIndex, isObject } from "../util"
+import { isValidKey } from "../util"
 
 import type { Path } from "../type"
 
 /**
- * Sets data value by path.
+ * Sets the specified value under the specified data path in the provided data.
+ *
+ * @param data - The data to set value for.
+ * @param path - The data path to set the value under.
+ * @param value - The value to set.
+ *
+ * @returns Provided data with the specified value set.
  */
-export function set(data: unknown, [...path]: Path, item: unknown): unknown {
+export function set(data: unknown, [...path]: Path, value: unknown): unknown {
   if (!path.length) {
-    return item
+    return value
   }
-  const last = path.pop()!
-  let value: any = data
+  const lastKey = path.pop()!
+  let subData: any = data
+  const error = () => {
+    throw new ErrorUnexpected("Can not set the value, because the specified data path does not exist in provided data.")
+  }
   for (const key of path) {
-    if ("string" === typeof key && !isObject(value)
-        || isIndex(key) && !Array.isArray(value)
-        || !(key in (value as object))) {
-      throw new ErrorUnexpected("Can not set data, because specified path does not exist.")
-    }
-    value = value[key]
+    isValidKey(key, subData, true) || error()
+    subData = subData[key]
   }
-  if ("string" === typeof last && !isObject(value)
-      || isIndex(last) && !Array.isArray(value)) {
-    throw new ErrorUnexpected("Can not set data, because value at specified path is invalid.")
-  }
-  undefined === item ? delete value[last] : value[last] = item
+  isValidKey(lastKey, subData, false) || error()
+  undefined === value ? delete subData[lastKey] : subData[lastKey] = value
   return data
 }

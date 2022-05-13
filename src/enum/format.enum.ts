@@ -16,28 +16,37 @@
 export enum Format {
 
   /**
-   * The data in the `input` format is a raw unvalidated data. The data in this
-   * format can be converted into the `base` data format (validated).
+   * The input data format.
+   *
+   * The data in the `input` data format is a raw unvalidated data. The data in
+   * this format can be converted into the `base` data format (validated).
    */
   input = "input",
 
   /**
-   * The data in the `base` format is the validated complete data. The data in
-   * this format can be converted into the `store` and `output` data formats.
+   * The base data format.
+   *
+   * The data in the `base` data format is the validated complete data. The data
+   * in this format can be converted into the `store` and `output` data formats.
    */
   base = "base",
 
   /**
-   * The data in the `store` format is the data read from the storage or the
-   * data prepared for the write to the storage. The data in this format can be
-   * converted into the `base` data format.
+   * The store data format.
+   *
+   * The data in the `store` data format is the data read from the storage or
+   * the data prepared for the write to the storage. The data in this format can
+   * be converted into the `base` data format.
    */
   store = "store",
 
   /**
-   * The data in the `output` format is the data prepared for the output. When
-   * converting to this format some confidential data can be removed, or some
-   * extra data can be added. The data can not be converted from this format.
+   * The output data format.
+   *
+   * The data in the `output` data format is the data prepared for the output.
+   * When converting to this format some confidential data can be removed, or
+   * some extra data can be added. The data can not be converted from this
+   * format.
    */
   output = "output",
 

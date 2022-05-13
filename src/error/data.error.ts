@@ -1,5 +1,6 @@
 import { pathToField } from "../util"
 
+import type { Validator } from "../component"
 import type { Field, Path } from "../type"
 
 /**
@@ -44,6 +45,18 @@ export abstract class ErrorData extends Error {
    */
   protected field(path?: Path): Field {
     return pathToField(path ?? this.path)
+  }
+
+  /**
+   * Returns the formatted handler data type.
+   *
+   * @param handler - The data handler instance.
+   *
+   * @returns Formatted data type.
+   */
+  public static type(handler: Validator): string {
+    const { typeName, typeDesc } = handler
+    return typeDesc ? `${typeName} (${typeDesc})` : typeName
   }
 
 }

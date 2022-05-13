@@ -19,7 +19,7 @@ class StringOptionHandler extends $String.Handler {
     new Data.Constraint("option", data =>
       this.optionKeys().includes(data)
         ? null
-        : [`${this.label} options do not contain the specified value.`, {
+        : [`${this.name} options do not contain the specified value.`, {
             type: this.id,
             options: this.options,
           }],
@@ -37,7 +37,7 @@ class StringOptionHandler extends $String.Handler {
   public constructor(config: $StringOption.Config, settings?: Data.Settings) {
     super(config, settings)
     this.options = config.options ?? this.options
-    if (!this.optionKeys().every(key => super.isValid(key))) {
+    if (!this.optionKeys().every(key => super.isValidType(key))) {
       throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Option keys don't match key type.`)
     }
   }

@@ -4,7 +4,8 @@
  * The data field is a string representation of a data path. The object keys in
  * the data path are prefixed with a dot symbol (`.`), and array indexes are
  * wrapped with square brackets symbols (`[`, `]`).
- * See {@link Path}.
+ *
+ * @see Path
  *
  * @example
  *   Path: ["a", "b", 1, "y"]

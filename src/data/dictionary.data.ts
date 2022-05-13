@@ -14,7 +14,7 @@ class DictionaryHandler extends $Object.Handler {
   /**
    * {@inheritdoc}
    */
-  public get label(): string { return "Dictionary" }
+  public get name(): string { return "Dictionary" }
 
   /**
    * {@inheritdoc}
@@ -51,13 +51,13 @@ class DictionaryHandler extends $Object.Handler {
    */
   protected async prepareSchema(format: Data.Format): Promise<$Object.Schema> {
     if (!this.key) {
-      throw new Data.ErrorUnexpected(`${this.label} configuration is invalid. Missing 'key' property.`)
+      throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Missing 'key' property.`)
     }
     if (!this.value) {
-      throw new Data.ErrorUnexpected(`${this.label} configuration is invalid. Missing 'value' property.`)
+      throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Missing 'value' property.`)
     }
     if (this.key.Handler !== $String.Handler && !(this.key.Handler.prototype instanceof $String.Handler)) {
-      throw new Data.ErrorUnexpected(`${this.label} configuration is invalid. Key handler must inherit a string handler.`)
+      throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Key handler must inherit a string handler.`)
     }
     const handler = this.initHandler(this.key)
     for (const value of Object.keys(this.data as Record<string, any>)) {
@@ -68,7 +68,7 @@ class DictionaryHandler extends $Object.Handler {
       catch (error) {
         if (error instanceof Data.ErrorExpected) {
           const { type, message, details } = error
-          throw new Data.ErrorConstraint("Object key is invalid.", this.path, this.id, "valid_key", {
+          throw new Data.ErrorConstraint(this, "valid_key", "Object key is invalid.", {
             key: { value, error: { type, message, details } },
           })
         }

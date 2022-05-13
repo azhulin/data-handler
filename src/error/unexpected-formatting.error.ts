@@ -1,7 +1,7 @@
 import { ErrorUnexpected } from "../error"
 
+import type { Handler } from "../component"
 import type { Format } from "../enum"
-import type { Path } from "../type"
 
 /**
  * The data formatting unexpected error.
@@ -20,15 +20,15 @@ export class ErrorUnexpectedFormatting extends ErrorUnexpected {
   /**
    * Constructor for the ErrorUnexpectedFormatting object.
    *
-   * @param path - The path of the data in the data tree.
-   * @param id - The data type (data handler ID) of the data error occured for.
+   * @param handler - The data handler instance.
    * @param from - The data format the data was converted from.
    * @param to - The data format the data was converted to.
    * @param value - The data value.
    */
-  public constructor(path: Path, id: string, from: Format, to: Format, value: unknown) {
-    super(`Invalid value type detected while formatting data.`, path)
-    this.details = { ...this.details, id, from, to, value }
+  public constructor(handler: Handler, from: Format, to: Format, value: unknown) {
+    super("Invalid value type detected while formatting data.", handler.path)
+    const { id, type } = handler
+    this.details = { ...this.details, id, type, from, to, value }
   }
 
 }

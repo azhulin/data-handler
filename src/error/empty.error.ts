@@ -15,15 +15,11 @@ export class ErrorEmpty extends ErrorExpected {
   /**
    * Constructor for the ErrorEmpty object.
    *
-   * @param validator - The data validator instance.
+   * @param handler - The data handler instance.
    */
-  public constructor(validator: Validator) {
-    super("")
-    const { id, name, description, path } = validator
-    const type = description ? `${name} (${description})` : name
-    this.message = `Value should not be empty. ${type} expected.`
-    this.path = path
-    this.details = { ...this.details, type: id }
+  public constructor(handler: Validator) {
+    super(`Value must not be empty. ${ErrorEmpty.type(handler)} expected.`, handler.path)
+    this.details = { ...this.details, id: handler.id, type: handler.type }
   }
 
 }

@@ -3,14 +3,13 @@ import type { Context } from "../interface"
 /**
  * The data processor.
  *
- * The data processor is a function (synchronous or asynchronous) for processing
- * data depending on data context.
+ * The data processor is a synchronous or asynchronous function for processing
+ * a data depending on the data context.
  *
  * @param data - The data to process.
  * @param context - The data context.
  *
- * @returns The processed data, or a promise that resolves with the processed
- *   data.
+ * @returns Processed data, or a promise that resolves with processed data.
  *
  * @example
  * <number>
@@ -31,11 +30,11 @@ export namespace Processor {
    * The data processor factory.
    *
    * The data processor factory is a function that accepts some arguments and
-   * returns a data processor that depend on these arguments.
+   * returns a data processor that depends on these arguments.
    *
    * @param args - The data processor factory arguments.
    *
-   * @returns The data processor.
+   * @returns A data processor.
    *
    * @example
    * <string>
@@ -72,7 +71,7 @@ export namespace Processor {
   /**
    * The data processor list factory.
    *
-   * The data processor list factory is a function that accepts a data context
+   * The data processor list factory is a function that accepts the data context
    * as an argument and returns an array of data processors.
    *
    * @param context - The data context.

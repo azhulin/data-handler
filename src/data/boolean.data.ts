@@ -8,17 +8,17 @@ class BooleanHandler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  public get id(): string { return "boolean" }
+  public get type(): string { return "boolean" }
 
   /**
    * {@inheritdoc}
    */
-  public get name(): string { return "Boolean" }
+  public get typeName(): string { return "Boolean" }
 
   /**
    * {@inheritdoc}
    */
-  protected isValid(data: unknown): boolean {
+  protected isValidType(data: unknown): boolean {
     return "boolean" === typeof data
   }
 

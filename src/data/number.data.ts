@@ -8,17 +8,17 @@ class NumberHandler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  public get id(): string { return "number" }
+  public get type(): string { return "number" }
 
   /**
    * {@inheritdoc}
    */
-  public get name(): string { return "Number" }
+  public get typeName(): string { return "Number" }
 
   /**
    * {@inheritdoc}
    */
-  public get description(): string {
+  public get typeDesc(): string {
     switch (this.decimals) {
       case null:
         return ""
@@ -65,7 +65,7 @@ class NumberHandler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  protected isValid(data: unknown): boolean {
+  protected isValidType(data: unknown): boolean {
     return "number" === typeof data && isFinite(data)
   }
 

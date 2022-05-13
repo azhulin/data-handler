@@ -1,4 +1,3 @@
-import { Constraint } from "../component"
 import { Mode } from "../enum"
 import {
   ErrorConstraint, ErrorExpected, ErrorEmpty, ErrorIgnored,
@@ -7,81 +6,189 @@ import {
 import { extract, pathResolve } from "../util"
 
 import type { Config, Context, Default, Options, Settings } from "../interface"
-import type { FieldRelative, Path, Processor, Property } from "../type"
+import type { Constraint, FieldRelative, Path, Processor, Property } from "../type"
 
 /**
  * The data validator class.
+ *
+ * The data handler base class containing the data validation functionality.
  */
 export abstract class Validator {
 
   /**
-   * The ID of the data type.
+   * The data handler ID.
+   *
+   * The unique data handler identifier. It is recommended to use dot-separated
+   * snake case strings for naming data handler identifiers. For example, if
+   * there is a String data handler with a `string` identifier, and this data
+   * handler is inherited by the Email data handler, the identifier of the last
+   * one can be `string.email`.
+   * Used in the following errors: `data.type`, `data.required`, `data.empty`,
+   * `data.constraint`, and `data.unexpected.formatting`.
    */
-  public abstract get id(): string
+  public get id(): string { return this.type }
 
   /**
-   * The name of the data type.
+   * The data handler name.
+   *
+   * A human-readable data handler name. For example, `String`, or `Email`.
+   * Not used in built-in errors, but can be used in data constraint or custom
+   * errors.
    */
-  public abstract get name(): string
+  public get name(): string { return this.typeName }
 
   /**
-   * The description of the data type.
+   * The data type ID.
+   *
+   * The unique identifier of the data handler's data type. It is recommended to
+   * use dot-separated snake case strings for naming data type identifiers. The
+   * data type identifier should only be overridden in the derived data handler,
+   * if the `isValidType` method was overridden.
+   * Used in the following errors: `data.type`, `data.required`, `data.empty`,
+   * `data.constraint`, and `data.unexpected.formatting`.
+   *
+   * @see Validator#isValidType
    */
-  public get description(): string { return "" }
+  public abstract get type(): string
 
   /**
-   * The label of the data handler.
+   * The data type name.
+   *
+   * A human-readable data type name. For example, `Number`, or `String`.
+   * Used in the following errors: `data.type`, `data.required`, and
+   * `data.empty`.
    */
-  public get label(): string { return this.name }
+  public abstract get typeName(): string
+
+  /**
+   * The data type description.
+   *
+   * Used in the following errors: `data.type`, `data.required`, and
+   * `data.empty`. Displayed in parentheses after the type name.
+   */
+  public get typeDesc(): string { return "" }
 
   /**
    * The data preparer library.
    *
    * The data preparer library contains predefined data preparers specific to
    * this data handler. The data preparers defined in the library can be used in
-   * data handler configuration and in `preparers` property of the data handler.
-   * See {@link Validator#preparers}, {@link Config#preparers}
+   * data handler configuration, and in `preparers` property of the data
+   * handler.
+   *
+   * @see Config#preparers
+   * @see Validator#preparers
    */
   public static preparer: Processor.Library<unknown> = {}
 
   /**
-   * A map of available data processors.
+   * The data processor library.
+   *
+   * The data processor library contains predefined data processors specific to
+   * this data handler. The data processors defined in the library can be used
+   * in data handler configuration, and in `preprocessors` and `postprocessors`
+   * properties of the data handler.
+   *
+   * @see Config#preprocessors
+   * @see Config#postprocessors
+   * @see Validator#preprocessors
+   * @see Validator#postprocessors
    */
   public static processor: Processor.Library<any> = {}
 
   /**
-   * A map of available data constraints.
+   * The data constraint library.
+   *
+   * The data constraint library contains predefined data constraints specific
+   * to this data handler. The data constraints defined in the library can be
+   * used in data handler configuration, and in `constraints` property of the
+   * data handler.
+   *
+   * @see Config#constraints
+   * @see Validator#constraints
    */
   public static constraint: Constraint.Library<any> = {}
 
   /**
    * The data preparers.
    *
-   * The data preparers is a data processor list for preparing the data. The
-   * data preparers (from this property with appended data preparers from the
-   * data handler configuration, if any) are ran during validation after the
-   * data value is ensured (not `undefined` and not `null`), and before the data
-   * value is validated. So the data preparers is a place to cast a data value
-   * to the desired type. For example, if expected input for a numeric data
-   * handler is a string, the data preparer can be used to convert a string
-   * representation of a number into a number.
+   * The data preparers is a data processor list with `unknown` input and output
+   * data type for preparing the data. The data preparers (from this property
+   * with appended data preparers from the data handler configuration, if any)
+   * are ran during validation after the data value is ensured (not `undefined`
+   * and not `null`), and before the data value is validated. So the data
+   * preparers is a place to cast a data value to the desired type. For example,
+   * if expected input for a numeric data handler is a string representation of
+   * a number, the data preparer can be used to convert a string into a number.
    * Additional data preparers can be added to the run in the data handler
-   * configuration. They will run after this data preparers.
+   * configuration. These data preparers will run after the data preparers from
+   * this property.
+   *
+   * @see Config#preparers
+   * @see Validator.preparer
    */
   protected preparers: Processor.List<unknown> = []
 
   /**
-   * An array of data preprocessors.
+   * The data preprocessors.
+   *
+   * The data preprocessors is a data processor list with valid for this data
+   * handler input and output data type for preprocessing the data. The data
+   * preprocessors (from this property with appended data preprocessors from the
+   * data handler configuration, if any) are ran during validation after the
+   * data value is validated, and before the data constraints check is
+   * performed. So the data preprocessors is a place to transform the data
+   * without changing its type before the data constraints check. For example,
+   * `trim` string data processor can be used as a data prerocessor in a string
+   * data handler before the string length data constraint check.
+   * Additional data preprocessors can be added to the run in the data handler
+   * configuration. They will run after the data preprocessors from this
+   * property.
+   *
+   * @see Config#preprocessors
+   * @see Validator.processor
    */
   protected preprocessors: Processor.List<any> = []
 
   /**
-   * An array of data constraints.
+   * The data constraints.
+   *
+   * The data constraints is a data constraint list to check the data of
+   * specific to this data handler type. The data constraints (from this
+   * property with appended data constraints from the data handler
+   * configuration, if any) are ran during validation after the data
+   * preprocessing is performed, and before the data postprocessing is
+   * performed. For example, the data constraints can be used to check whether
+   * the numeric data value is greater then specific value in a numeric data
+   * handler, or to check whether the string data value has specific length in a
+   * string data handler.
+   * Additional data constraints can be added to the run in the data handler
+   * configuration. They will run after the data constraints from this property.
+   *
+   * @see Config#constraints
+   * @see Validator.constraint
    */
   protected constraints: Constraint.List<any> = []
 
   /**
-   * An array of data postprocessors.
+   * The data postprocessors.
+   *
+   * The data postprocessors is a data processor list with valid for this data
+   * handler input and output data type for postprocessing the data. The data
+   * postprocessors (from this property with appended data postprocessors from
+   * the data handler configuration, if any) are ran during validation after the
+   * data constraints check is performed, and before the data is returned. So
+   * the data postprocessors is a place to transform the data without changing
+   * its type before the data is returned. For example, a number data processor
+   * to format a number using fixed-point notation can be used as a data
+   * postrocessor in a numeric data handler after the number was transformed by
+   * data preprocessors.
+   * Additional data postprocessors can be added to the run in the data handler
+   * configuration. They will run after the data postprocessors from this
+   * property.
+   *
+   * @see Config#postprocessors
+   * @see Validator.processor
    */
   protected postprocessors: Processor.List<any> = []
 
@@ -90,7 +197,8 @@ export abstract class Validator {
    *
    * Some or all data default value behaviors can be overridden in the data
    * handler configuration.
-   * See {@link Config#default}.
+   *
+   * @see Config#default
    */
   protected default: Default = {
 
@@ -127,19 +235,21 @@ export abstract class Validator {
   /**
    * The `input` data property.
    *
-   * The `input` data property determines whether to accept or ignore the data
-   * value from the source data when validating data. If the computed value of
-   * the `input` data property is:
-   * - `true`: the data value is taken from the source data;
+   * The `input` data property determines whether to accept or ignore the
+   * provided data value when validating data. If the computed value of the
+   * `input` data property is:
+   * - `true`: the data value is accepted;
    * - `false`: the data value is taken from the `create` or `update` data
-   *   default value behavior depending on the data mode. If the data value is
-   *   provided in source data, the warning about the ignored data value is
-   *   generated.
+   *   default value behavior depending on the data mode. If the data value was
+   *   provided, the warning about the ignored data value is generated.
    * By default, the `input` data property is `true`. It can be overridden in
    * the data handler configuration.
-   * See {@link Default}, {@link Config#input}, {@link Mode}.
+   *
+   * @see Config#input
+   * @see Default
+   * @see Mode
    */
-  protected input: Property<boolean, Context> = true
+  protected input: Property<boolean> = true
 
   /**
    * The `require` data property.
@@ -170,26 +280,26 @@ export abstract class Validator {
    *   taken from the `nulled` data default value behavior (`null` by default).
    * By default, the `require` data property is `true`. It can be overridden in
    * the data handler configuration.
-   * See {@link Default}, {@link Config}, {@link Mode}.
+   *
+   * @see Config#require
+   * @see Default
+   * @see Mode
    */
-  protected require: Property<boolean, Context> = true
+  protected require: Property<boolean> = true
 
   /**
-   * Custom preparers, preprocessors, constraints, postprocessors.
+   * The data configuration.
    */
-  protected custom: {
-    preparers?: Processor.List<unknown>
-    preprocessors?: Processor.List<any>
-    constraints?: Constraint.List<any>
-    postprocessors?: Processor.List<any>
-  } = {}
+  protected config: Config
 
   /**
    * The data path.
    *
    * The path of this data handler's data in the data tree. The data path can be
    * accessed from the data context.
-   * See {@link Context}, {@link Settings}.
+   *
+   * @see Context#path
+   * @see Settings#path
    */
   public readonly path: Path = []
 
@@ -203,9 +313,27 @@ export abstract class Validator {
    * problems. For example, when validating data, the user provided a value for
    * the data that is configured as not inputable, and in this case the user can
    * be warned that the provided data value was ignored.
-   * See {@link Context}, {@link Settings}.
+   *
+   * @see Context#warnings
+   * @see Settings#warnings
    */
   public warnings: ErrorExpected[] = []
+
+  /**
+   * The data storage.
+   *
+   * The data storage is an object shared among all the data handlers during the
+   * data formatting run that can be accessed from the data context. It can be
+   * used to pass some custom data from one data handler to another. For
+   * example, if several data handlers need to load some independent external
+   * data, only the first one can load the data and put it into the data storage
+   * under some agreed key and the other ones can retrive this data from the
+   * data storage.
+   *
+   * @see Context#storage
+   * @see Settings#storage
+   */
+  protected storage: Record<string, unknown> = {}
 
   /**
    * The source data.
@@ -216,7 +344,9 @@ export abstract class Validator {
    * validating data, the formatting is performed from the `input` data format
    * into the `base` data format, and in this case the source data is a data in
    * the `input` data format.
-   * See {@link Context}, {@link Settings}.
+   *
+   * @see Context#source
+   * @see Settings#source
    */
   protected source: unknown
 
@@ -229,73 +359,72 @@ export abstract class Validator {
    * data, the formatting is performed from the `input` data format into the
    * `base` data format, and in this case the result data is a data in the
    * `base` data format.
-   * See {@link Context}, {@link Settings}.
+   *
+   * @see Context#result
+   * @see Settings#result
    */
   protected result: unknown
 
   /**
-   * The data storage.
-   *
-   * The data storage is an object shared among all the data handlers during the
-   * data formatting run that can be accessed from the data context. It can be
-   * used to pass some custom data from one data handler to another. For
-   * example, if several data handlers need to load some independent external
-   * data, only the first one can load the data and put it into the data storage
-   * under some agreed key and the other ones can retrive this data from the
-   * data storage.
-   * See {@link Context}, {@link Settings}.
-   */
-  protected storage: Record<string, unknown> = {}
-
-  /**
    * Constructor for the Validator object.
+   *
+   * @param config - The data configuration.
+   * @param settings - The data settings.
    */
   public constructor(config: Config, settings?: Settings) {
-    this.input = config.input ?? this.input
-    this.require = config.require ?? this.require
-    this.default = { ...this.default, ...config.default }
-    this.custom.preparers = [
-      ...this.custom.preparers ?? [],
-      ...config.preparers ?? [],
-    ]
-    this.custom.preprocessors = [
-      ...this.custom.preprocessors ?? [],
-      ...config.preprocessors ?? [],
-    ]
-    this.custom.constraints = [
-      ...this.custom.constraints ?? [],
-      ...config.constraints ?? [],
-    ]
-    this.custom.postprocessors = [
-      ...this.custom.postprocessors ?? [],
-      ...config.postprocessors ?? [],
-    ]
-    const { path, warnings, source, result, storage } = settings ?? {}
+    this.config = config
+    const { path, warnings, storage, source, result } = settings ?? {}
     this.path = path ?? this.path
     this.warnings = warnings ?? this.warnings
+    this.storage = storage ?? this.storage
     this.source = source
     this.result = result
-    this.storage = storage ?? this.storage
   }
 
   /**
-   * Resets the handler state.
+   * Resets the data handler state.
+   *
+   * @param data - The data to set as a new source data.
    */
   protected reset(data: unknown): void {
     if (this.isRoot()) {
       this.warnings = []
+      this.storage = {}
       this.source = data
       this.result = undefined
-      this.storage = {}
     }
   }
 
   /**
-   * Returns validated data.
+   * Validates the provided data and returns the validated data.
+   *
+   * The data validation process can be divided into the following steps:
+   *   1. Ensuring the data:
+   *   - handling the inputable data property (see `isInputable` method);
+   *   - handling the omitted data (see `isRequired` method);
+   *   - handling the `null` data (see `isRequired` method).
+   *   2. Preparing the data (see `preparers` data property).
+   *   3. Validating the type of the data (see `isValidType` method).
+   *   4. Preprocessing the data (see `preprocessors` data property).
+   *   5. Checking data constraints (see `checkConstraints` method).
+   *   6. Postprocessing the data (see `postprocessors` data property).
+   *
+   * @param data - The data to validate.
+   * @param options - The data options.
+   *
+   * @returns A promise that resolves with a validated data.
+   *
+   * @see Validator#isInputable
+   * @see Validator#isRequired
+   * @see Validator#preparers
+   * @see Validator#isValidType
+   * @see Validator#preprocessors
+   * @see Validator#checkConstraints
+   * @see Validator#postprocessors
    */
   public async validate(data: unknown, options?: Options): Promise<unknown> {
     this.reset(data)
-    const context = await this.getContext(options)
+    const context = this.getContext(options)
     if (!await this.isInputable(context)) {
       !this.isOmitted(data) && this.inSource()
         && this.warnings.push(new ErrorIgnored(this.path))
@@ -319,7 +448,7 @@ export abstract class Validator {
     }
     if (!this.isEmpty(data)) {
       data = await this.run("preparers", data, context)
-      if (!this.isValid(data)) {
+      if (!this.isValidType(data)) {
         throw new ErrorType(this)
       }
       data = this.handle(data, context)
@@ -328,9 +457,13 @@ export abstract class Validator {
   }
 
   /**
-   * Returns the context.
+   * Returns the data context.
+   *
+   * @param options - The data options.
+   *
+   * @returns A data context.
    */
-  protected async getContext(options: Options = {}): Promise<Context> {
+  protected getContext(options: Options = {}): Context {
     const { mode = Mode.create, data } = options
     const update = Mode.update === mode
     if (update && !data) {
@@ -344,26 +477,63 @@ export abstract class Validator {
       handler: this,
       path: this.path,
       warnings: this.warnings,
+      storage: <T = unknown>(key: string, value?: T): T =>
+        undefined !== value ? this.storage[key] = value : this.storage[key] as T,
       source: <T = unknown>(field?: FieldRelative): T =>
         extract(this.source, pathResolve(this.path, field)) as T,
       result: <T = unknown>(field?: FieldRelative): T =>
         extract(this.result, pathResolve(this.path, field)) as T,
       original: <T = unknown>(field?: FieldRelative): T =>
         extract(data, pathResolve(this.path, field)) as T,
-      storage: <T = unknown>(key: string, value?: T): T =>
-        undefined !== value ? this.storage[key] = value : this.storage[key] as T,
     }
   }
 
   /**
-   * Determines whether the data is valid.
+   * Determines whether the provided data has an expected data type.
+   *
+   * Overriding this method in derived data handler produces a new data type, so
+   * the `type` and `typeName` properties of the derived data handler must be
+   * overridden as well. In some cases creating a new data constraint can
+   * replace the need to override this method. The choosen way affects the
+   * errors that occur during validation.
+   * For example, there is a String data handler with `string` type ID and
+   * handler ID, and `String` type name and handler name. There are two ways to
+   * create a new data handler for the email address validation, inheriting the
+   * String data handler:
+   *   1. Add an email validation data constraint to the `constraints` property.
+   *   2. Override the `isValidType` method, adding the email validation logic.
+   * In both cases a new Email data handler with `string.email` handler ID and
+   * `Email` handler name is created. In the first case the data type was not
+   * changed (`string`, `String`), but in the second case it was changed
+   * (`string.email`, `Email`), because the `isValidType` method was overridden.
+   * Let pass a 123 value for validation to the Email data handler:
+   *   1. The `data.type` error: `Value has invalid type. String expected.`.
+   *   2. The `data.type` error: `Value has invalid type. Email expected.`.
+   * Now let pass an "abc" value for validation to the Email data handler:
+   *   1. The `data.constraint` error on a `String` data type.
+   *   2. The `data.type` error: `Value has invalid type. Email expected.`.
+   *
+   * @param data - The data to check.
+   *
+   * @returns `true`, if the provided data has an expected data type, and
+   *   `false` otherwise.
+   *
+   * @see Validator#type
+   * @see Validator#typeName
+   * @see Validator#constraints
    */
-  protected isValid(data: unknown): boolean {
-    return true
-  }
+  protected abstract isValidType(data: unknown): boolean
 
   /**
-   * Handles the data.
+   * Handles the ensured data of the expected data type.
+   *
+   * This includes running data preprocessors, checking data constraints, and
+   * running postprocessors.
+   *
+   * @param data - The data to handle.
+   * @param context - The data context.
+   *
+   * @returns A promise that resolves with a handled data.
    */
   protected async handle(data: unknown, context: Context): Promise<unknown> {
     data = await this.run("preprocessors", data, context)
@@ -372,11 +542,17 @@ export abstract class Validator {
   }
 
   /**
-   * Runs processors on the data.
+   * Runs the data processors on the provided data.
+   *
+   * @param type - The type of the data processors to run.
+   * @param data - The data to run data processors on.
+   * @param context - The data context.
+   *
+   * @returns A promise that resolves with a processed data.
    */
   protected async run(type: "preparers" | "preprocessors" | "postprocessors", data: unknown, context: Context): Promise<unknown> {
     const processors = []
-    for (const item of [...this[type], ...this.custom[type] ?? []]) {
+    for (const item of [...this[type], ...this.config[type] ?? []]) {
       processors.push(...Array.isArray(item) ? item[0](context) : [item])
     }
     for (const processor of processors) {
@@ -386,89 +562,137 @@ export abstract class Validator {
   }
 
   /**
-   * Checks data constraints.
+   * Checks the data constraints on the provided data.
+   *
+   * @param data - The data to check the data constraints on.
+   * @param context - The data context.
    */
   protected async checkConstraints(data: unknown, context: Context): Promise<void> {
     const constraints = []
-    for (const item of [...this.constraints, ...this.custom.constraints ?? []]) {
+    for (const item of [...this.constraints, ...this.config.constraints ?? []]) {
       constraints.push(...Array.isArray(item) ? item[0](context) : [item])
     }
-    for (const { id, func, skip } of constraints) {
+    for (const { id, func, skippable } of constraints) {
       const { update, original } = context
-      // Allows to skip constraint validation on update with unchanged value.
-      if (skip && update && data === original()) {
+      if (skippable && update && data === original()) {
         continue
       }
       const result = await func(data, context)
       if (null !== result) {
         const [message, details] = "string" === typeof result ? [result] : result
-        throw new ErrorConstraint(message, this.path, this.id, id, details)
+        throw new ErrorConstraint(this, id, message, details)
       }
     }
   }
 
   /**
-   * Determines whether the value is present in source data.
+   * Determines whether the source data has a value under the current data path.
+   *
+   * @returns `true`, if the source data has a value under the current data
+   *   path, and `false` otherwise.
    */
   protected inSource(): boolean {
     return undefined !== extract(this.source, this.path)
   }
 
   /**
-   * Determines whether this is a root data handler.
+   * Determines whether this data handler is a root data handler.
+   *
+   * @returns `true`, if this data handler is a root data handler, and `false`
+   *   otherwise.
    */
   protected isRoot(): boolean {
     return !this.path.length
   }
 
   /**
-   * Determines whether the data is empty.
+   * Determines whether the specified data is empty (`undefined` or `null`).
+   *
+   * @param data - The data to check.
+   *
+   * @returns `true`, if the specified data is empty, and `false` otherwise.
    */
   protected isEmpty(data: unknown): boolean {
     return this.isOmitted(data) || this.isNull(data)
   }
 
   /**
-   * Determines whether the data is omitted.
+   * Determines whether the specified data is omitted (`undefined`).
+   *
+   * @param data - The data to check.
+   *
+   * @returns `true`, if the specified data is omitted, and `false` otherwise.
    */
   protected isOmitted(data: unknown): boolean {
     return undefined === data
   }
 
   /**
-   * Determines whether the data is null.
+   * Determines whether the specified data is `null`.
+   *
+   * @param data - The data to check.
+   *
+   * @returns `true`, if the specified data is `null`, and `false` otherwise.
    */
   protected isNull(data: unknown): boolean {
     return null === data
   }
 
   /**
-   * Returns "input" flag value.
+   * Determines whether the data is inputable.
+   *
+   * @param context - The data context.
+   *
+   * @returns A promise that resolves with `true`, if the data is inputable, and
+   *   with `false` otherwise.
+   *
+   * @see Validator#input
    */
   protected async isInputable(context: Context): Promise<boolean> {
-    return this.getProperty<boolean>(this.input, context)
+    return this.getProperty<boolean>(this.config.input ?? this.input, context)
   }
 
   /**
-   * Returns "require" flag value.
+   * Determines whether the data is required.
+   *
+   * @param context - The data context.
+   *
+   * @returns A promise that resolves with `true`, if the data is required, and
+   *   with `false` otherwise.
+   *
+   * @see Validator#require
    */
   protected async isRequired(context: Context): Promise<boolean> {
-    return this.getProperty<boolean>(this.require, context)
+    return this.getProperty<boolean>(this.config.require ?? this.require, context)
   }
 
   /**
-   * Returns the default value based on behavior.
+   * Returns the data default value behavior computed value.
+   *
+   * @param context - The data context.
+   * @param behavior - The data default value behavior type.
+   *
+   * @returns A promise that resolves with a data, computed by the data default
+   *   value behavior.
    */
   protected async getDefault(context: Context, behavior?: keyof Default): Promise<unknown> {
-    return this.getProperty(this.default[behavior ?? context.mode], context)
+    return this.getProperty({
+      ...this.default,
+      ...this.config.default,
+    }[behavior ?? context.mode], context)
   }
 
   /**
-   * Returns data handler dynamic context property value.
+   * Returns the computed data property.
+   *
+   * @param property - The data property to compute.
+   * @param context - The data context.
+   *
+   * @returns A promise that resolves with a computed data property.
    */
-  protected async getProperty<P = unknown, C = Context>(property: Property<P, C>, context: C): Promise<P> {
+  protected async getProperty<P = unknown>(property: Property<P>, context: Context): Promise<P> {
     return "function" === typeof property
-      ? (property as Property.Dynamic<P, C>)(context)
+      ? (property as Property.Dynamic<P>)(context)
       : property as Property.Static<P>
   }
 

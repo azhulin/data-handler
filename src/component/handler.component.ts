@@ -2,11 +2,13 @@ import { Validator } from "../component"
 import { Format } from "../enum"
 import { ErrorUnexpected, ErrorUnexpectedFormatting } from "../error"
 
-import type { Config, Context, Options, Settings } from "../interface"
-import type { Definition, Path, Property } from "../type"
+import type { Context, Definition, Options } from "../interface"
+import type { Path, Property } from "../type"
 
 /**
  * The data handler class.
+ *
+ * The base data handler class containing the data formatting functionality.
  */
 export abstract class Handler extends Validator {
 
@@ -16,28 +18,51 @@ export abstract class Handler extends Validator {
   protected format: Format = Format.base
 
   /**
-   * The data in current format.
+   * The data in current data format.
    */
   protected data: unknown
 
   /**
-   * Whether the data should be present in "store" format.
+   * The `store` data property.
+   *
+   * The `store` data property determines whether the data value is storable.
+   * That is, the data value must be passed to, and accepted from the `store`
+   * data format.
+   * When formatting the data from the `base` data format into the `store` data
+   * format (storing), and the computed value of the `store` data property is:
+   * - `true`: the data value is passed to the `store` data format;
+   * - `false`: the data value is not passed to the `store` data format.
+   * When formatting the data from the `store` data format into the `base` data
+   * format (reading), and the computed value of the `store` data property is:
+   * - `true`: the data value is accepted from the `store` data format;
+   * - `false`: the data value is taken from the `read` data default value
+   *   behavior (`null` by default).
+   * By default, the `store` data property is `true`. It can be overridden in
+   * the data handler configuration.
+   *
+   * @see Config#store
+   * @see Default
    */
-  protected store: Property<boolean, Context> = true
+  protected store: Property<boolean> = true
 
   /**
-   * Whether the data should be present in "output" format.
+   * The `output` data property.
+   *
+   * The `output` data property determines whether the data value is
+   * outputable. That is, the data value must be passed to the `output` data
+   * format.
+   * When formatting the data from the `base` data format into the `output` data
+   * format (outputting), and the computed value of the `output` data property
+   * is:
+   * - `true`: the data value is passed to the `output` data format;
+   * - `false`: the data value is not passed to the `output` data format.
+   * By default, the `output` data property is `true`. It can be overridden in
+   * the data handler configuration.
+   *
+   * @see Config#output
+   * @see Default
    */
-  protected output: Property<boolean, Context> = true
-
-  /**
-   * Constructor for the Handler object.
-   */
-  public constructor(config: Config, settings?: Settings) {
-    super(config, settings)
-    this.store = config.store ?? this.store
-    this.output = config.output ?? this.output
-  }
+  protected output: Property<boolean> = true
 
   /**
    * {@inheritdoc}
@@ -47,28 +72,52 @@ export abstract class Handler extends Validator {
   }
 
   /**
-   * Initializes the handler with data in input format.
+   * Initializes the data handler with the provided data in `input` data format.
+   *
+   * @param data - The data to initialize the data handler with.
+   *
+   * @returns This data handler.
+   *
+   * @see Format
    */
   public inInput(data: unknown): this {
     return this.initData(Format.input, data)
   }
 
   /**
-   * Initializes the handler with data in base format.
+   * Initializes the data handler with the provided data in `base` data format.
+   *
+   * @param data - The data to initialize the data handler with.
+   *
+   * @returns This data handler.
+   *
+   * @see Format
    */
   public inBase(data: unknown): this {
     return this.initData(Format.base, data)
   }
 
   /**
-   * Initializes the handler with data in store format.
+   * Initializes the data handler with the provided data in `store` data format.
+   *
+   * @param data - The data to initialize the data handler with.
+   *
+   * @returns This data handler.
+   *
+   * @see Format
    */
   public inStore(data: unknown): this {
     return this.initData(Format.store, data)
   }
 
   /**
-   * Initializes the handler with data in specified format.
+   * Initializes the data handler with the provided data in specified data
+   * format.
+   *
+   * @param format - The data format to initalize the data handler in.
+   * @param data - The data to initialize the data handler with.
+   *
+   * @returns This data handler.
    */
   public initData(format: Format, data: unknown): this {
     this.reset(data)
@@ -78,34 +127,60 @@ export abstract class Handler extends Validator {
   }
 
   /**
-   * Returns the data in base format.
+   * Returns the data formatted into the `base` data format.
+   *
+   * @param options - The data options.
+   *
+   * @returns A promise that resolves with a data formatted into the `base` data
+   *   format.
+   *
+   * @see Format
    */
   public async toBase(options?: Options): Promise<unknown> {
-    return this.formatData(Format.base, options) as Promise<unknown>
+    return this.formatData(Format.base, options)
   }
 
   /**
-   * Returns the data in store format.
+   * Returns the data formatted into the `store` data format.
+   *
+   * @param options - The data options.
+   *
+   * @returns A promise that resolves with a data formatted into the `store`
+   *   data format.
+   *
+   * @see Format
    */
   public async toStore(options?: Options): Promise<unknown> {
     return this.formatData(Format.store, options)
   }
 
   /**
-   * Returns the data in output format.
+   * Returns the data formatted into the `output` data format.
+   *
+   * @param options - The data options.
+   *
+   * @returns A promise that resolves with a data formatted into the `output`
+   *   data format.
+   *
+   * @see Format
    */
   public async toOutput(options?: Options): Promise<unknown> {
     return this.formatData(Format.output, options)
   }
 
   /**
-   * Returns data in specified format.
+   * Returns the data formatted into the specified data format.
+   *
+   * @param format - The data format to format the data into.
+   * @param options - The data options.
+   *
+   * @returns A promise that resolves with a data formatted into the specified
+   *   data format.
    */
   public async formatData(format: Format, options?: Options): Promise<unknown> {
     if (this.format === format) {
       return this.data
     }
-    this.reset(this.data)
     switch (this.format + format) {
       case Format.input + Format.base:
         this.data = await this.formatInputToBase(this.data, options)
@@ -122,44 +197,56 @@ export abstract class Handler extends Validator {
         return this.formatBaseToOutput(this.data, options)
 
       default:
-        throw new ErrorUnexpected("Invalid data format conversion.")
+        throw new ErrorUnexpected("Invalid data format transition.")
     }
     this.format = format
     return this.data
   }
 
   /**
-   * Returns the current data format.
-   */
-  public getFormat(): Format {
-    return this.format
-  }
-
-  /**
-   * Returns the data in current format.
-   */
-  public getData(): unknown {
-    return this.data
-  }
-
-  /**
-   * Returns the data in base format from data in input format.
+   * Returns the data formatted from the `input` data format into the `base`
+   * data format (data validation).
+   *
+   * @param data - The data to format.
+   * @param options - The data options.
+   *
+   * @returns A promise that resolves with a data formatted from the `input`
+   * data format into the `base` data format.
+   *
+   * @see Validator#validate
    */
   protected async formatInputToBase(data: unknown, options?: Options): Promise<unknown> {
     return super.validate(data, options)
   }
 
   /**
-   * Returns store data from base data.
+   * Returns the data formatted from the `base` data format into the `store`
+   * data format (data storing).
+   *
+   * The data storing process can be divided into the following steps:
+   *   1. Ensuring the data:
+   *   - handling the storable data property (see `isStorable` method).
+   *   2. Validating the type of the data (see `isValidTypeBase` method).
+   *   3. Processing the data (see `baseToStore` method).
+   *
+   * @param data - The data to format.
+   * @param options - The data options.
+   *
+   * @returns A promise that resolves with a data formatted from the `base`
+   * data format into the `store` data format.
+   *
+   * @see Handler#isStorable
+   * @see Handler#isValidTypeBase
+   * @see Handler#baseToStore
    */
   protected async formatBaseToStore(data: unknown, options?: Options): Promise<unknown> {
-    const context = await this.getContext(options)
+    const context = this.getContext(options)
     if (!await this.isStorable(context)) {
       data = undefined
     }
     if (!this.isEmpty(data)) {
-      if (!this.isValidBaseData(data)) {
-        throw new ErrorUnexpectedFormatting(this.path, this.id, Format.base, Format.store, data)
+      if (!this.isValidTypeBase(data)) {
+        throw new ErrorUnexpectedFormatting(this, Format.base, Format.store, data)
       }
       data = this.baseToStore(data, context)
     }
@@ -167,16 +254,33 @@ export abstract class Handler extends Validator {
   }
 
   /**
-   * Returns output data from base data.
+   * Returns the data formatted from the `base` data format into the `output`
+   * data format (data outputting).
+   *
+   * The data outputting process can be divided into the following steps:
+   *   1. Ensuring the data:
+   *   - handling the outputable data property (see `isOutputable` method).
+   *   2. Validating the type of the data (see `isValidTypeBase` method).
+   *   3. Processing the data (see `baseToOutput` method).
+   *
+   * @param data - The data to format.
+   * @param options - The data options.
+   *
+   * @returns A promise that resolves with a data formatted from the `base`
+   * data format into the `output` data format.
+   *
+   * @see Handler#isOutputable
+   * @see Handler#isValidTypeBase
+   * @see Handler#baseToOutput
    */
   protected async formatBaseToOutput(data: unknown, options?: Options): Promise<unknown> {
-    const context = await this.getContext(options)
+    const context = this.getContext(options)
     if (!await this.isOutputable(context)) {
       data = undefined
     }
     if (!this.isEmpty(data)) {
-      if (!this.isValidBaseData(data)) {
-        throw new ErrorUnexpectedFormatting(this.path, this.id, Format.base, Format.output, data)
+      if (!this.isValidTypeBase(data)) {
+        throw new ErrorUnexpectedFormatting(this, Format.base, Format.output, data)
       }
       data = this.baseToOutput(data, context)
     }
@@ -184,16 +288,33 @@ export abstract class Handler extends Validator {
   }
 
   /**
-   * Returns base data from store data.
+   * Returns the data formatted from the `store` data format into the `base`
+   * data format (data reading).
+   *
+   * The data reading process can be divided into the following steps:
+   *   1. Ensuring the data:
+   *   - handling the storable data property (see `isStorable` method).
+   *   2. Validating the type of the data (see `isValidTypeStore` method).
+   *   3. Processing the data (see `storeToBase` method).
+   *
+   * @param data - The data to format.
+   * @param options - The data options.
+   *
+   * @returns A promise that resolves with a data formatted from the `store`
+   * data format into the `base` data format.
+   *
+   * @see Handler#isStorable
+   * @see Handler#isValidTypeStore
+   * @see Handler#baseToOutput
    */
   protected async formatStoreToBase(data: unknown, options?: Options): Promise<unknown> {
-    const context = await this.getContext(options)
+    const context = this.getContext(options)
     if (!await this.isStorable(context) || this.isOmitted(data)) {
       data = await this.getDefault(context, "read")
     }
     if (!this.isEmpty(data)) {
-      if (!this.isValidStoreData(data)) {
-        throw new ErrorUnexpectedFormatting(this.path, this.id, Format.store, Format.base, data)
+      if (!this.isValidTypeStore(data)) {
+        throw new ErrorUnexpectedFormatting(this, Format.store, Format.base, data)
       }
       data = this.storeToBase(data, context)
     }
@@ -201,28 +322,52 @@ export abstract class Handler extends Validator {
   }
 
   /**
-   * Determines whether the data is in expected input format.
+   * Determines whether the provided data has an expected data type for the
+   * `input` data format.
+   *
+   * @param data - The data to check.
+   *
+   * @returns `true`, if the provided data has an expected data type for the
+   *   `input` data format, and `false` otherwise.
    */
-  protected isValidInputData(data: unknown): boolean {
-    return this.isValid(data)
+  protected isValidTypeInput(data: unknown): boolean {
+    return this.isValidType(data)
   }
 
   /**
-   * Determines whether the data is in expected base format.
+   * Determines whether the provided data has an expected data type for the
+   * `base` data format.
+   *
+   * @param data - The data to check.
+   *
+   * @returns `true`, if the provided data has an expected data type for the
+   *   `base` data format, and `false` otherwise.
    */
-  protected isValidBaseData(data: unknown): boolean {
-    return this.isValidInputData(data)
+  protected isValidTypeBase(data: unknown): boolean {
+    return this.isValidTypeInput(data)
   }
 
   /**
-   * Determines whether the data is in expected store format.
+   * Determines whether the provided data has an expected data type for the
+   * `store` data format.
+   *
+   * @param data - The data to check.
+   *
+   * @returns `true`, if the provided data has an expected data type for the
+   *   `store` data format, and `false` otherwise.
    */
-  protected isValidStoreData(data: unknown): boolean {
-    return this.isValidBaseData(data)
+  protected isValidTypeStore(data: unknown): boolean {
+    return this.isValidTypeBase(data)
   }
 
   /**
-   * Converts data in input format to data in base format.
+   * Converts the ensured data of the expected data type from the `input` data
+   * format into the `base` data format.
+   *
+   * @param data - The data to convert.
+   * @param context - The data context.
+   *
+   * @returns A promise that resolves with a converted data.
    */
   protected async inputToBase(data: unknown, context: Context): Promise<unknown> {
     return super.handle(data, context)
@@ -230,47 +375,86 @@ export abstract class Handler extends Validator {
   protected handle = this.inputToBase
 
   /**
-   * Converts data in base format to data in store format.
+   * Converts the ensured data of the expected data type from the `base` data
+   * format into the `store` data format.
+   *
+   * @param data - The data to convert.
+   * @param context - The data context.
+   *
+   * @returns A promise that resolves with a converted data.
    */
   protected async baseToStore(data: unknown, context: Context): Promise<unknown> {
     return data
   }
 
   /**
-   * Converts data in base format to data in output format.
+   * Converts the ensured data of the expected data type from the `base` data
+   * format into the `output` data format.
+   *
+   * @param data - The data to convert.
+   * @param context - The data context.
+   *
+   * @returns A promise that resolves with a converted data.
    */
   protected async baseToOutput(data: unknown, context: Context): Promise<unknown> {
     return data
   }
 
   /**
-   * Converts data in store format to data in base format.
+   * Converts the ensured data of the expected data type from the `store` data
+   * format into the `base` data format.
+   *
+   * @param data - The data to convert.
+   * @param context - The data context.
+   *
+   * @returns A promise that resolves with a converted data.
    */
   protected async storeToBase(data: unknown, context: Context): Promise<unknown> {
     return data
   }
 
   /**
-   * Returns "store" flag value.
+   * Determines whether the data is storable.
+   *
+   * @param context - The data context.
+   *
+   * @returns A promise that resolves with `true`, if the data is storable, and
+   *   with `false` otherwise.
+   *
+   * @see Handler#store
    */
   protected async isStorable(context: Context): Promise<boolean> {
-    return this.getProperty<boolean>(this.store, context)
+    return this.getProperty<boolean>(this.config.store ?? this.store, context)
   }
 
   /**
-   * Returns "output" flag value.
+   * Determines whether the data is outputable.
+   *
+   * @param context - The data context.
+   *
+   * @returns A promise that resolves with `true`, if the data is outputable,
+   *   and with `false` otherwise.
+   *
+   * @see Handler#output
    */
   protected async isOutputable(context: Context): Promise<boolean> {
-    return this.getProperty<boolean>(this.output, context)
+    return this.getProperty<boolean>(this.config.output ?? this.output, context)
   }
 
   /**
-   * Returns the data handler for specified data definition.
+   * Returns the data handler instance initialized from the specified data
+   * definition.
+   *
+   * @param definition - The data definition to initialize the data handler
+   *   from.
+   * @param path - The data path the data handler to be initialized for.
+   *
+   * @returns A data handler instance.
    */
   protected initHandler(definition: Definition, path: Path = []): Handler {
     const { Handler, config } = "config" in definition ? definition : { ...definition, config: {} }
-    const { source, result, storage, warnings } = this
-    return new Handler(config, { path, source, result, storage, warnings })
+    const { warnings, storage, source, result } = this
+    return new Handler(config, { path, warnings, storage, source, result })
   }
 
 }

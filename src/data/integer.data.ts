@@ -1,41 +1,39 @@
-import { $Number } from "."
+import * as Data from ".."
 
 /**
  * The integer data handler class.
  */
-class IntegerHandler extends $Number.Handler {
+class IntegerHandler extends Data.Handler {
 
   /**
    * {@inheritdoc}
    */
-  public get id(): string { return super.id + ".integer" }
+  public get type(): string { return "integer" }
 
   /**
    * {@inheritdoc}
    */
-  public get name(): string { return "Integer" }
+  public get typeName(): string { return "Integer" }
 
   /**
    * {@inheritdoc}
    */
-  public get description(): string { return "" }
+  public static constraint = {
+    ...Data.Handler.constraint,
+    ...Data.inequalityConstraints<number>("", data => data, "Value"),
+  }
 
   /**
    * {@inheritdoc}
    */
-  protected decimals: null | number = 0
-
-  /**
-   * {@inheritdoc}
-   */
-  protected isValid(data: unknown): boolean {
-    return super.isValid(data) && Number.isInteger(data)
+  protected isValidType(data: unknown): boolean {
+    return Number.isInteger(data)
   }
 
 }
 
 export namespace $Integer {
-  export type Config = Omit<$Number.Config, "decimals">
+  export type Config = Data.Config
   export const Handler = IntegerHandler
   export const constraint = Handler.constraint
   export const preparer = Handler.preparer
