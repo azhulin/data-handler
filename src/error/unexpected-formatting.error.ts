@@ -27,8 +27,7 @@ export class ErrorUnexpectedFormatting extends ErrorUnexpected {
    */
   public constructor(handler: Handler, from: Format, to: Format, value: unknown) {
     super("Invalid value type detected while formatting data.", handler.path)
-    const { id, type } = handler
-    this.details = { ...this.details, id, type, from, to, value }
+    this.details = { ...this.details, id: handler.id, from, to, value }
   }
 
 }

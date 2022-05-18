@@ -3,7 +3,7 @@ import * as Data from ".."
 /**
  * The boolean data handler class.
  */
-class BooleanHandler extends Data.Handler {
+class BooleanHandler extends Data.Handler<boolean> {
 
   /**
    * {@inheritdoc}
@@ -24,12 +24,15 @@ class BooleanHandler extends Data.Handler {
 
 }
 
+/**
+ * The boolean data handler namespace.
+ */
 export namespace $Boolean {
   export type Config<T = boolean> = Data.Config<T>
   export const Handler = BooleanHandler
   export const constraint = Handler.constraint
   export const preparer = Handler.preparer
   export const processor = Handler.processor
-  export function conf(config: Config = {}) { return { Handler, config } }
+  export function conf(config: Config = {}): Data.Definition { return { Handler, config } }
   export function init(config: Config = {}) { return new Handler(config) }
 }

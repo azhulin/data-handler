@@ -1,10 +1,10 @@
 import * as Data from ".."
-import { $Object, $String } from "."
+import { $Object } from "."
 
 /**
  * The dictionary data handler class.
  */
-class DictionaryHandler extends $Object.Handler {
+class DictionaryHandler<T> extends $Object.Handler<T> {
 
   /**
    * {@inheritdoc}
@@ -21,8 +21,10 @@ class DictionaryHandler extends $Object.Handler {
    */
   public static constraint = {
     ...$Object.Handler.constraint,
-    items_number: Data.inequalityConstraints<Record<string, any>>(
-      "items_number", data => Object.keys(data).length, "Number of items",
+    items_number: Data.inequalityConstraints<Record<string, unknown>>(
+      "dictionary_items_number",
+      data => Object.keys(data).length,
+      "Number of dictionary items",
     ),
   }
 
@@ -39,50 +41,85 @@ class DictionaryHandler extends $Object.Handler {
   /**
    * {@inheritdoc}
    */
-  public constructor(config: $Dictionary.Config, settings?: Data.Settings) {
+  public constructor(config: Partial<$Dictionary.Config>, settings?: Data.Settings) {
     super(config, settings)
-    const { key, value } = config
-    key && (this.key = key)
-    value && (this.value = value)
+    this.key = config.key ?? this.key
+    this.value = config.value ?? this.value
+  }
+
+  /**
+   * Returns the dictionary key data definition.
+   *
+   * @returns Dictionary key data definition.
+   *
+   * @throws {@link Data.ErrorUnexpected}
+   * Thrown if the `key` data handler property is missing.
+   */
+  protected getKey(): Data.Definition {
+    if (!this.key) {
+      throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Missing 'key' property.`)
+    }
+    return this.key
+  }
+
+    /**
+   * Returns the dictionary value data definition.
+   *
+   * @returns Dictionary value data definition.
+   *
+   * @throws {@link Data.ErrorUnexpected}
+   * Thrown if the `value` data handler property is missing.
+   */
+  protected getValue(): Data.Definition {
+    if (!this.value) {
+      throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Missing 'value' property.`)
+    }
+    return this.value
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @throws {@link Data.ErrorConstraint}
+   * Thrown if dictionary key failed validation.
+   *
+   * @throws {@link Data.ErrorUnexpected}
+   * Thrown if unexpectted error occured during dictionary key validation.
    */
-  protected async prepareSchema(format: Data.Format): Promise<$Object.Schema> {
-    if (!this.key) {
-      throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Missing 'key' property.`)
-    }
-    if (!this.value) {
-      throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Missing 'value' property.`)
-    }
-    if (this.key.Handler !== $String.Handler && !(this.key.Handler.prototype instanceof $String.Handler)) {
-      throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Key handler must inherit a string handler.`)
-    }
-    const handler = this.initHandler(this.key)
-    for (const value of Object.keys(this.data as Record<string, any>)) {
+  protected async convert(format: Data.Format, data: any, context: Data.Context): Promise<any> {
+    const result: Record<string, unknown> = {}
+    this.result = Data.set(this.result, this.path, result)
+    const keyHandler = this.initHandler(this.getKey())
+    for (const [dataKey, dataValue] of Object.entries(data)) {
       let key
       try {
-        key = await handler.initData(this.format, value).formatData(format)
+        key = await keyHandler.in(this.format, dataKey).to(format, context)
       }
       catch (error) {
         if (error instanceof Data.ErrorExpected) {
           const { type, message, details } = error
           throw new Data.ErrorConstraint(this, "valid_key", "Object key is invalid.", {
-            key: { value, error: { type, message, details } },
+            key: { value: dataKey, error: { type, message, details } },
           })
         }
         throw error
       }
-      this.schema[key as string] = this.value
+      if ("string" === typeof key) {
+        const valueHandler = this.initHandler(this.getValue(), [...this.path, dataKey])
+        const value = await valueHandler.in(this.format, dataValue).to(format, context)
+        undefined !== value && (result[key] = value)
+      }
     }
-    return this.schema
+    return result
   }
 
 }
 
+/**
+ * The dictionary data handler namespace.
+ */
 export namespace $Dictionary {
-  export type Config<T = any> = Omit<$Object.Config<T>, "schema" | "reduce"> & {
+  export type Config<T = any> = Omit<$Object.Config<T>, "schema"> & {
     key: Data.Definition
     value: Data.Definition
   }
@@ -90,6 +127,6 @@ export namespace $Dictionary {
   export const constraint = Handler.constraint
   export const preparer = Handler.preparer
   export const processor = Handler.processor
-  export function conf<T extends Record<string, any> = Record<string, any>>(config: Config<T>) { return { Handler, config } }
-  export function init<T extends Record<string, any> = Record<string, any>>(config: Config<T>) { return new Handler(config) }
+  export function conf<T extends Record<string, unknown>>(config: Config<T>): Data.Definition { return { Handler, config } }
+  export function init<T extends Record<string, unknown>>(config: Config<T>) { return new Handler<T>(config) }
 }

@@ -11,6 +11,9 @@ import type { Path } from "../type"
  * @param value - The value to set.
  *
  * @returns Provided data with the specified value set.
+ *
+ * @throws {@link ErrorUnexpected}
+ * Thrown if the specified data path does not exist in provided data.
  */
 export function set(data: unknown, [...path]: Path, value: unknown): unknown {
   if (!path.length) {

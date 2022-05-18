@@ -3,7 +3,7 @@ import * as Data from ".."
 /**
  * The object data handler class.
  */
-class ObjectHandler extends Data.Handler {
+class ObjectHandler<T> extends Data.Handler<T> {
 
   /**
    * {@inheritdoc}
@@ -16,36 +16,46 @@ class ObjectHandler extends Data.Handler {
   public get typeName(): string { return "Object" }
 
   /**
-   * The schema.
+   * {@inheritdoc}
+   */
+  protected preprocessors: Data.Processor.List<any> = [
+    async (data, { source }) => {
+      const schema = await this.getSchema()
+      Object.keys(source() ?? {}).filter(key => !(key in schema))
+        .forEach(key => this.warnings.push(new Data.ErrorIgnored([...this.path, key])))
+      return data
+    },
+  ]
+
+  /**
+   * The object data schema.
    */
   protected schema: $Object.Schema = {}
 
   /**
-   * Whether to use default value, if all schema keys are optional and equal to Null.
-   */
-  protected reduce: boolean = false
-
-  /**
    * {@inheritdoc}
    */
-  public constructor(config: $Object.Config, settings?: Data.Settings) {
+  public constructor(config: Partial<$Object.Config>, settings?: Data.Settings) {
     super(config, settings)
     this.schema = config.schema ?? this.schema
-    this.reduce = config.reduce ?? this.reduce
   }
 
   /**
-   * Returns prepared schema.
+   * Returns the data schema.
+   *
+   * @returns A promise that resolves with a data schema.
    */
-  protected async getSchema(format: Data.Format): Promise<$Object.Schema> {
-    return this._schema[format] ?? (this._schema[format] = await this.prepareSchema(format))
+  protected async getSchema(): Promise<$Object.Schema> {
+    return this._schema ?? (this._schema = await this.prepareSchema())
   }
-  private _schema: { [format in Data.Format]?: $Object.Schema } = {}
+  private _schema?: $Object.Schema
 
   /**
-   * Prepares the schema.
+   * Returns the prepared data schema.
+   *
+   * @returns A promise that resolves with a prepared data schema.
    */
-  protected async prepareSchema(format: Data.Format): Promise<$Object.Schema> {
+  protected async prepareSchema(): Promise<$Object.Schema> {
     return this.schema
   }
 
@@ -59,23 +69,15 @@ class ObjectHandler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  protected async inputToBase(data: Record<string, any>, context: Data.Context): Promise<Record<string, any>> {
-    const format = Data.Format.base
-    const schema = await this.getSchema(format)
-    Object.keys(data).filter(key => !(key in schema))
-      .forEach(key => this.warnings.push(new Data.ErrorIgnored([...this.path, key])))
-    let result = await this.convert(format, data, context)
-    if (this.reduce && Object.values(result!).every(value => null === value)
-        && !await this.isRequired(context)) {
-      result = await this.getDefault(context) as Record<string, any>
-    }
-    return super.inputToBase(result, context) as Promise<Record<string, any>>
+  protected async inputToBase(data: any, context: Data.Context): Promise<any> {
+    const result = await this.convert(Data.Format.base, data, context)
+    return super.inputToBase(result, context)
   }
 
   /**
    * {@inheritdoc}
    */
-  protected async baseToStore(data: Record<string, any>, context: Data.Context): Promise<any> {
+  protected async baseToStore(data: any, context: Data.Context): Promise<any> {
     const result = await this.convert(Data.Format.store, data, context)
     return super.baseToStore(result, context)
   }
@@ -83,7 +85,7 @@ class ObjectHandler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  protected async baseToOutput(data: Record<string, any>, context: Data.Context): Promise<any> {
+  protected async baseToOutput(data: any, context: Data.Context): Promise<any> {
     const result = await this.convert(Data.Format.output, data, context)
     return super.baseToOutput(result, context)
   }
@@ -91,22 +93,28 @@ class ObjectHandler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  protected async storeToBase(data: Record<string, any>, context: Data.Context): Promise<Record<string, any>> {
+  protected async storeToBase(data: any, context: Data.Context): Promise<any> {
     const result = await this.convert(Data.Format.base, data, context)
-    return super.storeToBase(result, context) as Promise<Record<string, any>>
+    return super.storeToBase(result, context)
   }
 
   /**
-   * Performs format conversion.
+   * Performs the data format conversion.
+   *
+   * @param format - The data format to convert the data to.
+   * @param data - The data to convert.
+   * @param context - The data context.
+   *
+   * @returns A promise that resolves with a converted data.
    */
-  protected async convert(format: Data.Format, data: Record<string, any>, context: Data.Context): Promise<Record<string, any>> {
-    const result: Record<string, any> = {}
+  protected async convert(format: Data.Format, data: any, context: Data.Context): Promise<any> {
+    const result: Record<string, unknown> = {}
     this.result = Data.set(this.result, this.path, result)
-    const schema = await this.getSchema(format)
+    const schema = await this.getSchema()
     for (const [key, definition] of Object.entries(schema)) {
       const handler = this.initHandler(definition, [...this.path, key])
-        .initData(this.format, data[key])
-      const value = await handler.formatData(format, context)
+        .in(this.format, data[key])
+      const value = await handler.to(format, context)
       undefined !== value && (result[key] = value)
     }
     return result
@@ -114,16 +122,18 @@ class ObjectHandler extends Data.Handler {
 
 }
 
+/**
+ * The object data handler namespace.
+ */
 export namespace $Object {
   export type Config<T = any> = Data.Config<T> & {
-    schema?: Schema
-    reduce?: boolean
+    schema: Schema
   }
   export type Schema = Record<string, Data.Definition>
   export const Handler = ObjectHandler
   export const constraint = Handler.constraint
   export const preparer = Handler.preparer
   export const processor = Handler.processor
-  export function conf<T extends Record<string, any> = Record<string, any>>(config: Config<T>) { return { Handler, config } }
-  export function init<T extends Record<string, any> = Record<string, any>>(config: Config<T>) { return new Handler(config) }
+  export function conf<T extends Record<string, unknown>>(config: Config<T>): Data.Definition { return { Handler, config } }
+  export function init<T extends Record<string, unknown>>(config: Config<T>) { return new Handler<T>(config) }
 }

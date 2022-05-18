@@ -9,8 +9,13 @@ import type { Path, Property } from "../type"
  * The data handler class.
  *
  * The base data handler class containing the data formatting functionality.
+ * The generics of the data handler class allow to specify the type of the
+ * returned data in corresponging data formats:
+ * - `B` for `base` data format;
+ * - `S` for `store` data format;
+ * - `O` for `output` data format.
  */
-export abstract class Handler extends Validator {
+export abstract class Handler<B = unknown, S = B, O = B> extends Validator {
 
   /**
    * The current data format.
@@ -67,7 +72,7 @@ export abstract class Handler extends Validator {
   /**
    * {@inheritdoc}
    */
-  public async validate(data: unknown, options?: Options): Promise<unknown> {
+  public async validate(data: unknown, options?: Options): Promise<null | B> {
     return this.inInput(data).toBase(options)
   }
 
@@ -81,7 +86,7 @@ export abstract class Handler extends Validator {
    * @see Format
    */
   public inInput(data: unknown): this {
-    return this.initData(Format.input, data)
+    return this.in(Format.input, data)
   }
 
   /**
@@ -94,7 +99,7 @@ export abstract class Handler extends Validator {
    * @see Format
    */
   public inBase(data: unknown): this {
-    return this.initData(Format.base, data)
+    return this.in(Format.base, data)
   }
 
   /**
@@ -107,7 +112,7 @@ export abstract class Handler extends Validator {
    * @see Format
    */
   public inStore(data: unknown): this {
-    return this.initData(Format.store, data)
+    return this.in(Format.store, data)
   }
 
   /**
@@ -119,7 +124,7 @@ export abstract class Handler extends Validator {
    *
    * @returns This data handler.
    */
-  public initData(format: Format, data: unknown): this {
+  public in(format: Format, data: unknown): this {
     this.reset(data)
     this.format = format
     this.data = data
@@ -136,8 +141,8 @@ export abstract class Handler extends Validator {
    *
    * @see Format
    */
-  public async toBase(options?: Options): Promise<unknown> {
-    return this.formatData(Format.base, options)
+  public async toBase(options?: Options): Promise<null | B> {
+    return this.to(Format.base, options) as Promise<null | B>
   }
 
   /**
@@ -150,8 +155,8 @@ export abstract class Handler extends Validator {
    *
    * @see Format
    */
-  public async toStore(options?: Options): Promise<unknown> {
-    return this.formatData(Format.store, options)
+  public async toStore(options?: Options): Promise<undefined | null | S> {
+    return this.to(Format.store, options) as Promise<undefined | null | S>
   }
 
   /**
@@ -164,8 +169,8 @@ export abstract class Handler extends Validator {
    *
    * @see Format
    */
-  public async toOutput(options?: Options): Promise<unknown> {
-    return this.formatData(Format.output, options)
+  public async toOutput(options?: Options): Promise<undefined | null | O> {
+    return this.to(Format.output, options) as Promise<undefined | null | O>
   }
 
   /**
@@ -176,8 +181,11 @@ export abstract class Handler extends Validator {
    *
    * @returns A promise that resolves with a data formatted into the specified
    *   data format.
+   *
+   * @throws {@link ErrorUnexpected}
+   * Thrown in case of invalid data format transition.
    */
-  public async formatData(format: Format, options?: Options): Promise<unknown> {
+  public async to(format: Format, options?: Options): Promise<unknown> {
     if (this.format === format) {
       return this.data
     }
@@ -235,6 +243,9 @@ export abstract class Handler extends Validator {
    * @returns A promise that resolves with a data formatted from the `base`
    * data format into the `store` data format.
    *
+   * @throws {@link ErrorUnexpectedFormatting}
+   * Thrown if the data to format has invalid type.
+   *
    * @see Handler#isStorable
    * @see Handler#isValidTypeBase
    * @see Handler#baseToStore
@@ -269,6 +280,9 @@ export abstract class Handler extends Validator {
    * @returns A promise that resolves with a data formatted from the `base`
    * data format into the `output` data format.
    *
+   * @throws {@link ErrorUnexpectedFormatting}
+   * Thrown if the data to format has invalid type.
+   *
    * @see Handler#isOutputable
    * @see Handler#isValidTypeBase
    * @see Handler#baseToOutput
@@ -302,6 +316,9 @@ export abstract class Handler extends Validator {
    *
    * @returns A promise that resolves with a data formatted from the `store`
    * data format into the `base` data format.
+   *
+   * @throws {@link ErrorUnexpectedFormatting}
+   * Thrown if the data to format has invalid type.
    *
    * @see Handler#isStorable
    * @see Handler#isValidTypeStore
@@ -369,7 +386,7 @@ export abstract class Handler extends Validator {
    *
    * @returns A promise that resolves with a converted data.
    */
-  protected async inputToBase(data: unknown, context: Context): Promise<unknown> {
+  protected async inputToBase(data: unknown, context: Context): Promise<any> {
     return super.handle(data, context)
   }
   protected handle = this.inputToBase
@@ -383,7 +400,7 @@ export abstract class Handler extends Validator {
    *
    * @returns A promise that resolves with a converted data.
    */
-  protected async baseToStore(data: unknown, context: Context): Promise<unknown> {
+  protected async baseToStore(data: unknown, context: Context): Promise<any> {
     return data
   }
 
@@ -396,7 +413,7 @@ export abstract class Handler extends Validator {
    *
    * @returns A promise that resolves with a converted data.
    */
-  protected async baseToOutput(data: unknown, context: Context): Promise<unknown> {
+  protected async baseToOutput(data: unknown, context: Context): Promise<any> {
     return data
   }
 
@@ -409,7 +426,7 @@ export abstract class Handler extends Validator {
    *
    * @returns A promise that resolves with a converted data.
    */
-  protected async storeToBase(data: unknown, context: Context): Promise<unknown> {
+  protected async storeToBase(data: unknown, context: Context): Promise<any> {
     return data
   }
 
@@ -451,7 +468,7 @@ export abstract class Handler extends Validator {
    *
    * @returns A data handler instance.
    */
-  protected initHandler(definition: Definition, path: Path = []): Handler {
+  protected initHandler(definition: Definition, [...path]: Path = []): Handler {
     const { Handler, config } = "config" in definition ? definition : { ...definition, config: {} }
     const { warnings, storage, source, result } = this
     return new Handler(config, { path, warnings, storage, source, result })

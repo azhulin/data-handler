@@ -67,7 +67,7 @@ export interface Config<T = any> {
    *
    * @see Validator#default
    */
-  default?: Partial<Default<T>>
+  default?: Partial<Default<null | T>>
 
   /**
    * The data preparers.

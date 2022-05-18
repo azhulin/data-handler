@@ -9,7 +9,7 @@ import type { Property } from "../type"
  * different data default value behavior is used to obtain the missing data
  * value.
  */
-export interface Default<T = any> {
+export interface Default<T = unknown> {
 
   /**
    * This data default value behavior is used as a fallback for other behaviors.

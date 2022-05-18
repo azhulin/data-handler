@@ -4,7 +4,7 @@ import { $List, $StringOption } from "."
 /**
  * The string option list data handler class.
  */
-class StringOptionListHandler extends $List.Handler {
+class StringOptionListHandler extends $List.Handler<string[]> {
 
   /**
    * {@inheritdoc}
@@ -17,13 +17,15 @@ class StringOptionListHandler extends $List.Handler {
   /**
    * {@inheritdoc}
    */
-  public static processor = {
-    ...$List.processor,
-    order: <Data.Processor<string[]>>((data, { handler }) => {
-      const keys = $StringOption.Handler.optionKeys((<StringOptionListHandler>handler).options)
+  protected postprocessors: Data.Processor.List<string[]> = [
+    data => {
+      if (this.preserve_order) {
+        return data
+      }
+      const keys = $StringOption.Handler.optionKeys(this.options)
       return data.sort((a, b) => keys.indexOf(a) - keys.indexOf(b))
-    })
-  }
+    }
+  ]
 
   /**
    * The options.
@@ -31,36 +33,36 @@ class StringOptionListHandler extends $List.Handler {
   protected options: $StringOption.Options = []
 
   /**
-   * Whether to keep the items order from the input.
+   * Whether to preserve the original order of option items.
    */
-  protected preserve: boolean = false
+  protected preserve_order: boolean = false
 
   /**
    * {@inheritdoc}
    */
-  public constructor(config: $StringOptionList.Config, settings?: Data.Settings) {
-    super({
-      ...config,
-      item: $StringOption.conf({
-        options: config.options,
-      }),
-    }, settings)
+  public constructor(config: Partial<$StringOptionList.Config>, settings?: Data.Settings) {
+    super(config, settings)
     this.options = config.options ?? this.options
-    this.preserve = config.preserve ?? this.preserve
-    this.preserve || this.postprocessors.push($StringOptionList.processor.order)
+    this.preserve_order = config.preserve_order ?? this.preserve_order
+    this.item = $StringOption.conf({
+      options: this.options,
+    })
   }
 
 }
 
+/**
+ * The string option list data handler namespace.
+ */
 export namespace $StringOptionList {
   export type Config<T = string[]> = Omit<$List.Config<T>, "item"> & {
     options: $StringOption.Options
-    preserve?: boolean
+    preserve_order?: boolean
   }
   export const Handler = StringOptionListHandler
   export const constraint = Handler.constraint
   export const preparer = Handler.preparer
   export const processor = Handler.processor
-  export function conf(config: Config) { return { Handler, config } }
+  export function conf(config: Config): Data.Definition { return { Handler, config } }
   export function init(config: Config) { return new Handler(config) }
 }

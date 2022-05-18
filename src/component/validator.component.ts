@@ -23,8 +23,6 @@ export abstract class Validator {
    * there is a String data handler with a `string` identifier, and this data
    * handler is inherited by the Email data handler, the identifier of the last
    * one can be `string.email`.
-   * Used in the following errors: `data.type`, `data.required`, `data.empty`,
-   * `data.constraint`, and `data.unexpected.formatting`.
    */
   public get id(): string { return this.type }
 
@@ -32,8 +30,6 @@ export abstract class Validator {
    * The data handler name.
    *
    * A human-readable data handler name. For example, `String`, or `Email`.
-   * Not used in built-in errors, but can be used in data constraint or custom
-   * errors.
    */
   public get name(): string { return this.typeName }
 
@@ -44,8 +40,6 @@ export abstract class Validator {
    * use dot-separated snake case strings for naming data type identifiers. The
    * data type identifier should only be overridden in the derived data handler,
    * if the `isValidType` method was overridden.
-   * Used in the following errors: `data.type`, `data.required`, `data.empty`,
-   * `data.constraint`, and `data.unexpected.formatting`.
    *
    * @see Validator#isValidType
    */
@@ -55,16 +49,11 @@ export abstract class Validator {
    * The data type name.
    *
    * A human-readable data type name. For example, `Number`, or `String`.
-   * Used in the following errors: `data.type`, `data.required`, and
-   * `data.empty`.
    */
   public abstract get typeName(): string
 
   /**
    * The data type description.
-   *
-   * Used in the following errors: `data.type`, `data.required`, and
-   * `data.empty`. Displayed in parentheses after the type name.
    */
   public get typeDesc(): string { return "" }
 
@@ -179,10 +168,8 @@ export abstract class Validator {
    * the data handler configuration, if any) are ran during validation after the
    * data constraints check is performed, and before the data is returned. So
    * the data postprocessors is a place to transform the data without changing
-   * its type before the data is returned. For example, a number data processor
-   * to format a number using fixed-point notation can be used as a data
-   * postrocessor in a numeric data handler after the number was transformed by
-   * data preprocessors.
+   * its type before the data is returned. For example, a data postprocessor can
+   * be used in a list data handler to sort the list items.
    * Additional data postprocessors can be added to the run in the data handler
    * configuration. They will run after the data postprocessors from this
    * property.
@@ -218,7 +205,7 @@ export abstract class Validator {
      * data, and if the retrieved value is undefined or empty, it falls back to
      * the `value` behavior.
      */
-    update: (context: Context) => context.original() ?? this.default.value,
+    update: (context: Context) => context.original() ?? this.getProperty(this.default.value, context),
 
     /**
      * This data default value behavior falls back to the `create` behavior.
@@ -373,6 +360,7 @@ export abstract class Validator {
    */
   public constructor(config: Config, settings?: Settings) {
     this.config = config
+    this.default = { ...this.default, ...config.default }
     const { path, warnings, storage, source, result } = settings ?? {}
     this.path = path ?? this.path
     this.warnings = warnings ?? this.warnings
@@ -413,6 +401,17 @@ export abstract class Validator {
    * @param options - The data options.
    *
    * @returns A promise that resolves with a validated data.
+   *
+   * @throws {@link ErrorRequired}
+   * Thrown if required data value is omitted in `create` data mode, or if
+   * required data value is omitted in `update` data mode, and the data default
+   * value behavior returned an empty value.
+   *
+   * @throws {@link ErrorEmpty}
+   * Thrown if required data value is `null`.
+   *
+   * @throws {@link ErrorType}
+   * Thrown if ensured data value has invalid type.
    *
    * @see Validator#isInputable
    * @see Validator#isRequired
@@ -462,6 +461,9 @@ export abstract class Validator {
    * @param options - The data options.
    *
    * @returns A data context.
+   *
+   * @throws {@link ErrorUnexpected}
+   * Thrown if the `data` option is not specified in `update` data mode.
    */
   protected getContext(options: Options = {}): Context {
     const { mode = Mode.create, data } = options
@@ -477,13 +479,13 @@ export abstract class Validator {
       handler: this,
       path: this.path,
       warnings: this.warnings,
-      storage: <T = unknown>(key: string, value?: T): T =>
+      storage: <T>(key: string, value?: T): T =>
         undefined !== value ? this.storage[key] = value : this.storage[key] as T,
-      source: <T = unknown>(field?: FieldRelative): T =>
+      source: <T>(field?: FieldRelative): T =>
         extract(this.source, pathResolve(this.path, field)) as T,
-      result: <T = unknown>(field?: FieldRelative): T =>
+      result: <T>(field?: FieldRelative): T =>
         extract(this.result, pathResolve(this.path, field)) as T,
-      original: <T = unknown>(field?: FieldRelative): T =>
+      original: <T>(field?: FieldRelative): T =>
         extract(data, pathResolve(this.path, field)) as T,
     }
   }
@@ -566,13 +568,25 @@ export abstract class Validator {
    *
    * @param data - The data to check the data constraints on.
    * @param context - The data context.
+   *
+   * @throws {@link ErrorConstraint}
+   * Thrown if the data failed one of the data constraint checks.
    */
   protected async checkConstraints(data: unknown, context: Context): Promise<void> {
-    const constraints = []
+    const constraints: Constraint<unknown>[] = []
     for (const item of [...this.constraints, ...this.config.constraints ?? []]) {
-      constraints.push(...Array.isArray(item) ? item[0](context) : [item])
+      if ("function" === typeof item) {
+        constraints.push(...item(context))
+      }
+      else if (1 === item.length) {
+        const [[id, func]] = item
+        constraints.push([id, func, true])
+      }
+      else {
+        constraints.push(item)
+      }
     }
-    for (const { id, func, skippable } of constraints) {
+    for (const [id, func, skippable] of constraints) {
       const { update, original } = context
       if (skippable && update && data === original()) {
         continue
@@ -676,10 +690,7 @@ export abstract class Validator {
    *   value behavior.
    */
   protected async getDefault(context: Context, behavior?: keyof Default): Promise<unknown> {
-    return this.getProperty({
-      ...this.default,
-      ...this.config.default,
-    }[behavior ?? context.mode], context)
+    return this.getProperty<unknown>(this.default[behavior ?? context.mode], context)
   }
 
   /**
@@ -690,10 +701,10 @@ export abstract class Validator {
    *
    * @returns A promise that resolves with a computed data property.
    */
-  protected async getProperty<P = unknown>(property: Property<P>, context: Context): Promise<P> {
+  protected async getProperty<T>(property: Property<T>, context: Context): Promise<T> {
     return "function" === typeof property
-      ? (property as Property.Dynamic<P>)(context)
-      : property as Property.Static<P>
+      ? (property as Property.Dynamic<T>)(context)
+      : property as Property.Static<T>
   }
 
 }

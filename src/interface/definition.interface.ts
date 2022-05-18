@@ -9,7 +9,7 @@ import type { Config, Settings } from "../interface"
  * handlers in data configuration of such data handlers as List, Object, and
  * Dictionary.
  */
-export interface Definition {
+export interface Definition<T = any> {
 
   /**
    * The data handler constructor.
@@ -19,6 +19,6 @@ export interface Definition {
   /**
    * The data configuration.
    */
-  config?: Config
+  config?: Config<T>
 
 }

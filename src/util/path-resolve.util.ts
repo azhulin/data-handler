@@ -11,6 +11,9 @@ import type { FieldRelative, Path } from "../type"
  * @param field - The relative data field to apply to the data path.
  *
  * @returns A resolved data path.
+ *
+ * @throws {@link ErrorUnexpected}
+ * Thrown if the data path can not be resolved.
  */
 export function pathResolve(path: Path, field: FieldRelative = ""): Path {
   const [prefix, level] = field.match(/^\^([0-9]+)?/) ?? ["", "0"]

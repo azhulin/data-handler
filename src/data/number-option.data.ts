@@ -16,14 +16,14 @@ class NumberOptionHandler extends $Number.Handler {
    */
   protected constraints: Data.Constraint.List<number> = [
     ...this.constraints,
-    new Data.Constraint("option", data =>
-      this.optionKeys().includes(data)
-        ? null
-        : [`${this.name} options do not contain the specified value.`, {
-            type: this.id,
-            options: this.options instanceof Map ? [...this.options.entries()] : this.options,
-          }],
-    ),
+    ["option", data => this.optionKeys().includes(data)
+      ? null
+      : [`${this.name} options do not contain the specified value.`, {
+        options: this.options instanceof Map
+          ? [...this.options.entries()]
+          : this.options,
+      }],
+    ],
   ]
 
   /**
@@ -34,23 +34,27 @@ class NumberOptionHandler extends $Number.Handler {
   /**
    * {@inheritdoc}
    */
-  public constructor(config: $NumberOption.Config, settings?: Data.Settings) {
+  public constructor(config: Partial<$NumberOption.Config>, settings?: Data.Settings) {
     super(config, settings)
     this.options = config.options ?? this.options
-    if (!this.optionKeys().every(key => super.isValidType(key))) {
-      throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Option keys don't match key type.`)
-    }
   }
 
   /**
-   * Returns option keys.
+   * Returns the option keys.
+   *
+   * @returns An array of numbers representing the option keys.
    */
   protected optionKeys(): number[] {
     return NumberOptionHandler.optionKeys(this.options)
   }
 
   /**
-   * Returns option keys.
+   * Returns the option keys of the specified options.
+   *
+   * @param options - The options.
+   *
+   * @returns An array of numbers representing the keys of the specified
+   *   options.
    */
   public static optionKeys(options: $NumberOption.Options): number[] {
     return Array.isArray(options) ? options : [...options.keys()]
@@ -58,15 +62,18 @@ class NumberOptionHandler extends $Number.Handler {
 
 }
 
+/**
+ * The number option data handler namespace.
+ */
 export namespace $NumberOption {
-  export interface Config extends Omit<$Number.Config, "decimals"> {
-    options?: Options
+  export type Config = Omit<$Number.Config, "decimals"> & {
+    options: Options
   }
   export type Options = number[] | Map<number, string>
   export const Handler = NumberOptionHandler
   export const constraint = Handler.constraint
   export const preparer = Handler.preparer
   export const processor = Handler.processor
-  export function conf(config: Config = {}) { return { Handler, config } }
-  export function init(config: Config = {}) { return new Handler(config) }
+  export function conf(config: Config): Data.Definition { return { Handler, config } }
+  export function init(config: Config) { return new Handler(config) }
 }

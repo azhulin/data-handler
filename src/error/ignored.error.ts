@@ -29,7 +29,8 @@ export class ErrorIgnored extends ErrorExpected {
    * {@inheritdoc}
    */
   public toString(): string {
-    return `Value of the field ${this.field()} is ignored.`
+    const field = this.field()
+    return field ? `Value of the field ${field} is ignored.` : this.message
   }
 
 }

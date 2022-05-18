@@ -1,6 +1,5 @@
 export * from "./data.error"
 export * from "./expected.error"
-export * from "./adapted.error"
 export * from "./constraint.error"
 export * from "./empty.error"
 export * from "./ignored.error"

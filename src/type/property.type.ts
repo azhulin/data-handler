@@ -7,7 +7,7 @@ import type { Context } from "../interface"
  * synchronous or asynchronous function that returns a value of a certain type
  * that depends on a data context argument (dynamic data property).
  */
-export type Property<P> = Property.Static<P> | Property.Dynamic<P>
+export type Property<T> = Property.Static<T> | Property.Dynamic<T>
 
 /**
  * The data property namespace.
@@ -17,11 +17,11 @@ export namespace Property {
   /**
    * The static data property.
    */
-  export type Static<P> = P
+  export type Static<T> = T
 
   /**
    * The dynamic data property.
    */
-  export type Dynamic<P> = (context: Context) => P | Promise<P>
+  export type Dynamic<T> = (context: Context) => T | Promise<T>
 
 }

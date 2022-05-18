@@ -3,7 +3,7 @@ import * as Data from ".."
 /**
  * The integer data handler class.
  */
-class IntegerHandler extends Data.Handler {
+class IntegerHandler extends Data.Handler<number> {
 
   /**
    * {@inheritdoc}
@@ -32,12 +32,15 @@ class IntegerHandler extends Data.Handler {
 
 }
 
+/**
+ * The integer data handler namespace.
+ */
 export namespace $Integer {
-  export type Config = Data.Config
+  export type Config<T = number> = Data.Config<T>
   export const Handler = IntegerHandler
   export const constraint = Handler.constraint
   export const preparer = Handler.preparer
   export const processor = Handler.processor
-  export function conf(config: Config = {}) { return { Handler, config } }
+  export function conf(config: Config = {}): Data.Definition { return { Handler, config } }
   export function init(config: Config = {}) { return new Handler(config) }
 }

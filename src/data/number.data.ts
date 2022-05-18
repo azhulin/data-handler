@@ -3,7 +3,7 @@ import * as Data from ".."
 /**
  * The number data handler class.
  */
-class NumberHandler extends Data.Handler {
+class NumberHandler extends Data.Handler<number> {
 
   /**
    * {@inheritdoc}
@@ -32,7 +32,7 @@ class NumberHandler extends Data.Handler {
   }
 
   /**
-   * The number of decimal points.
+   * The number of decimal places.
    */
   protected decimals: null | number = null
 
@@ -46,13 +46,9 @@ class NumberHandler extends Data.Handler {
 
   /**
    * {@inheritdoc}
-   */
-  protected postprocessors: Data.Processor.List<number> = [
-    data => null !== this.decimals ? +data.toFixed(this.decimals) : data,
-  ]
-
-  /**
-   * {@inheritdoc}
+   *
+   * @throws {@link Data.ErrorUnexpected}
+   * Thrown if the `decimals` data handler property is invalid.
    */
   public constructor(config: $Number.Config, settings?: Data.Settings) {
     super(config, settings)
@@ -73,15 +69,15 @@ class NumberHandler extends Data.Handler {
    * {@inheritdoc}
    */
   protected async inputToBase(data: number, context: Data.Context): Promise<number> {
-    const original = data
-    data = await super.inputToBase(data, context) as number
-    original !== data
-      && this.warnings.push(new Data.ErrorAdapted(this.path, original, data))
-    return data
+    data = await super.inputToBase(data, context)
+    return null !== this.decimals ? +data.toFixed(this.decimals) : data
   }
 
 }
 
+/**
+ * The number data handler namespace.
+ */
 export namespace $Number {
   export type Config<T = number> = Data.Config<T> & {
     decimals?: number
@@ -90,6 +86,6 @@ export namespace $Number {
   export const constraint = Handler.constraint
   export const preparer = Handler.preparer
   export const processor = Handler.processor
-  export function conf(config: Config = {}) { return { Handler, config } }
+  export function conf(config: Config = {}): Data.Definition { return { Handler, config } }
   export function init(config: Config = {}) { return new Handler(config) }
 }

@@ -61,7 +61,7 @@ export interface Context extends Options {
    *
    * @see Validator#storage
    */
-  storage: <T = unknown>(key: string, value?: T) => T
+  storage: <T>(key: string, value?: T) => T
 
   /**
    * Returns a field value from the source data.
@@ -73,7 +73,7 @@ export interface Context extends Options {
    *
    * @see Validator#source
    */
-  source: <T = unknown>(field?: FieldRelative) => T
+  source: <T>(field?: FieldRelative) => T
 
   /**
    * Returns a field value from the result data.
@@ -85,7 +85,7 @@ export interface Context extends Options {
    *
    * @see Validator#result
    */
-  result: <T = unknown>(field?: FieldRelative) => T
+  result: <T>(field?: FieldRelative) => T
 
   /**
    * Returns a field value from the original data.
@@ -100,6 +100,6 @@ export interface Context extends Options {
    *
    * @see Options#data
    */
-  original: <T = unknown>(field?: FieldRelative) => T
+  original: <T>(field?: FieldRelative) => T
 
 }

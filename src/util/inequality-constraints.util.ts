@@ -1,4 +1,4 @@
-import { Constraint } from "../component"
+import { Constraint } from "../type"
 
 /**
  * Generates an inequality data constraint library.
@@ -27,29 +27,29 @@ import { Constraint } from "../component"
 export function inequalityConstraints<T>(key: string, count: (data: T) => number, prefix: string, suffix?: string) {
   suffix = suffix ? ` ${suffix}` : ""
   return {
-    eq: (value: number) => new Constraint<T>(
+    eq: (value: number): Constraint<T> => [
       `${key}=${value}`,
       data => count(data) === value ? null : `${prefix} must be equal to ${value}${suffix}.`,
-    ),
-    gt: (value: number) => new Constraint<T>(
+    ],
+    gt: (value: number): Constraint<T> => [
       `${key}>${value}`,
       data => count(data) > value ? null : `${prefix} must be greater than ${value}${suffix}.`,
-    ),
-    gte: (value: number) => new Constraint<T>(
+    ],
+    gte: (value: number): Constraint<T> => [
       `${key}>=${value}`,
       data => count(data) >= value ? null : `${prefix} must be greater than or equal to ${value}${suffix}.`,
-    ),
-    lt: (value: number) => new Constraint<T>(
+    ],
+    lt: (value: number): Constraint<T> => [
       `${key}<${value}`,
       data => count(data) < value ? null : `${prefix} must be lesser than ${value}${suffix}.`,
-    ),
-    lte: (value: number) => new Constraint<T>(
+    ],
+    lte: (value: number): Constraint<T> => [
       `${key}<=${value}`,
       data => count(data) <= value ? null : `${prefix} must be lesser than or equal to ${value}${suffix}.`,
-    ),
-    neq: (value: number) => new Constraint<T>(
+    ],
+    neq: (value: number): Constraint<T> => [
       `${key}<>${value}`,
       data => count(data) !== value ? null : `${prefix} must not be equal to ${value}${suffix}.`,
-    ),
+    ],
   }
 }

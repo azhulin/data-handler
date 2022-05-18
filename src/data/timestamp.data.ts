@@ -3,7 +3,7 @@ import * as Data from ".."
 /**
  * The timestamp data handler class.
  */
-class TimestampHandler extends Data.Handler {
+class TimestampHandler extends Data.Handler<number> {
 
   /**
    * {@inheritdoc}
@@ -26,12 +26,12 @@ class TimestampHandler extends Data.Handler {
   public static constraint = {
     ...Data.Handler.constraint,
     ...Data.inequalityConstraints<number>("", data => data, "Value"),
-    future: new Data.Constraint<number>(">now", data =>
+    future: <Data.Constraint<number>>[">now", data =>
       data > Date.now() ? null : "Future date expected.",
-    ),
-    past: new Data.Constraint<number>("<now", data =>
+    ],
+    past: <Data.Constraint<number>>["<now", data =>
       data < Date.now() ? null : "Past date expected.",
-    ),
+    ],
   }
 
   /**
@@ -43,12 +43,15 @@ class TimestampHandler extends Data.Handler {
 
 }
 
+/**
+ * The timestamp data handler namespace.
+ */
 export namespace $Timestamp {
-  export type Config = Data.Config
+  export type Config<T = number> = Data.Config<T>
   export const Handler = TimestampHandler
   export const constraint = Handler.constraint
   export const preparer = Handler.preparer
   export const processor = Handler.processor
-  export function conf(config: Config = {}) { return { Handler, config } }
+  export function conf(config: Config = {}): Data.Definition { return { Handler, config } }
   export function init(config: Config = {}) { return new Handler(config) }
 }

@@ -16,14 +16,12 @@ class StringOptionHandler extends $String.Handler {
    */
   protected constraints: Data.Constraint.List<string> = [
     ...this.constraints,
-    new Data.Constraint("option", data =>
-      this.optionKeys().includes(data)
-        ? null
-        : [`${this.name} options do not contain the specified value.`, {
-            type: this.id,
-            options: this.options,
-          }],
-    ),
+    ["option", data => this.optionKeys().includes(data)
+      ? null
+      : [`${this.name} options do not contain the specified value.`, {
+        options: this.options,
+      }],
+    ],
   ]
 
   /**
@@ -34,23 +32,27 @@ class StringOptionHandler extends $String.Handler {
   /**
    * {@inheritdoc}
    */
-  public constructor(config: $StringOption.Config, settings?: Data.Settings) {
+  public constructor(config: Partial<$StringOption.Config>, settings?: Data.Settings) {
     super(config, settings)
     this.options = config.options ?? this.options
-    if (!this.optionKeys().every(key => super.isValidType(key))) {
-      throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Option keys don't match key type.`)
-    }
   }
 
   /**
-   * Returns option keys.
+   * Returns the option keys.
+   *
+   * @returns An array of strings representing the option keys.
    */
   protected optionKeys(): string[] {
     return StringOptionHandler.optionKeys(this.options)
   }
 
   /**
-   * Returns option keys.
+   * Returns the option keys of the specified options.
+   *
+   * @param options - The options.
+   *
+   * @returns An array of strings representing the keys of the specified
+   *   options.
    */
   public static optionKeys(options: $StringOption.Options): string[] {
     return Array.isArray(options) ? options : Object.keys(options)
@@ -58,15 +60,18 @@ class StringOptionHandler extends $String.Handler {
 
 }
 
+/**
+ * The string option data handler namespace.
+ */
 export namespace $StringOption {
   export type Config = $String.Config & {
-    options?: Options
+    options: Options
   }
   export type Options = string[] | Record<string, string>
   export const Handler = StringOptionHandler
   export const constraint = Handler.constraint
   export const preparer = Handler.preparer
   export const processor = Handler.processor
-  export function conf(config: Config = {}) { return { Handler, config } }
-  export function init(config: Config = {}) { return new Handler(config) }
+  export function conf(config: Config): Data.Definition { return { Handler, config } }
+  export function init(config: Config) { return new Handler(config) }
 }

@@ -3,7 +3,7 @@ import * as Data from ".."
 /**
  * The list data handler class.
  */
-class ListHandler extends Data.Handler {
+class ListHandler<T> extends Data.Handler<T> {
 
   /**
    * {@inheritdoc}
@@ -30,7 +30,7 @@ class ListHandler extends Data.Handler {
    */
   protected default: Data.Default<null | any[]> = {
     ...this.default,
-    value: this.default.value ?? [],
+    value: undefined !== this.config.default?.value ? this.default.value : [],
   }
 
   /**
@@ -41,38 +41,37 @@ class ListHandler extends Data.Handler {
     length: Data.inequalityConstraints<any[]>(
       "length", data => data.length, "Length",
     ),
-    unique: new Data.Constraint<any[]>("unique", data => {
+    unique: <Data.Constraint<any[]>>["unique", data => {
       const items = new Set()
-      for (const [index, item] of data.map(i => JSON.stringify(i)).entries()) {
+      for (const [index, item] of data.entries()) {
         if (items.has(item)) {
-          return [`Values are not unique.`, { index }]
+          return ["Values are not unique.", { index }]
         }
         items.add(item)
       }
       return null
-    }),
+    }],
   }
 
   /**
-   * The list item definition.
+   * The list item data definition.
    */
-  protected item: Data.Definition
+  protected item?: Data.Definition
 
   /**
    * The list item data handler.
    */
-  protected itemHandler: Data.Handler
+  protected get itemHandler(): Data.Handler {
+    return this._itemHandler ?? (this._itemHandler = this.getHandler())
+  }
+  private _itemHandler?: Data.Handler
 
   /**
    * {@inheritdoc}
    */
-  public constructor(config: $List.Config, settings?: Data.Settings) {
+  public constructor(config: Partial<$List.Config>, settings?: Data.Settings) {
     super(config, settings)
-    if (!config.item) {
-      throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Missing 'item' property.`)
-    }
-    this.item = config.item
-    this.itemHandler = this.getHandler()
+    this.item = config.item ?? this.item
   }
 
   /**
@@ -85,44 +84,50 @@ class ListHandler extends Data.Handler {
   /**
    * {@inheritdoc}
    */
-  protected async inputToBase(data: unknown[], context: Data.Context): Promise<unknown[]> {
+  protected async inputToBase(data: any[], context: Data.Context): Promise<any[]> {
     const result = await this.convert(Data.Format.base, data, context)
-    return super.inputToBase(result, context) as Promise<unknown[]>
+    return super.inputToBase(result, context)
   }
 
   /**
    * {@inheritdoc}
    */
-  protected async baseToStore(data: any[], context: Data.Context): Promise<unknown[]> {
+  protected async baseToStore(data: any[], context: Data.Context): Promise<any[]> {
     const result = await this.convert(Data.Format.store, data, context)
-    return super.baseToStore(result, context) as Promise<unknown[]>
+    return super.baseToStore(result, context)
   }
 
   /**
    * {@inheritdoc}
    */
-  protected async baseToOutput(data: any[], context: Data.Context): Promise<unknown[]> {
+  protected async baseToOutput(data: any[], context: Data.Context): Promise<any[]> {
     const result = await this.convert(Data.Format.output, data, context)
-    return super.baseToOutput(result, context) as Promise<unknown[]>
+    return super.baseToOutput(result, context)
   }
 
   /**
    * {@inheritdoc}
    */
-  protected async storeToBase(data: unknown[], context: Data.Context): Promise<any[]> {
+  protected async storeToBase(data: any[], context: Data.Context): Promise<any[]> {
     const result = await this.convert(Data.Format.base, data, context)
-    return super.storeToBase(result, context) as Promise<any[]>
+    return super.storeToBase(result, context)
   }
 
   /**
-   * Performs format conversion.
+   * Performs the data format conversion.
+   *
+   * @param format - The data format to convert the data to.
+   * @param data - The data to convert.
+   * @param context - The data context.
+   *
+   * @returns A promise that resolves with a converted data.
    */
-  protected async convert(format: Data.Format, data: unknown[], context: Data.Context): Promise<unknown[]> {
-    const result: unknown[] = []
+  protected async convert(format: Data.Format, data: any[], context: Data.Context): Promise<any[]> {
+    const result: any[] = []
     this.result = Data.set(this.result, this.path, result)
     const indexes = []
     for (const [index, item] of data.entries()) {
-      const value = await this.getHandler(index, item).formatData(format, context)
+      const value = await this.getHandler(index, item).to(format, context)
       undefined !== value ? result[index] = value : indexes.push(index)
     }
     indexes.reduce((delta, index) => (result.splice(index - delta++, 1), delta), 0)
@@ -130,15 +135,39 @@ class ListHandler extends Data.Handler {
   }
 
   /**
-   * Returns data handler.
+   * Returns the list item data handler instance for the specified list index.
+   *
+   * @param index - The list index to return the list item data handler instance
+   *   for.
+   * @param data - The list item data.
+   *
+   * @returns A list item data handler instance for the specified list index.
    */
   protected getHandler(index?: number, data?: unknown): Data.Handler {
-    return this.initHandler(this.item, [...this.path, index ?? "#"])
-      .initData(this.format, data)
+    return this.initHandler(this.getItem(), [...this.path, index ?? "#"])
+      .in(this.format, data)
+  }
+
+  /**
+   * Returns the list item data definition.
+   *
+   * @returns List item data definition.
+   *
+   * @throws {@link Data.ErrorUnexpected}
+   * Thrown if the `item` data handler property is missing.
+   */
+  protected getItem() {
+    if (!this.item) {
+      throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Missing 'item' property.`)
+    }
+    return this.item
   }
 
 }
 
+/**
+ * The list data handler namespace.
+ */
 export namespace $List {
   export type Config<T = any> = Data.Config<T> & {
     item: Data.Definition
@@ -147,6 +176,6 @@ export namespace $List {
   export const constraint = Handler.constraint
   export const preparer = Handler.preparer
   export const processor = Handler.processor
-  export function conf<T extends any[] = any[]>(config: Config<T>) { return { Handler, config } }
-  export function init<T extends any[] = any[]>(config: Config<T>) { return new Handler(config) }
+  export function conf<T extends unknown[]>(config: Config<T>): Data.Definition { return { Handler, config } }
+  export function init<T extends unknown[]>(config: Config<T>) { return new Handler<T>(config) }
 }

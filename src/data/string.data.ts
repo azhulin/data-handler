@@ -3,7 +3,7 @@ import * as Data from ".."
 /**
  * The string data handler class.
  */
-class StringHandler extends Data.Handler {
+class StringHandler extends Data.Handler<string> {
 
   /**
    * {@inheritdoc}
@@ -20,12 +20,12 @@ class StringHandler extends Data.Handler {
    */
   public static constraint = {
     ...Data.Handler.constraint,
-    trimmed: new Data.Constraint<string>("trimmed", data =>
-      data === data.trim() ? null : "Value must be trimmed.",
-    ),
     length: Data.inequalityConstraints<string>(
       "length", data => data.length, "Length",
     ),
+    trimmed: <Data.Constraint<string>>["trimmed", data =>
+      data === data.trim() ? null : "Value must be trimmed.",
+    ],
   }
 
   /**
@@ -45,25 +45,17 @@ class StringHandler extends Data.Handler {
     return "string" === typeof data
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected async inputToBase(data: string, context: Data.Context): Promise<string> {
-    const original = data
-    data = await super.inputToBase(data, context) as string
-    original !== data
-      && this.warnings.push(new Data.ErrorAdapted(this.path, original, data))
-    return data
-  }
-
 }
 
+/**
+ * The string data handler namespace.
+ */
 export namespace $String {
   export type Config<T = string> = Data.Config<T>
   export const Handler = StringHandler
   export const constraint = Handler.constraint
   export const preparer = Handler.preparer
   export const processor = Handler.processor
-  export function conf(config: Config = {}) { return { Handler, config } }
+  export function conf(config: Config = {}): Data.Definition { return { Handler, config } }
   export function init(config: Config = {}) { return new Handler(config) }
 }

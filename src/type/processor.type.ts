@@ -91,10 +91,10 @@ export namespace Processor {
    * The data processor list.
    *
    * The data processor list is an array of data processors and data processor
-   * list factories. Note that the data processor list factory must be specified
-   * as an array (this allows typescript to distinguish between a data processor
-   * function and a data processor list factory function without specifying the
-   * type).
+   * list factories. Note that a data processor list factory must be enclosed in
+   * square brackets (this allows typescript to distinguish between a data
+   * processor function and a data processor list factory function without
+   * specifying the type).
    *
    * @example
    * <string>[

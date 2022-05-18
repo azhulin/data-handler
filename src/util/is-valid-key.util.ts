@@ -14,5 +14,5 @@ export function isValidKey(key: number | string, data: unknown, exists: boolean)
   return (
     "string" === typeof key && isObject(data)
       || isIndex(key) && Array.isArray(data)
-  ) && (exists ? key in <object>data : true)
+  ) && (exists ? key in <Record<number | string, unknown>>data : true)
 }
