@@ -4,19 +4,19 @@ import { $Number } from "."
 /**
  * The number option data handler class.
  */
-class NumberOptionHandler extends $Number.Handler {
+class $ extends $Number.Handler {
 
   /**
    * {@inheritdoc}
    */
-  public get id(): string { return super.id + ".option" }
+  public static id: string = `${$Number.id}.option`
 
   /**
    * {@inheritdoc}
    */
   protected constraints: Data.Constraint.List<number> = [
     ...this.constraints,
-    ["option", data => this.optionKeys().includes(data)
+    [`${$.id}:valid`, data => this.optionKeys().includes(data)
       ? null
       : [`${this.name} options do not contain the specified value.`, {
         options: this.options instanceof Map
@@ -45,7 +45,7 @@ class NumberOptionHandler extends $Number.Handler {
    * @returns An array of numbers representing the option keys.
    */
   protected optionKeys(): number[] {
-    return NumberOptionHandler.optionKeys(this.options)
+    return $.optionKeys(this.options)
   }
 
   /**
@@ -70,10 +70,8 @@ export namespace $NumberOption {
     options: Options
   }
   export type Options = number[] | Map<number, string>
-  export const Handler = NumberOptionHandler
-  export const constraint = Handler.constraint
-  export const preparer = Handler.preparer
-  export const processor = Handler.processor
-  export function conf(config: Config): Data.Definition { return { Handler, config } }
-  export function init(config: Config) { return new Handler(config) }
+  export const Handler = $
+  export const { id, constraint, preparer, processor } = $
+  export function conf(config: Config) { return $.conf($, config) }
+  export function init(config: Config) { return $.init($, config) }
 }

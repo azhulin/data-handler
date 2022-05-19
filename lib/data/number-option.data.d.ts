@@ -3,11 +3,11 @@ import { $Number } from ".";
 /**
  * The number option data handler class.
  */
-declare class NumberOptionHandler extends $Number.Handler {
+declare class $ extends $Number.Handler {
     /**
      * {@inheritdoc}
      */
-    get id(): string;
+    static id: string;
     /**
      * {@inheritdoc}
      */
@@ -44,18 +44,16 @@ export declare namespace $NumberOption {
         options: Options;
     };
     type Options = number[] | Map<number, string>;
-    const Handler: typeof NumberOptionHandler;
-    const constraint: {
+    const Handler: typeof $;
+    const id: string, constraint: {
         eq: (value: number) => Data.Constraint<number>;
         gt: (value: number) => Data.Constraint<number>;
         gte: (value: number) => Data.Constraint<number>;
         lt: (value: number) => Data.Constraint<number>;
         lte: (value: number) => Data.Constraint<number>;
         neq: (value: number) => Data.Constraint<number>;
-    };
-    const preparer: Data.Processor.Library<unknown>;
-    const processor: Data.Processor.Library<any>;
-    function conf(config: Config): Data.Definition;
-    function init(config: Config): NumberOptionHandler;
+    }, preparer: Data.Processor.Library<unknown>, processor: Data.Processor.Library<any>;
+    function conf(config: Config): Data.Definition<any>;
+    function init(config: Config): Data.Handler<number, number, number>;
 }
 export {};

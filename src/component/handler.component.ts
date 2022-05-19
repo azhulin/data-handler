@@ -3,7 +3,7 @@ import { Format } from "../enum"
 import { ErrorUnexpected, ErrorUnexpectedFormatting } from "../error"
 
 import type { Context, Definition, Options } from "../interface"
-import type { Path, Property } from "../type"
+import type { HandlerConstructor, Path, Property } from "../type"
 
 /**
  * The data handler class.
@@ -326,7 +326,7 @@ export abstract class Handler<B = unknown, S = B, O = B> extends Validator {
    */
   protected async formatStoreToBase(data: unknown, options?: Options): Promise<unknown> {
     const context = this.getContext(options)
-    if (!await this.isStorable(context) || this.isOmitted(data)) {
+    if (!await this.isStorable(context) || this.isUndefined(data)) {
       data = await this.getDefault(context, "read")
     }
     if (!this.isEmpty(data)) {
@@ -472,6 +472,30 @@ export abstract class Handler<B = unknown, S = B, O = B> extends Validator {
     const { Handler, config } = "config" in definition ? definition : { ...definition, config: {} }
     const { warnings, storage, source, result } = this
     return new Handler(config, { path, warnings, storage, source, result })
+  }
+
+  /**
+   * Returns the data definition.
+   *
+   * @param Handler - The data handler constructor.
+   * @param config - The data configuration.
+   *
+   * @returns A data definition.
+   */
+  public static conf(Handler: HandlerConstructor, config: any): Definition {
+    return { Handler, config }
+  }
+
+  /**
+   * Returns the data handler instance.
+   *
+   * @param Handler - The data handler constructor.
+   * @param config - The data configuration.
+   *
+   * @returns A data handler instance.
+   */
+  public static init<T>(Handler: HandlerConstructor<T>, config: any): Handler<T> {
+    return new Handler(config)
   }
 
 }

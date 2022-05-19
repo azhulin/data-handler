@@ -1,5 +1,5 @@
-import type { Handler } from "../component"
-import type { Config, Settings } from "../interface"
+import type { Config } from "../interface"
+import type { HandlerConstructor } from "../type"
 
 /**
  * The data definition.
@@ -14,7 +14,7 @@ export interface Definition<T = any> {
   /**
    * The data handler constructor.
    */
-  Handler: new (config: any, settings?: Settings) => Handler
+  Handler: HandlerConstructor
 
   /**
    * The data configuration.

@@ -22,8 +22,9 @@ export class ErrorConstraint extends ErrorExpected {
    */
   public constructor(handler: Validator, constraint: string, message: string, details?: Record<string, unknown>) {
     super(message, handler.path)
-    const { id, type } = handler
-    this.details = { ...this.details, id, type, constraint, ...details }
+    this.details = {
+      ...this.details, type: handler.type, id: this.id(handler), constraint, ...details,
+    }
   }
 
 }

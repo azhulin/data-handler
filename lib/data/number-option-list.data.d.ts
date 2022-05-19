@@ -3,7 +3,11 @@ import { $List, $NumberOption } from ".";
 /**
  * The number option list data handler class.
  */
-declare class NumberOptionListHandler extends $List.Handler<number[]> {
+declare class $ extends $List.Handler<number[]> {
+    /**
+     * {@inheritdoc}
+     */
+    static id: string;
     /**
      * {@inheritdoc}
      */
@@ -24,17 +28,22 @@ declare class NumberOptionListHandler extends $List.Handler<number[]> {
      * {@inheritdoc}
      */
     constructor(config: Partial<$NumberOptionList.Config>, settings?: Data.Settings);
+    /**
+     * {@inheritdoc}
+     */
+    protected getItem(): Data.Definition;
 }
 /**
  * The number option list data handler namespace.
  */
 export declare namespace $NumberOptionList {
-    type Config<T = number[]> = Omit<$List.Config<T>, "item"> & {
+    type Config = Omit<$List.Config<number[]>, "item"> & {
         options: $NumberOption.Options;
         preserve_order?: boolean;
     };
-    const Handler: typeof NumberOptionListHandler;
-    const constraint: {
+    type Options = $NumberOption.Options;
+    const Handler: typeof $;
+    const id: string, constraint: {
         length: {
             eq: (value: number) => Data.Constraint<any[]>;
             gt: (value: number) => Data.Constraint<any[]>;
@@ -43,11 +52,9 @@ export declare namespace $NumberOptionList {
             lte: (value: number) => Data.Constraint<any[]>;
             neq: (value: number) => Data.Constraint<any[]>;
         };
-        unique: Data.Constraint<any[]>;
-    };
-    const preparer: Data.Processor.Library<unknown>;
-    const processor: Data.Processor.Library<any>;
-    function conf(config: Config): Data.Definition;
-    function init(config: Config): NumberOptionListHandler;
+        items_unique: Data.Constraint<any[]>;
+    }, preparer: Data.Processor.Library<unknown>, processor: Data.Processor.Library<any>;
+    function conf(config: Config): Data.Definition<any>;
+    function init(config: Config): Data.Handler<number[], number[], number[]>;
 }
 export {};

@@ -4,19 +4,19 @@ import { $String } from "."
 /**
  * The string option data handler class.
  */
-class StringOptionHandler extends $String.Handler {
+class $ extends $String.Handler {
 
   /**
    * {@inheritdoc}
    */
-  public get id(): string { return super.id + ".option" }
+  public static id: string = `${$String.id}.option`
 
   /**
    * {@inheritdoc}
    */
   protected constraints: Data.Constraint.List<string> = [
     ...this.constraints,
-    ["option", data => this.optionKeys().includes(data)
+    [`${$.id}:valid`, data => this.optionKeys().includes(data)
       ? null
       : [`${this.name} options do not contain the specified value.`, {
         options: this.options,
@@ -43,7 +43,7 @@ class StringOptionHandler extends $String.Handler {
    * @returns An array of strings representing the option keys.
    */
   protected optionKeys(): string[] {
-    return StringOptionHandler.optionKeys(this.options)
+    return $.optionKeys(this.options)
   }
 
   /**
@@ -68,10 +68,8 @@ export namespace $StringOption {
     options: Options
   }
   export type Options = string[] | Record<string, string>
-  export const Handler = StringOptionHandler
-  export const constraint = Handler.constraint
-  export const preparer = Handler.preparer
-  export const processor = Handler.processor
-  export function conf(config: Config): Data.Definition { return { Handler, config } }
-  export function init(config: Config) { return new Handler(config) }
+  export const Handler = $
+  export const { id, constraint, preparer, processor } = $
+  export function conf(config: Config) { return $.conf($, config) }
+  export function init(config: Config) { return $.init($, config) }
 }

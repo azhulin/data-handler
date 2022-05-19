@@ -3,17 +3,17 @@ import * as Data from ".."
 /**
  * The list data handler class.
  */
-class ListHandler<T> extends Data.Handler<T> {
+class $<T> extends Data.Handler<T> {
 
   /**
    * {@inheritdoc}
    */
-  public get id(): string { return `list.${this.itemHandler.id}` }
+  public static id: string = "list"
 
   /**
    * {@inheritdoc}
    */
-  public get name(): string { return `${this.itemHandler.name} list` }
+  public name: string = "List"
 
   /**
    * {@inheritdoc}
@@ -39,18 +39,21 @@ class ListHandler<T> extends Data.Handler<T> {
   public static constraint = {
     ...Data.Handler.constraint,
     length: Data.inequalityConstraints<any[]>(
-      "length", data => data.length, "Length",
+      `${$.id}:length`, data => data.length, "Length",
     ),
-    unique: <Data.Constraint<any[]>>["unique", data => {
-      const items = new Set()
-      for (const [index, item] of data.entries()) {
-        if (items.has(item)) {
-          return ["Values are not unique.", { index }]
+    items_unique: <Data.Constraint<any[]>>[
+      `${$.id}:items_unique`,
+      (data, { handler }) => {
+        const items = new Set()
+        for (const [index, item] of data.entries()) {
+          if (items.has(item)) {
+            return [`${handler.name} items are not unique.`, { index }]
+          }
+          items.add(item)
         }
-        items.add(item)
-      }
-      return null
-    }],
+        return null
+      },
+    ],
   }
 
   /**
@@ -123,7 +126,7 @@ class ListHandler<T> extends Data.Handler<T> {
    * @returns A promise that resolves with a converted data.
    */
   protected async convert(format: Data.Format, data: any[], context: Data.Context): Promise<any[]> {
-    const result: any[] = []
+    const result: unknown[] = []
     this.result = Data.set(this.result, this.path, result)
     const indexes = []
     for (const [index, item] of data.entries()) {
@@ -156,7 +159,7 @@ class ListHandler<T> extends Data.Handler<T> {
    * @throws {@link Data.ErrorUnexpected}
    * Thrown if the `item` data handler property is missing.
    */
-  protected getItem() {
+  protected getItem(): Data.Definition {
     if (!this.item) {
       throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Missing 'item' property.`)
     }
@@ -172,10 +175,8 @@ export namespace $List {
   export type Config<T = any> = Data.Config<T> & {
     item: Data.Definition
   }
-  export const Handler = ListHandler
-  export const constraint = Handler.constraint
-  export const preparer = Handler.preparer
-  export const processor = Handler.processor
-  export function conf<T extends unknown[]>(config: Config<T>): Data.Definition { return { Handler, config } }
-  export function init<T extends unknown[]>(config: Config<T>) { return new Handler<T>(config) }
+  export const Handler = $
+  export const { id, constraint, preparer, processor } = $
+  export function conf<T extends unknown[]>(config: Config<T>) { return $.conf($, config) }
+  export function init<T extends unknown[]>(config: Config<T>) { return $.init<T>($, config) }
 }

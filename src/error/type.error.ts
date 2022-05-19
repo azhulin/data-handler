@@ -18,8 +18,8 @@ export class ErrorType extends ErrorExpected {
    * @param handler - The data handler instance.
    */
   public constructor(handler: Validator) {
-    super(`Value has invalid type. ${ErrorType.type(handler)} expected.`, handler.path)
-    this.details = { ...this.details, id: handler.id, type: handler.type }
+    super(`Value has invalid type. ${handler.typeName} expected.`, handler.path)
+    this.details = { ...this.details, type: handler.type, id: this.id(handler) }
   }
 
 }

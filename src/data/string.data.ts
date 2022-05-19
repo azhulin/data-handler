@@ -3,17 +3,27 @@ import * as Data from ".."
 /**
  * The string data handler class.
  */
-class StringHandler extends Data.Handler<string> {
+class $ extends Data.Handler<string> {
 
   /**
    * {@inheritdoc}
    */
-  public get type(): string { return "string" }
+  public static id: string = "string"
 
   /**
    * {@inheritdoc}
    */
-  public get typeName(): string { return "String" }
+  public name: string = "String"
+
+  /**
+   * {@inheritdoc}
+   */
+  public type: string = $.id
+
+  /**
+   * {@inheritdoc}
+   */
+  public typeName: string = this.name
 
   /**
    * {@inheritdoc}
@@ -21,10 +31,11 @@ class StringHandler extends Data.Handler<string> {
   public static constraint = {
     ...Data.Handler.constraint,
     length: Data.inequalityConstraints<string>(
-      "length", data => data.length, "Length",
+      `${$.id}:length`, data => data.length, "Length",
     ),
-    trimmed: <Data.Constraint<string>>["trimmed", data =>
-      data === data.trim() ? null : "Value must be trimmed.",
+    trimmed: <Data.Constraint<string>>[
+      `${$.id}:trimmed`,
+      data => data === data.trim() ? null : "Value must be trimmed.",
     ],
   }
 
@@ -51,11 +62,9 @@ class StringHandler extends Data.Handler<string> {
  * The string data handler namespace.
  */
 export namespace $String {
-  export type Config<T = string> = Data.Config<T>
-  export const Handler = StringHandler
-  export const constraint = Handler.constraint
-  export const preparer = Handler.preparer
-  export const processor = Handler.processor
-  export function conf(config: Config = {}): Data.Definition { return { Handler, config } }
-  export function init(config: Config = {}) { return new Handler(config) }
+  export type Config = Data.Config<string>
+  export const Handler = $
+  export const { id, constraint, preparer, processor } = $
+  export function conf(config: Config = {}) { return $.conf($, config) }
+  export function init(config: Config = {}) { return $.init($, config) }
 }

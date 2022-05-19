@@ -2,19 +2,23 @@ import * as Data from "..";
 /**
  * The timestamp data handler class.
  */
-declare class TimestampHandler extends Data.Handler<number> {
+declare class $ extends Data.Handler<number> {
     /**
      * {@inheritdoc}
      */
-    get type(): string;
+    static id: string;
     /**
      * {@inheritdoc}
      */
-    get typeName(): string;
+    name: string;
     /**
      * {@inheritdoc}
      */
-    get typeDesc(): string;
+    type: string;
+    /**
+     * {@inheritdoc}
+     */
+    typeName: string;
     /**
      * {@inheritdoc}
      */
@@ -37,9 +41,9 @@ declare class TimestampHandler extends Data.Handler<number> {
  * The timestamp data handler namespace.
  */
 export declare namespace $Timestamp {
-    type Config<T = number> = Data.Config<T>;
-    const Handler: typeof TimestampHandler;
-    const constraint: {
+    type Config = Data.Config<number>;
+    const Handler: typeof $;
+    const id: string, constraint: {
         future: Data.Constraint<number>;
         past: Data.Constraint<number>;
         eq: (value: number) => Data.Constraint<number>;
@@ -48,10 +52,8 @@ export declare namespace $Timestamp {
         lt: (value: number) => Data.Constraint<number>;
         lte: (value: number) => Data.Constraint<number>;
         neq: (value: number) => Data.Constraint<number>;
-    };
-    const preparer: Data.Processor.Library<unknown>;
-    const processor: Data.Processor.Library<any>;
-    function conf(config?: Config): Data.Definition;
-    function init(config?: Config): TimestampHandler;
+    }, preparer: Data.Processor.Library<unknown>, processor: Data.Processor.Library<any>;
+    function conf(config?: Config): Data.Definition<any>;
+    function init(config?: Config): Data.Handler<number, number, number>;
 }
 export {};

@@ -3,11 +3,11 @@ import { $String } from ".";
 /**
  * The string option data handler class.
  */
-declare class StringOptionHandler extends $String.Handler {
+declare class $ extends $String.Handler {
     /**
      * {@inheritdoc}
      */
-    get id(): string;
+    static id: string;
     /**
      * {@inheritdoc}
      */
@@ -44,8 +44,8 @@ export declare namespace $StringOption {
         options: Options;
     };
     type Options = string[] | Record<string, string>;
-    const Handler: typeof StringOptionHandler;
-    const constraint: {
+    const Handler: typeof $;
+    const id: string, constraint: {
         length: {
             eq: (value: number) => Data.Constraint<string>;
             gt: (value: number) => Data.Constraint<string>;
@@ -55,14 +55,17 @@ export declare namespace $StringOption {
             neq: (value: number) => Data.Constraint<string>;
         };
         trimmed: Data.Constraint<string>;
-    };
-    const preparer: Data.Processor.Library<unknown>;
-    const processor: {
+    }, preparer: Data.Processor.Library<unknown>, processor: {
+        /**
+         * Returns the option keys.
+         *
+         * @returns An array of strings representing the option keys.
+         */
         trim: (data: string) => string;
         lower: (data: string) => string;
         upper: (data: string) => string;
     };
-    function conf(config: Config): Data.Definition;
-    function init(config: Config): StringOptionHandler;
+    function conf(config: Config): Data.Definition<any>;
+    function init(config: Config): Data.Handler<string, string, string>;
 }
 export {};

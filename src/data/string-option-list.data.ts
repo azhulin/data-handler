@@ -4,14 +4,19 @@ import { $List, $StringOption } from "."
 /**
  * The string option list data handler class.
  */
-class StringOptionListHandler extends $List.Handler<string[]> {
+class $ extends $List.Handler<string[]> {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static id: string = `${$List.id}.string.option`
 
   /**
    * {@inheritdoc}
    */
   protected constraints: Data.Constraint.List<string[]> = [
     ...this.constraints,
-    $List.constraint.unique,
+    $List.constraint.items_unique,
   ]
 
   /**
@@ -44,9 +49,16 @@ class StringOptionListHandler extends $List.Handler<string[]> {
     super(config, settings)
     this.options = config.options ?? this.options
     this.preserve_order = config.preserve_order ?? this.preserve_order
-    this.item = $StringOption.conf({
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected getItem(): Data.Definition {
+    this.item = this.item ?? $StringOption.conf({
       options: this.options,
     })
+    return super.getItem()
   }
 
 }
@@ -55,14 +67,13 @@ class StringOptionListHandler extends $List.Handler<string[]> {
  * The string option list data handler namespace.
  */
 export namespace $StringOptionList {
-  export type Config<T = string[]> = Omit<$List.Config<T>, "item"> & {
+  export type Config = Omit<$List.Config<string[]>, "item"> & {
     options: $StringOption.Options
     preserve_order?: boolean
   }
-  export const Handler = StringOptionListHandler
-  export const constraint = Handler.constraint
-  export const preparer = Handler.preparer
-  export const processor = Handler.processor
-  export function conf(config: Config): Data.Definition { return { Handler, config } }
-  export function init(config: Config) { return new Handler(config) }
+  export type Options = $StringOption.Options
+  export const Handler = $
+  export const { id, constraint, preparer, processor } = $
+  export function conf(config: Config) { return $.conf($, config) }
+  export function init(config: Config) { return $.init($, config) }
 }

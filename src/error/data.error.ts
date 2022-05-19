@@ -48,15 +48,14 @@ export abstract class ErrorData extends Error {
   }
 
   /**
-   * Returns the formatted handler data type.
+   * Returns the data handler ID.
    *
-   * @param handler - The data handler instance.
+   * @param handler - The data handler.
    *
-   * @returns Formatted data type.
+   * @returns A data handler ID.
    */
-  public static type(handler: Validator): string {
-    const { typeName, typeDesc } = handler
-    return typeDesc ? `${typeName} (${typeDesc})` : typeName
+  protected id(handler: Validator): string {
+    return (<typeof Validator>handler.constructor).id
   }
 
 }

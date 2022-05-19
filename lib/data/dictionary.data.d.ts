@@ -3,15 +3,15 @@ import { $Object } from ".";
 /**
  * The dictionary data handler class.
  */
-declare class DictionaryHandler<T> extends $Object.Handler<T> {
+declare class $<T> extends $Object.Handler<T> {
     /**
      * {@inheritdoc}
      */
-    get id(): string;
+    static id: string;
     /**
      * {@inheritdoc}
      */
-    get name(): string;
+    name: string;
     /**
      * {@inheritdoc}
      */
@@ -26,6 +26,10 @@ declare class DictionaryHandler<T> extends $Object.Handler<T> {
         };
     };
     /**
+     * {@inheritdoc}
+     */
+    protected warnExtraKeys: boolean;
+    /**
      * The dictionary key data definition.
      */
     protected key?: Data.Definition;
@@ -38,24 +42,6 @@ declare class DictionaryHandler<T> extends $Object.Handler<T> {
      */
     constructor(config: Partial<$Dictionary.Config>, settings?: Data.Settings);
     /**
-     * Returns the dictionary key data definition.
-     *
-     * @returns Dictionary key data definition.
-     *
-     * @throws {@link Data.ErrorUnexpected}
-     * Thrown if the `key` data handler property is missing.
-     */
-    protected getKey(): Data.Definition;
-    /**
-   * Returns the dictionary value data definition.
-   *
-   * @returns Dictionary value data definition.
-   *
-   * @throws {@link Data.ErrorUnexpected}
-   * Thrown if the `value` data handler property is missing.
-   */
-    protected getValue(): Data.Definition;
-    /**
      * {@inheritdoc}
      *
      * @throws {@link Data.ErrorConstraint}
@@ -65,6 +51,24 @@ declare class DictionaryHandler<T> extends $Object.Handler<T> {
      * Thrown if unexpectted error occured during dictionary key validation.
      */
     protected convert(format: Data.Format, data: any, context: Data.Context): Promise<any>;
+    /**
+     * Returns the dictionary key data definition.
+     *
+     * @returns Dictionary key data definition.
+     *
+     * @throws {@link Data.ErrorUnexpected}
+     * Thrown if the `key` data handler property is missing.
+     */
+    protected getKey(): Data.Definition;
+    /**
+     * Returns the dictionary value data definition.
+     *
+     * @returns Dictionary value data definition.
+     *
+     * @throws {@link Data.ErrorUnexpected}
+     * Thrown if the `value` data handler property is missing.
+     */
+    protected getValue(): Data.Definition;
 }
 /**
  * The dictionary data handler namespace.
@@ -74,8 +78,8 @@ export declare namespace $Dictionary {
         key: Data.Definition;
         value: Data.Definition;
     };
-    const Handler: typeof DictionaryHandler;
-    const constraint: {
+    const Handler: typeof $;
+    const id: string, constraint: {
         items_number: {
             eq: (value: number) => Data.Constraint<Record<string, unknown>>;
             gt: (value: number) => Data.Constraint<Record<string, unknown>>;
@@ -84,10 +88,8 @@ export declare namespace $Dictionary {
             lte: (value: number) => Data.Constraint<Record<string, unknown>>;
             neq: (value: number) => Data.Constraint<Record<string, unknown>>;
         };
-    };
-    const preparer: Data.Processor.Library<unknown>;
-    const processor: Data.Processor.Library<any>;
-    function conf<T extends Record<string, unknown>>(config: Config<T>): Data.Definition;
-    function init<T extends Record<string, unknown>>(config: Config<T>): DictionaryHandler<T>;
+    }, preparer: Data.Processor.Library<unknown>, processor: Data.Processor.Library<any>;
+    function conf<T extends Record<string, unknown>>(config: Config<T>): Data.Definition<any>;
+    function init<T extends Record<string, unknown>>(config: Config<T>): Data.Handler<T, T, T>;
 }
 export {};

@@ -1,7 +1,6 @@
 import { Mode } from "../enum"
 import {
-  ErrorConstraint, ErrorExpected, ErrorEmpty, ErrorIgnored,
-  ErrorRequired, ErrorType, ErrorUnexpected,
+  ErrorConstraint, ErrorExpected, ErrorIgnored, ErrorRequired, ErrorType, ErrorUnexpected,
 } from "../error"
 import { extract, pathResolve } from "../util"
 
@@ -24,14 +23,14 @@ export abstract class Validator {
    * handler is inherited by the Email data handler, the identifier of the last
    * one can be `string.email`.
    */
-  public get id(): string { return this.type }
+  public static id: string
 
   /**
    * The data handler name.
    *
    * A human-readable data handler name. For example, `String`, or `Email`.
    */
-  public get name(): string { return this.typeName }
+  public abstract name: string
 
   /**
    * The data type ID.
@@ -43,19 +42,14 @@ export abstract class Validator {
    *
    * @see Validator#isValidType
    */
-  public abstract get type(): string
+  public abstract type: string
 
   /**
    * The data type name.
    *
    * A human-readable data type name. For example, `Number`, or `String`.
    */
-  public abstract get typeName(): string
-
-  /**
-   * The data type description.
-   */
-  public get typeDesc(): string { return "" }
+  public abstract typeName: string
 
   /**
    * The data preparer library.
@@ -425,11 +419,11 @@ export abstract class Validator {
     this.reset(data)
     const context = this.getContext(options)
     if (!await this.isInputable(context)) {
-      !this.isOmitted(data) && this.inSource()
+      !this.isUndefined(data) && this.inSource()
         && this.warnings.push(new ErrorIgnored(this.path))
       data = await this.getDefault(context)
     }
-    else if (this.isOmitted(data)) {
+    else if (this.isUndefined(data)) {
       const required = await this.isRequired(context)
       if (required && !context.update) {
         throw new ErrorRequired(this)
@@ -441,7 +435,7 @@ export abstract class Validator {
     }
     else if (this.isNull(data)) {
       if (await this.isRequired(context)) {
-        throw new ErrorEmpty(this)
+        throw new ErrorRequired(this)
       }
       data = await this.getDefault(context, "nulled")
     }
@@ -627,17 +621,18 @@ export abstract class Validator {
    * @returns `true`, if the specified data is empty, and `false` otherwise.
    */
   protected isEmpty(data: unknown): boolean {
-    return this.isOmitted(data) || this.isNull(data)
+    return this.isUndefined(data) || this.isNull(data)
   }
 
   /**
-   * Determines whether the specified data is omitted (`undefined`).
+   * Determines whether the specified data is `undefined`.
    *
    * @param data - The data to check.
    *
-   * @returns `true`, if the specified data is omitted, and `false` otherwise.
+   * @returns `true`, if the specified data is `undefined`, and `false`
+   *   otherwise.
    */
-  protected isOmitted(data: unknown): boolean {
+  protected isUndefined(data: unknown): boolean {
     return undefined === data
   }
 

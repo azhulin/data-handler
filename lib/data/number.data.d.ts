@@ -2,19 +2,23 @@ import * as Data from "..";
 /**
  * The number data handler class.
  */
-declare class NumberHandler extends Data.Handler<number> {
+declare class $ extends Data.Handler<number> {
     /**
      * {@inheritdoc}
      */
-    get type(): string;
+    static id: string;
     /**
      * {@inheritdoc}
      */
-    get typeName(): string;
+    name: string;
     /**
      * {@inheritdoc}
      */
-    get typeDesc(): string;
+    type: string;
+    /**
+     * {@inheritdoc}
+     */
+    typeName: string;
     /**
      * The number of decimal places.
      */
@@ -50,21 +54,19 @@ declare class NumberHandler extends Data.Handler<number> {
  * The number data handler namespace.
  */
 export declare namespace $Number {
-    type Config<T = number> = Data.Config<T> & {
+    type Config = Data.Config<number> & {
         decimals?: number;
     };
-    const Handler: typeof NumberHandler;
-    const constraint: {
+    const Handler: typeof $;
+    const id: string, constraint: {
         eq: (value: number) => Data.Constraint<number>;
         gt: (value: number) => Data.Constraint<number>;
         gte: (value: number) => Data.Constraint<number>;
         lt: (value: number) => Data.Constraint<number>;
         lte: (value: number) => Data.Constraint<number>;
         neq: (value: number) => Data.Constraint<number>;
-    };
-    const preparer: Data.Processor.Library<unknown>;
-    const processor: Data.Processor.Library<any>;
-    function conf(config?: Config): Data.Definition;
-    function init(config?: Config): NumberHandler;
+    }, preparer: Data.Processor.Library<unknown>, processor: Data.Processor.Library<any>;
+    function conf(config?: Config): Data.Definition<any>;
+    function init(config?: Config): Data.Handler<number, number, number>;
 }
 export {};

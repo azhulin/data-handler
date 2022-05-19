@@ -3,17 +3,27 @@ import * as Data from ".."
 /**
  * The boolean data handler class.
  */
-class BooleanHandler extends Data.Handler<boolean> {
+class $ extends Data.Handler<boolean> {
 
   /**
    * {@inheritdoc}
    */
-  public get type(): string { return "boolean" }
+  public static id: string = "boolean"
 
   /**
    * {@inheritdoc}
    */
-  public get typeName(): string { return "Boolean" }
+  public name: string = "Boolean"
+
+  /**
+   * {@inheritdoc}
+   */
+  public type: string = $.id
+
+  /**
+   * {@inheritdoc}
+   */
+  public typeName: string = this.name
 
   /**
    * {@inheritdoc}
@@ -28,11 +38,9 @@ class BooleanHandler extends Data.Handler<boolean> {
  * The boolean data handler namespace.
  */
 export namespace $Boolean {
-  export type Config<T = boolean> = Data.Config<T>
-  export const Handler = BooleanHandler
-  export const constraint = Handler.constraint
-  export const preparer = Handler.preparer
-  export const processor = Handler.processor
-  export function conf(config: Config = {}): Data.Definition { return { Handler, config } }
-  export function init(config: Config = {}) { return new Handler(config) }
+  export type Config = Data.Config<boolean>
+  export const Handler = $
+  export const { id, constraint, preparer, processor } = $
+  export function conf(config: Config = {}) { return $.conf($, config) }
+  export function init(config: Config = {}) { return $.init($, config) }
 }

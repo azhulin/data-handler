@@ -3,24 +3,34 @@ import * as Data from ".."
 /**
  * The integer data handler class.
  */
-class IntegerHandler extends Data.Handler<number> {
+class $ extends Data.Handler<number> {
 
   /**
    * {@inheritdoc}
    */
-  public get type(): string { return "integer" }
+  public static id: string = "integer"
 
   /**
    * {@inheritdoc}
    */
-  public get typeName(): string { return "Integer" }
+  public name: string = "Integer"
+
+  /**
+   * {@inheritdoc}
+   */
+  public type: string = $.id
+
+  /**
+   * {@inheritdoc}
+   */
+  public typeName: string = this.name
 
   /**
    * {@inheritdoc}
    */
   public static constraint = {
     ...Data.Handler.constraint,
-    ...Data.inequalityConstraints<number>("", data => data, "Value"),
+    ...Data.inequalityConstraints<number>(`${$.id}:`, data => data, "Value"),
   }
 
   /**
@@ -36,11 +46,9 @@ class IntegerHandler extends Data.Handler<number> {
  * The integer data handler namespace.
  */
 export namespace $Integer {
-  export type Config<T = number> = Data.Config<T>
-  export const Handler = IntegerHandler
-  export const constraint = Handler.constraint
-  export const preparer = Handler.preparer
-  export const processor = Handler.processor
-  export function conf(config: Config = {}): Data.Definition { return { Handler, config } }
-  export function init(config: Config = {}) { return new Handler(config) }
+  export type Config = Data.Config<number>
+  export const Handler = $
+  export const { id, constraint, preparer, processor } = $
+  export function conf(config: Config = {}) { return $.conf($, config) }
+  export function init(config: Config = {}) { return $.init($, config) }
 }

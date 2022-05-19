@@ -9,8 +9,8 @@ export declare type Constraint<T> = [
     /**
      * The data constraint ID.
      *
-     * The data constraint ID is a unique within a data type identifier of the
-     * data constraint.
+     * The data constraint ID is a unique identifier of the data constraint. It is
+     * recommended to prefix data constaraint IDs with the data handler ID.
      */
     string,
     /**

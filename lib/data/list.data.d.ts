@@ -2,15 +2,15 @@ import * as Data from "..";
 /**
  * The list data handler class.
  */
-declare class ListHandler<T> extends Data.Handler<T> {
+declare class $<T> extends Data.Handler<T> {
     /**
      * {@inheritdoc}
      */
-    get id(): string;
+    static id: string;
     /**
      * {@inheritdoc}
      */
-    get name(): string;
+    name: string;
     /**
      * {@inheritdoc}
      */
@@ -35,7 +35,7 @@ declare class ListHandler<T> extends Data.Handler<T> {
             lte: (value: number) => Data.Constraint<any[]>;
             neq: (value: number) => Data.Constraint<any[]>;
         };
-        unique: Data.Constraint<any[]>;
+        items_unique: Data.Constraint<any[]>;
     };
     /**
      * The list item data definition.
@@ -98,7 +98,7 @@ declare class ListHandler<T> extends Data.Handler<T> {
      * @throws {@link Data.ErrorUnexpected}
      * Thrown if the `item` data handler property is missing.
      */
-    protected getItem(): Data.Definition<any>;
+    protected getItem(): Data.Definition;
 }
 /**
  * The list data handler namespace.
@@ -107,8 +107,8 @@ export declare namespace $List {
     type Config<T = any> = Data.Config<T> & {
         item: Data.Definition;
     };
-    const Handler: typeof ListHandler;
-    const constraint: {
+    const Handler: typeof $;
+    const id: string, constraint: {
         length: {
             eq: (value: number) => Data.Constraint<any[]>;
             gt: (value: number) => Data.Constraint<any[]>;
@@ -117,11 +117,9 @@ export declare namespace $List {
             lte: (value: number) => Data.Constraint<any[]>;
             neq: (value: number) => Data.Constraint<any[]>;
         };
-        unique: Data.Constraint<any[]>;
-    };
-    const preparer: Data.Processor.Library<unknown>;
-    const processor: Data.Processor.Library<any>;
-    function conf<T extends unknown[]>(config: Config<T>): Data.Definition;
-    function init<T extends unknown[]>(config: Config<T>): ListHandler<T>;
+        items_unique: Data.Constraint<any[]>;
+    }, preparer: Data.Processor.Library<unknown>, processor: Data.Processor.Library<any>;
+    function conf<T extends unknown[]>(config: Config<T>): Data.Definition<any>;
+    function init<T extends unknown[]>(config: Config<T>): Data.Handler<T, T, T>;
 }
 export {};

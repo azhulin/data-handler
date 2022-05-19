@@ -1,7 +1,7 @@
 import { Validator } from "../component";
 import { Format } from "../enum";
 import type { Context, Definition, Options } from "../interface";
-import type { Path, Property } from "../type";
+import type { HandlerConstructor, Path, Property } from "../type";
 /**
  * The data handler class.
  *
@@ -340,4 +340,22 @@ export declare abstract class Handler<B = unknown, S = B, O = B> extends Validat
      * @returns A data handler instance.
      */
     protected initHandler(definition: Definition, [...path]?: Path): Handler;
+    /**
+     * Returns the data definition.
+     *
+     * @param Handler - The data handler constructor.
+     * @param config - The data configuration.
+     *
+     * @returns A data definition.
+     */
+    static conf(Handler: HandlerConstructor, config: any): Definition;
+    /**
+     * Returns the data handler instance.
+     *
+     * @param Handler - The data handler constructor.
+     * @param config - The data configuration.
+     *
+     * @returns A data handler instance.
+     */
+    static init<T>(Handler: HandlerConstructor<T>, config: any): Handler<T>;
 }

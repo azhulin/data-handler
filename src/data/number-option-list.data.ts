@@ -4,14 +4,19 @@ import { $List, $NumberOption } from "."
 /**
  * The number option list data handler class.
  */
-class NumberOptionListHandler extends $List.Handler<number[]> {
+class $ extends $List.Handler<number[]> {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static id: string = `${$List.id}.number.option`
 
   /**
    * {@inheritdoc}
    */
   protected constraints: Data.Constraint.List<number[]> = [
     ...this.constraints,
-    $List.constraint.unique,
+    $List.constraint.items_unique,
   ]
 
   /**
@@ -44,9 +49,16 @@ class NumberOptionListHandler extends $List.Handler<number[]> {
     super(config, settings)
     this.options = config.options ?? this.options
     this.preserve_order = config.preserve_order ?? this.preserve_order
-    this.item = $NumberOption.conf({
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected getItem(): Data.Definition {
+    this.item = this.item ?? $NumberOption.conf({
       options: this.options,
     })
+    return super.getItem()
   }
 
 }
@@ -55,14 +67,13 @@ class NumberOptionListHandler extends $List.Handler<number[]> {
  * The number option list data handler namespace.
  */
 export namespace $NumberOptionList {
-  export type Config<T = number[]> = Omit<$List.Config<T>, "item"> & {
+  export type Config = Omit<$List.Config<number[]>, "item"> & {
     options: $NumberOption.Options
     preserve_order?: boolean
   }
-  export const Handler = NumberOptionListHandler
-  export const constraint = Handler.constraint
-  export const preparer = Handler.preparer
-  export const processor = Handler.processor
-  export function conf(config: Config): Data.Definition { return { Handler, config } }
-  export function init(config: Config) { return new Handler(config) }
+  export type Options = $NumberOption.Options
+  export const Handler = $
+  export const { id, constraint, preparer, processor } = $
+  export function conf(config: Config) { return $.conf($, config) }
+  export function init(config: Config) { return $.init($, config) }
 }

@@ -3,26 +3,39 @@ import * as Data from ".."
 /**
  * The object data handler class.
  */
-class ObjectHandler<T> extends Data.Handler<T> {
+class $<T> extends Data.Handler<T> {
 
   /**
    * {@inheritdoc}
    */
-  public get type(): string { return "object" }
+  public static id: string = "object"
 
   /**
    * {@inheritdoc}
    */
-  public get typeName(): string { return "Object" }
+  public name: string = "Object"
+
+  /**
+   * {@inheritdoc}
+   */
+  public type: string = $.id
+
+  /**
+   * {@inheritdoc}
+   */
+  public typeName: string = this.name
 
   /**
    * {@inheritdoc}
    */
   protected preprocessors: Data.Processor.List<any> = [
     async (data, { source }) => {
-      const schema = await this.getSchema()
-      Object.keys(source() ?? {}).filter(key => !(key in schema))
-        .forEach(key => this.warnings.push(new Data.ErrorIgnored([...this.path, key])))
+      if (this.warnExtraKeys) {
+        const schema = await this.getSchema()
+        Object.keys(source() ?? {}).filter(key => !(key in schema)).forEach(
+          key => this.warnings.push(new Data.ErrorIgnored([...this.path, key]))
+        )
+      }
       return data
     },
   ]
@@ -30,7 +43,12 @@ class ObjectHandler<T> extends Data.Handler<T> {
   /**
    * The object data schema.
    */
-  protected schema: $Object.Schema = {}
+  protected schema?: Data.Schema
+
+  /**
+   * Whether to generate warnings if data contains keys missing in data schema.
+   */
+  protected warnExtraKeys: boolean = true
 
   /**
    * {@inheritdoc}
@@ -38,25 +56,6 @@ class ObjectHandler<T> extends Data.Handler<T> {
   public constructor(config: Partial<$Object.Config>, settings?: Data.Settings) {
     super(config, settings)
     this.schema = config.schema ?? this.schema
-  }
-
-  /**
-   * Returns the data schema.
-   *
-   * @returns A promise that resolves with a data schema.
-   */
-  protected async getSchema(): Promise<$Object.Schema> {
-    return this._schema ?? (this._schema = await this.prepareSchema())
-  }
-  private _schema?: $Object.Schema
-
-  /**
-   * Returns the prepared data schema.
-   *
-   * @returns A promise that resolves with a prepared data schema.
-   */
-  protected async prepareSchema(): Promise<$Object.Schema> {
-    return this.schema
   }
 
   /**
@@ -120,6 +119,21 @@ class ObjectHandler<T> extends Data.Handler<T> {
     return result
   }
 
+  /**
+   * Returns the data schema.
+   *
+   * @returns A data schema.
+   *
+   * @throws {@link Data.ErrorUnexpected}
+   * Thrown if the `schema` data handler property is missing.
+   */
+  protected async getSchema(): Promise<Data.Schema> {
+    if (!this.schema) {
+      throw new Data.ErrorUnexpected(`${this.name} configuration is invalid. Missing 'schema' property.`)
+    }
+    return this.schema
+  }
+
 }
 
 /**
@@ -127,13 +141,10 @@ class ObjectHandler<T> extends Data.Handler<T> {
  */
 export namespace $Object {
   export type Config<T = any> = Data.Config<T> & {
-    schema: Schema
+    schema: Data.Schema
   }
-  export type Schema = Record<string, Data.Definition>
-  export const Handler = ObjectHandler
-  export const constraint = Handler.constraint
-  export const preparer = Handler.preparer
-  export const processor = Handler.processor
-  export function conf<T extends Record<string, unknown>>(config: Config<T>): Data.Definition { return { Handler, config } }
-  export function init<T extends Record<string, unknown>>(config: Config<T>) { return new Handler<T>(config) }
+  export const Handler = $
+  export const { id, constraint, preparer, processor } = $
+  export function conf<T extends Record<string, unknown>>(config: Config<T>) { return $.conf($, config) }
+  export function init<T extends Record<string, unknown>>(config: Config<T>) { return $.init<T>($, config) }
 }

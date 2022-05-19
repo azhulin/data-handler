@@ -4,29 +4,34 @@ import { $Object } from "."
 /**
  * The dictionary data handler class.
  */
-class DictionaryHandler<T> extends $Object.Handler<T> {
+class $<T> extends $Object.Handler<T> {
 
   /**
    * {@inheritdoc}
    */
-  public get id(): string { return super.id + ".dictionary" }
+  public static id: string = `${$Object.id}.dictionary`
 
   /**
    * {@inheritdoc}
    */
-  public get name(): string { return "Dictionary" }
+  public name: string = "Dictionary"
 
   /**
    * {@inheritdoc}
    */
   public static constraint = {
-    ...$Object.Handler.constraint,
+    ...$Object.constraint,
     items_number: Data.inequalityConstraints<Record<string, unknown>>(
-      "dictionary_items_number",
+      `${$.id}:items_number`,
       data => Object.keys(data).length,
       "Number of dictionary items",
     ),
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected warnExtraKeys: boolean = false
 
   /**
    * The dictionary key data definition.
@@ -43,8 +48,46 @@ class DictionaryHandler<T> extends $Object.Handler<T> {
    */
   public constructor(config: Partial<$Dictionary.Config>, settings?: Data.Settings) {
     super(config, settings)
+    this.schema = {}
     this.key = config.key ?? this.key
     this.value = config.value ?? this.value
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @throws {@link Data.ErrorConstraint}
+   * Thrown if dictionary key failed validation.
+   *
+   * @throws {@link Data.ErrorUnexpected}
+   * Thrown if unexpectted error occured during dictionary key validation.
+   */
+  protected async convert(format: Data.Format, data: any, context: Data.Context): Promise<any> {
+    const result: Record<string, unknown> = {}
+    this.result = Data.set(this.result, this.path, result)
+    const keyHandler = this.initHandler(this.getKey())
+    const valueDefinition = this.getValue()
+    for (const [dataKey, dataValue] of Object.entries(data)) {
+      let key
+      try {
+        key = await keyHandler.in(this.format, dataKey).to(format, context)
+      }
+      catch (error) {
+        if (error instanceof Data.ErrorExpected) {
+          const { type, message, details } = error
+          throw new Data.ErrorConstraint(this, `${$.id}:key_valid`, "Object key is invalid.", {
+            key: { value: dataKey, error: { type, message, details } },
+          })
+        }
+        throw error
+      }
+      if ("string" === typeof key) {
+        const valueHandler = this.initHandler(valueDefinition, [...this.path, dataKey])
+        const value = await valueHandler.in(this.format, dataValue).to(format, context)
+        undefined !== value && (result[key] = value)
+      }
+    }
+    return result
   }
 
   /**
@@ -62,7 +105,7 @@ class DictionaryHandler<T> extends $Object.Handler<T> {
     return this.key
   }
 
-    /**
+  /**
    * Returns the dictionary value data definition.
    *
    * @returns Dictionary value data definition.
@@ -77,42 +120,6 @@ class DictionaryHandler<T> extends $Object.Handler<T> {
     return this.value
   }
 
-  /**
-   * {@inheritdoc}
-   *
-   * @throws {@link Data.ErrorConstraint}
-   * Thrown if dictionary key failed validation.
-   *
-   * @throws {@link Data.ErrorUnexpected}
-   * Thrown if unexpectted error occured during dictionary key validation.
-   */
-  protected async convert(format: Data.Format, data: any, context: Data.Context): Promise<any> {
-    const result: Record<string, unknown> = {}
-    this.result = Data.set(this.result, this.path, result)
-    const keyHandler = this.initHandler(this.getKey())
-    for (const [dataKey, dataValue] of Object.entries(data)) {
-      let key
-      try {
-        key = await keyHandler.in(this.format, dataKey).to(format, context)
-      }
-      catch (error) {
-        if (error instanceof Data.ErrorExpected) {
-          const { type, message, details } = error
-          throw new Data.ErrorConstraint(this, "valid_key", "Object key is invalid.", {
-            key: { value: dataKey, error: { type, message, details } },
-          })
-        }
-        throw error
-      }
-      if ("string" === typeof key) {
-        const valueHandler = this.initHandler(this.getValue(), [...this.path, dataKey])
-        const value = await valueHandler.in(this.format, dataValue).to(format, context)
-        undefined !== value && (result[key] = value)
-      }
-    }
-    return result
-  }
-
 }
 
 /**
@@ -123,10 +130,8 @@ export namespace $Dictionary {
     key: Data.Definition
     value: Data.Definition
   }
-  export const Handler = DictionaryHandler
-  export const constraint = Handler.constraint
-  export const preparer = Handler.preparer
-  export const processor = Handler.processor
-  export function conf<T extends Record<string, unknown>>(config: Config<T>): Data.Definition { return { Handler, config } }
-  export function init<T extends Record<string, unknown>>(config: Config<T>) { return new Handler<T>(config) }
+  export const Handler = $
+  export const { id, constraint, preparer, processor } = $
+  export function conf<T extends Record<string, unknown>>(config: Config<T>) { return $.conf($, config) }
+  export function init<T extends Record<string, unknown>>(config: Config<T>) { return $.init<T>($, config) }
 }

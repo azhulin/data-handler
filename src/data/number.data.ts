@@ -3,33 +3,27 @@ import * as Data from ".."
 /**
  * The number data handler class.
  */
-class NumberHandler extends Data.Handler<number> {
+class $ extends Data.Handler<number> {
 
   /**
    * {@inheritdoc}
    */
-  public get type(): string { return "number" }
+  public static id: string = "number"
 
   /**
    * {@inheritdoc}
    */
-  public get typeName(): string { return "Number" }
+  public name: string = "Number"
 
   /**
    * {@inheritdoc}
    */
-  public get typeDesc(): string {
-    switch (this.decimals) {
-      case null:
-        return ""
+  public type: string = $.id
 
-      case 1:
-        return "1 decimal place"
-
-      default:
-        return `${this.decimals} decimal places`
-    }
-  }
+  /**
+   * {@inheritdoc}
+   */
+  public typeName: string = this.name
 
   /**
    * The number of decimal places.
@@ -41,7 +35,7 @@ class NumberHandler extends Data.Handler<number> {
    */
   public static constraint = {
     ...Data.Handler.constraint,
-    ...Data.inequalityConstraints<number>("", data => data, "Value"),
+    ...Data.inequalityConstraints<number>(`${$.id}:`, data => data, "Value"),
   }
 
   /**
@@ -79,13 +73,11 @@ class NumberHandler extends Data.Handler<number> {
  * The number data handler namespace.
  */
 export namespace $Number {
-  export type Config<T = number> = Data.Config<T> & {
+  export type Config = Data.Config<number> & {
     decimals?: number
   }
-  export const Handler = NumberHandler
-  export const constraint = Handler.constraint
-  export const preparer = Handler.preparer
-  export const processor = Handler.processor
-  export function conf(config: Config = {}): Data.Definition { return { Handler, config } }
-  export function init(config: Config = {}) { return new Handler(config) }
+  export const Handler = $
+  export const { id, constraint, preparer, processor } = $
+  export function conf(config: Config = {}) { return $.conf($, config) }
+  export function init(config: Config = {}) { return $.init($, config) }
 }

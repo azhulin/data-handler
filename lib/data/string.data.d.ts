@@ -2,15 +2,23 @@ import * as Data from "..";
 /**
  * The string data handler class.
  */
-declare class StringHandler extends Data.Handler<string> {
+declare class $ extends Data.Handler<string> {
     /**
      * {@inheritdoc}
      */
-    get type(): string;
+    static id: string;
     /**
      * {@inheritdoc}
      */
-    get typeName(): string;
+    name: string;
+    /**
+     * {@inheritdoc}
+     */
+    type: string;
+    /**
+     * {@inheritdoc}
+     */
+    typeName: string;
     /**
      * {@inheritdoc}
      */
@@ -42,9 +50,9 @@ declare class StringHandler extends Data.Handler<string> {
  * The string data handler namespace.
  */
 export declare namespace $String {
-    type Config<T = string> = Data.Config<T>;
-    const Handler: typeof StringHandler;
-    const constraint: {
+    type Config = Data.Config<string>;
+    const Handler: typeof $;
+    const id: string, constraint: {
         length: {
             eq: (value: number) => Data.Constraint<string>;
             gt: (value: number) => Data.Constraint<string>;
@@ -54,14 +62,12 @@ export declare namespace $String {
             neq: (value: number) => Data.Constraint<string>;
         };
         trimmed: Data.Constraint<string>;
-    };
-    const preparer: Data.Processor.Library<unknown>;
-    const processor: {
+    }, preparer: Data.Processor.Library<unknown>, processor: {
         trim: (data: string) => string;
         lower: (data: string) => string;
         upper: (data: string) => string;
     };
-    function conf(config?: Config): Data.Definition;
-    function init(config?: Config): StringHandler;
+    function conf(config?: Config): Data.Definition<any>;
+    function init(config?: Config): Data.Handler<string, string, string>;
 }
 export {};

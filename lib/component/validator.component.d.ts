@@ -16,13 +16,13 @@ export declare abstract class Validator {
      * handler is inherited by the Email data handler, the identifier of the last
      * one can be `string.email`.
      */
-    get id(): string;
+    static id: string;
     /**
      * The data handler name.
      *
      * A human-readable data handler name. For example, `String`, or `Email`.
      */
-    get name(): string;
+    abstract name: string;
     /**
      * The data type ID.
      *
@@ -33,17 +33,13 @@ export declare abstract class Validator {
      *
      * @see Validator#isValidType
      */
-    abstract get type(): string;
+    abstract type: string;
     /**
      * The data type name.
      *
      * A human-readable data type name. For example, `Number`, or `String`.
      */
-    abstract get typeName(): string;
-    /**
-     * The data type description.
-     */
-    get typeDesc(): string;
+    abstract typeName: string;
     /**
      * The data preparer library.
      *
@@ -446,13 +442,14 @@ export declare abstract class Validator {
      */
     protected isEmpty(data: unknown): boolean;
     /**
-     * Determines whether the specified data is omitted (`undefined`).
+     * Determines whether the specified data is `undefined`.
      *
      * @param data - The data to check.
      *
-     * @returns `true`, if the specified data is omitted, and `false` otherwise.
+     * @returns `true`, if the specified data is `undefined`, and `false`
+     *   otherwise.
      */
-    protected isOmitted(data: unknown): boolean;
+    protected isUndefined(data: unknown): boolean;
     /**
      * Determines whether the specified data is `null`.
      *

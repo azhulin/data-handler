@@ -2,15 +2,23 @@ import * as Data from "..";
 /**
  * The object data handler class.
  */
-declare class ObjectHandler<T> extends Data.Handler<T> {
+declare class $<T> extends Data.Handler<T> {
     /**
      * {@inheritdoc}
      */
-    get type(): string;
+    static id: string;
     /**
      * {@inheritdoc}
      */
-    get typeName(): string;
+    name: string;
+    /**
+     * {@inheritdoc}
+     */
+    type: string;
+    /**
+     * {@inheritdoc}
+     */
+    typeName: string;
     /**
      * {@inheritdoc}
      */
@@ -18,24 +26,15 @@ declare class ObjectHandler<T> extends Data.Handler<T> {
     /**
      * The object data schema.
      */
-    protected schema: $Object.Schema;
+    protected schema?: Data.Schema;
+    /**
+     * Whether to generate warnings if data contains keys missing in data schema.
+     */
+    protected warnExtraKeys: boolean;
     /**
      * {@inheritdoc}
      */
     constructor(config: Partial<$Object.Config>, settings?: Data.Settings);
-    /**
-     * Returns the data schema.
-     *
-     * @returns A promise that resolves with a data schema.
-     */
-    protected getSchema(): Promise<$Object.Schema>;
-    private _schema?;
-    /**
-     * Returns the prepared data schema.
-     *
-     * @returns A promise that resolves with a prepared data schema.
-     */
-    protected prepareSchema(): Promise<$Object.Schema>;
     /**
      * {@inheritdoc}
      */
@@ -66,20 +65,26 @@ declare class ObjectHandler<T> extends Data.Handler<T> {
      * @returns A promise that resolves with a converted data.
      */
     protected convert(format: Data.Format, data: any, context: Data.Context): Promise<any>;
+    /**
+     * Returns the data schema.
+     *
+     * @returns A data schema.
+     *
+     * @throws {@link Data.ErrorUnexpected}
+     * Thrown if the `schema` data handler property is missing.
+     */
+    protected getSchema(): Promise<Data.Schema>;
 }
 /**
  * The object data handler namespace.
  */
 export declare namespace $Object {
     type Config<T = any> = Data.Config<T> & {
-        schema: Schema;
+        schema: Data.Schema;
     };
-    type Schema = Record<string, Data.Definition>;
-    const Handler: typeof ObjectHandler;
-    const constraint: Data.Constraint.Library<any>;
-    const preparer: Data.Processor.Library<unknown>;
-    const processor: Data.Processor.Library<any>;
-    function conf<T extends Record<string, unknown>>(config: Config<T>): Data.Definition;
-    function init<T extends Record<string, unknown>>(config: Config<T>): ObjectHandler<T>;
+    const Handler: typeof $;
+    const id: string, constraint: Data.Constraint.Library<any>, preparer: Data.Processor.Library<unknown>, processor: Data.Processor.Library<any>;
+    function conf<T extends Record<string, unknown>>(config: Config<T>): Data.Definition<any>;
+    function init<T extends Record<string, unknown>>(config: Config<T>): Data.Handler<T, T, T>;
 }
 export {};
