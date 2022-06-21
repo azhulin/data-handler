@@ -17,12 +17,12 @@ declare class $<T> extends $Object.Handler<T> {
      */
     static constraint: {
         items_number: {
-            eq: (value: number) => Data.Constraint<Record<string, unknown>>;
-            gt: (value: number) => Data.Constraint<Record<string, unknown>>;
-            gte: (value: number) => Data.Constraint<Record<string, unknown>>;
-            lt: (value: number) => Data.Constraint<Record<string, unknown>>;
-            lte: (value: number) => Data.Constraint<Record<string, unknown>>;
-            neq: (value: number) => Data.Constraint<Record<string, unknown>>;
+            eq: (value: number) => Data.Constraint<Record<string, any>>;
+            gt: (value: number) => Data.Constraint<Record<string, any>>;
+            gte: (value: number) => Data.Constraint<Record<string, any>>;
+            lt: (value: number) => Data.Constraint<Record<string, any>>;
+            lte: (value: number) => Data.Constraint<Record<string, any>>;
+            neq: (value: number) => Data.Constraint<Record<string, any>>;
         };
     };
     /**
@@ -81,15 +81,15 @@ export declare namespace $Dictionary {
     const Handler: typeof $;
     const id: string, constraint: {
         items_number: {
-            eq: (value: number) => Data.Constraint<Record<string, unknown>>;
-            gt: (value: number) => Data.Constraint<Record<string, unknown>>;
-            gte: (value: number) => Data.Constraint<Record<string, unknown>>;
-            lt: (value: number) => Data.Constraint<Record<string, unknown>>;
-            lte: (value: number) => Data.Constraint<Record<string, unknown>>;
-            neq: (value: number) => Data.Constraint<Record<string, unknown>>;
+            eq: (value: number) => Data.Constraint<Record<string, any>>;
+            gt: (value: number) => Data.Constraint<Record<string, any>>;
+            gte: (value: number) => Data.Constraint<Record<string, any>>;
+            lt: (value: number) => Data.Constraint<Record<string, any>>;
+            lte: (value: number) => Data.Constraint<Record<string, any>>;
+            neq: (value: number) => Data.Constraint<Record<string, any>>;
         };
     }, preparer: Data.Processor.Library<unknown>, processor: Data.Processor.Library<any>;
-    function conf<T extends Record<string, unknown>>(config: Config<T>): Data.Definition<any>;
-    function init<T extends Record<string, unknown>>(config: Config<T>): Data.Handler<T, T, T>;
+    function conf<T extends Record<string, any>>(config: Config<T>): Data.Definition<any>;
+    function init<T extends Record<string, any>>(config: Config<T>): Data.Handler<T, T, T>;
 }
 export {};

@@ -107,7 +107,7 @@ class $<T> extends Data.Handler<T> {
    * @returns A promise that resolves with a converted data.
    */
   protected async convert(format: Data.Format, data: any, context: Data.Context): Promise<any> {
-    const result: Record<string, unknown> = {}
+    const result: Record<string, any> = {}
     this.result = Data.set(this.result, this.path, result)
     const schema = await this.getSchema()
     for (const [key, definition] of Object.entries(schema)) {
@@ -145,6 +145,6 @@ export namespace $Object {
   }
   export const Handler = $
   export const { id, constraint, preparer, processor } = $
-  export function conf<T extends Record<string, unknown>>(config: Config<T>) { return $.conf($, config) }
-  export function init<T extends Record<string, unknown>>(config: Config<T>) { return $.init<T>($, config) }
+  export function conf<T extends Record<string, any>>(config: Config<T>) { return $.conf($, config) }
+  export function init<T extends Record<string, any>>(config: Config<T>) { return $.init<T>($, config) }
 }

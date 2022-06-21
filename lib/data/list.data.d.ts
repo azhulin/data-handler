@@ -119,7 +119,7 @@ export declare namespace $List {
         };
         items_unique: Data.Constraint<any[]>;
     }, preparer: Data.Processor.Library<unknown>, processor: Data.Processor.Library<any>;
-    function conf<T extends unknown[]>(config: Config<T>): Data.Definition<any>;
-    function init<T extends unknown[]>(config: Config<T>): Data.Handler<T, T, T>;
+    function conf<T extends any[]>(config: Config<T>): Data.Definition<any>;
+    function init<T extends any[]>(config: Config<T>): Data.Handler<T, T, T>;
 }
 export {};

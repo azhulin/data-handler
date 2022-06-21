@@ -84,7 +84,7 @@ export declare namespace $Object {
     };
     const Handler: typeof $;
     const id: string, constraint: Data.Constraint.Library<any>, preparer: Data.Processor.Library<unknown>, processor: Data.Processor.Library<any>;
-    function conf<T extends Record<string, unknown>>(config: Config<T>): Data.Definition<any>;
-    function init<T extends Record<string, unknown>>(config: Config<T>): Data.Handler<T, T, T>;
+    function conf<T extends Record<string, any>>(config: Config<T>): Data.Definition<any>;
+    function init<T extends Record<string, any>>(config: Config<T>): Data.Handler<T, T, T>;
 }
 export {};

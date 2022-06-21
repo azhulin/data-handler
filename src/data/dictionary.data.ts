@@ -21,7 +21,7 @@ class $<T> extends $Object.Handler<T> {
    */
   public static constraint = {
     ...$Object.constraint,
-    items_number: Data.inequalityConstraints<Record<string, unknown>>(
+    items_number: Data.inequalityConstraints<Record<string, any>>(
       `${$.id}:items_number`,
       data => Object.keys(data).length,
       "Number of dictionary items",
@@ -63,7 +63,7 @@ class $<T> extends $Object.Handler<T> {
    * Thrown if unexpectted error occured during dictionary key validation.
    */
   protected async convert(format: Data.Format, data: any, context: Data.Context): Promise<any> {
-    const result: Record<string, unknown> = {}
+    const result: Record<string, any> = {}
     this.result = Data.set(this.result, this.path, result)
     const keyHandler = this.initHandler(this.getKey())
     const valueDefinition = this.getValue()
@@ -132,6 +132,6 @@ export namespace $Dictionary {
   }
   export const Handler = $
   export const { id, constraint, preparer, processor } = $
-  export function conf<T extends Record<string, unknown>>(config: Config<T>) { return $.conf($, config) }
-  export function init<T extends Record<string, unknown>>(config: Config<T>) { return $.init<T>($, config) }
+  export function conf<T extends Record<string, any>>(config: Config<T>) { return $.conf($, config) }
+  export function init<T extends Record<string, any>>(config: Config<T>) { return $.init<T>($, config) }
 }
